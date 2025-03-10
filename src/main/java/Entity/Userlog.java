@@ -1,6 +1,6 @@
 package Entity;
 
-public class Userlogs {
+public class Userlog {
     private int log_id;
     private int user_id;
     private String action;
@@ -9,7 +9,7 @@ public class Userlogs {
     private String action_time;
 
     // Constructor
-    public Userlogs(int log_id, int user_id, String action, String time_stamp, String user_name, String action_time){
+    public Userlog(int log_id, int user_id, String action, String time_stamp, String user_name, String action_time){
         this.log_id = log_id;
         this.user_id = user_id;
         this.action = action;
