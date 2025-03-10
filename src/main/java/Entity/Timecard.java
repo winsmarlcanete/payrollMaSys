@@ -13,6 +13,7 @@ public class Timecard {
     private float hours_clocked;
     private  float minutes_clocked;
 
+    //Constructor
     public Timecard(int timecard_id, int employee_id, String first_name,String last_name, String date, String time_in, String time_out,String shift_start, String shift_end, float hours_clocked, float minutes_clocked){
         this.timecard_id = timecard_id;
         this.employee_id = employee_id;
@@ -26,7 +27,7 @@ public class Timecard {
         this.hours_clocked = hours_clocked;
         this.minutes_clocked = minutes_clocked;
     }
-
+    //Getters and Setters
     public int getTimecard_id(){return timecard_id;}
     public int getEmployee_id(){return employee_id;}
     public String getFirst_name(){return first_name;}
