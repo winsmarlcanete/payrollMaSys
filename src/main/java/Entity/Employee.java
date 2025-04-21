@@ -5,8 +5,8 @@ public class Employee {
     private String last_name;
     private String first_name;
     private String middle_name;
-    private int tin_number;
-    private int philhealth_number;
+    private String tin_number;
+    private String philhealth_number;
     private float pay_rate;
     private String employment_status;
     private String department;
@@ -15,7 +15,7 @@ public class Employee {
 
     // Constructor
 
-    public Employee(int employee_id, String last_name, String first_name, String middle_name, int tin_number, int philhealth_number, float pay_rate, String employment_status, String department, String shift_start, String shift_end ){
+    public Employee(int employee_id, String last_name, String first_name, String middle_name, String tin_number, String philhealth_number, float pay_rate, String employment_status, String department, String shift_start, String shift_end ){
         this.employee_id = employee_id;
         this.last_name = last_name;
         this.first_name = first_name;
@@ -34,8 +34,8 @@ public class Employee {
     public String  getLast_name(){return last_name;}
     public String getFirst_name(){return  first_name;}
     public String getMiddle_name(){return middle_name;}
-    public  int getTin_number(){return tin_number;}
-    public int getPhilhealth_number(){return philhealth_number;}
+    public  String getTin_number(){return tin_number;}
+    public String getPhilhealth_number(){return philhealth_number;}
     public float getPay_rate(){return pay_rate;}
     public String getEmployment_status(){return employment_status;}
     public String getDepartment(){return department;}

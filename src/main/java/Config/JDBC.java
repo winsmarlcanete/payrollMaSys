@@ -34,7 +34,7 @@ public class JDBC {
             e.printStackTrace();
             return null;
         }finally {
-            closeResources(conn,stmt, rs); // Always close resources
+            closeResources(conn,stmt, rs);
         }
 
     }
