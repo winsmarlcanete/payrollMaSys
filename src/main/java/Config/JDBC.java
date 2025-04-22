@@ -3,9 +3,6 @@ package Config;
 import java.sql.*;
 
 public class JDBC {
-    private final static String URL = "jdbc:mysql://127.0.0.1:3306/sample_schema";
-    private final static String USER = "root";
-    private final static String PASSWORD = "wpc";
     public static void closeResources(Connection conn, Statement stmt, ResultSet rs) {
         try {
             if (rs != null) rs.close();
@@ -16,25 +13,15 @@ public class JDBC {
         }
     }
     public static Connection getConnection() {
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-
         try {
-             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             stmt  = conn.createStatement();
-             rs = stmt.executeQuery("Select * from sample_table");
-
-            while (rs.next()){
-                System.out.println(rs.getString("sample_tablecol"));
-
+            final  String URL = "jdbc:mysql://127.0.0.1:3306/sample_schema";
+            final  String USER = "root";
+            final  String PASSWORD = "wpc";
+            return DriverManager.getConnection(URL,USER,PASSWORD);
             }
-            return conn;
-        } catch (SQLException e) {
+        catch (SQLException e) {
             e.printStackTrace();
             return null;
-        }finally {
-            closeResources(conn,stmt, rs);
         }
 
     }
