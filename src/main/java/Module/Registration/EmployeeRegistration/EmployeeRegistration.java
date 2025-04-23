@@ -36,8 +36,8 @@ public class EmployeeRegistration {
 
 
             stmt.executeUpdate();
-
-
+            stmt.close();
+            conn.close();
         }catch(SQLException e){
             e.printStackTrace();
 
