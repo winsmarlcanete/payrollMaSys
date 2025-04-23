@@ -6,6 +6,7 @@ import Config.JDBC;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
 
 public class EmployeeRegistration {
 
@@ -26,8 +27,10 @@ public class EmployeeRegistration {
             stmt.setDouble(7, emp.getPay_rate());
             stmt.setString(8, emp.getEmployment_status());
             stmt.setString(9, emp.getDepartment());
-            stmt.setString(10, emp.getShift_start());
-            stmt.setString(11, emp.getShift_end());
+            Time shiftStart = java.sql.Time.valueOf(emp.getShift_start()); //convert string to time
+            stmt.setTime(10, shiftStart);
+            Time shiftEnd = java.sql.Time.valueOf(emp.getShift_end());
+            stmt.setTime(11, shiftEnd);
 
 
             stmt.executeUpdate();
