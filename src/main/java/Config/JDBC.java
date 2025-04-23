@@ -3,9 +3,8 @@ package Config;
 import java.sql.*;
 
 public class JDBC {
-    public static void closeResources(Connection conn, Statement stmt, ResultSet rs) {
+    public static void closeResources(Connection conn, Statement stmt) {
         try {
-            if (rs != null) rs.close();
             if (stmt != null) stmt.close();
             if (conn != null) conn.close();  // Properly close connection
         } catch (SQLException e) {
