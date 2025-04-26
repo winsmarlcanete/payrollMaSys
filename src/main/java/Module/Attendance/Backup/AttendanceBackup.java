@@ -4,6 +4,7 @@ import Config.JDBC;
 import Entity.Timecard;
 
 import java.sql.*;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -62,20 +63,46 @@ public class AttendanceBackup {
 
 
     public static void recordTimeOut(int employee_id){
-        String sql = "UPDATE payrollmsdb.timecards SET time_out = ? " +
-                "WHERE employee_id = ? AND date = CURDATE()"; // curdate() called to ensure same date attendance
+        Connection conn;
 
         if (checkEmployee(employee_id)) {
             System.out.println("Employee ID exists!");
 
-            Connection conn;
             try{
                 conn = JDBC.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setTime(1, Time.valueOf(LocalTime.now()));
-                stmt.setInt(2,employee_id);
 
-                stmt.executeUpdate();
+                //Fetch time_in
+                String sql1 = "SELECT time_in FROM `payrollmsdb`.`timecards` WHERE employee_id = ? AND date = CURDATE()";
+                PreparedStatement stmt1 = conn.prepareStatement(sql1);
+                stmt1.setInt(1, employee_id);
+                ResultSet rs = stmt1.executeQuery();
+
+                if (rs.next()) {
+
+                    Time timeInSQL = rs.getTime("time_in");
+                    LocalTime timeIn = timeInSQL.toLocalTime();
+                    LocalTime timeOut = LocalTime.now();
+
+                    //Calculate clocked hrs and min
+                    Duration workedDuration = Duration.between(timeIn, timeOut);
+                    float totalMinutes = workedDuration.toMinutes();
+                    float hoursClocked = totalMinutes / 60;
+
+
+                    String sql2 = "UPDATE`payrollmsdb`.`timecards` SET time_out = ?, hours_clocked = ?, " +
+                            "minutes_clocked = ? WHERE employee_id = ? AND date = CURDATE()";
+
+                    PreparedStatement stmt2 = conn.prepareStatement(sql2);
+                    stmt2.setTime(1, Time.valueOf(timeOut));
+                    stmt2.setFloat(2, hoursClocked);
+                    stmt2.setFloat(3, totalMinutes);
+                    stmt2.setInt(4, employee_id);
+
+                    stmt2.executeUpdate();
+
+                } else {
+                    System.out.println("No time_in record found for today.");
+                }
 
             }catch(SQLException e){
                 e.printStackTrace();
@@ -90,7 +117,7 @@ public class AttendanceBackup {
 
     public static void main(String[] args){
         int input_employee_id = 1;
-        recordTimein(input_employee_id);
+        recordTimeOut(input_employee_id);
 
 
 
