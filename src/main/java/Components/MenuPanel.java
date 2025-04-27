@@ -1,77 +1,64 @@
 package Components;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import Screens.Employees;
+import Screens.Help;
+import Screens.RegisterEmployee; // Import RegisterEmployee screen
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class MenuPanel extends JPanel {
-
     private JFrame parentFrame;
 
     public MenuPanel(JFrame parentFrame) {
         this.parentFrame = parentFrame;
-        initComponents();
+        this.initComponents();
     }
 
     private void initComponents() {
-        setLayout(new BorderLayout());
-
+        this.setLayout(new BorderLayout());
         JPanel tabPanel = new JPanel();
-        tabPanel.setLayout(new GridLayout(1, 9)); // 9 tabs now
-        String[] tabs = {"Employees", "Register Employee", "Attendance", "Leave Management", "Payroll", "Reports", "Help", "About", "Settings"};
-
-
+        tabPanel.setLayout(new GridLayout(1, 9));
+        String[] tabs = new String[] { "Employees", "Register Employee", "Attendance", "Leave Management", "Payroll",
+                "Reports", "Help", "About", "Settings" };
         for (String tab : tabs) {
             JButton button = new JButton(tab);
             button.setPreferredSize(new Dimension(100, 30));
-            button.setFocusable(false); // Remove focus outline
-
-            // Set up action listeners
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    navigateTo(tab);
-                }
-            });
-
+            button.setFocusable(false);
+            button.addActionListener(e -> navigateTo(tab)); // Lambda for navigation
             tabPanel.add(button);
         }
 
-        add(tabPanel, BorderLayout.NORTH);
+        this.add(tabPanel, BorderLayout.NORTH);
     }
 
     private void navigateTo(String tab) {
-        parentFrame.dispose(); // Close the current window
-
+        this.parentFrame.dispose(); // Close the current window
         switch (tab) {
             case "Employees":
-                Screens.Employees.main(null); // Call Employees screen
+                Employees.main(null); // Open Employees screen
+                break;
+            case "Register Employee":
+                RegisterEmployee.main(null); // Open RegisterEmployee screen
                 break;
             case "Help":
-                Screens.Help.main(null); // Call Help screen
+                Help.main(null); // Open Help screen
                 break;
-            // Add other cases here...
-            case "Register Employee":
-                // Screens.RegisterEmployee.main(null);
-                break;
+            // Add more cases for other tabs
+            // Example cases for other tabs
             case "Attendance":
-                // Screens.Attendance.main(null);
-                break;
             case "Leave Management":
-                // Screens.LeaveManagement.main(null);
-                break;
             case "Payroll":
-                // Screens.Payroll.main(null);
-                break;
             case "Reports":
-                // Screens.Reports.main(null);
-                break;
             case "About":
-                // Screens.About.main(null);
-                break;
             case "Settings":
-                // Screens.Settings.main(null);
+                // Handle other tabs similarly
+                break;
+            default:
+                System.out.println("No action defined for tab: " + tab);
                 break;
         }
     }

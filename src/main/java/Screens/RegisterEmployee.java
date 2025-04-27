@@ -28,6 +28,9 @@ public class RegisterEmployee extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        // Maximize the window
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         // Add MenuPanel to the top of the frame
         MenuPanel menuPanel = new MenuPanel(this);
         add(menuPanel, BorderLayout.NORTH);
