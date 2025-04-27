@@ -20,7 +20,6 @@ public class Employees {
         // Create a panel for navigation tabs
         MenuPanel tabPanel = new MenuPanel(frame);
 
-
         // Create a search bar
         JPanel searchPanel = new JPanel();
         // Adjust the search text field to occupy the entire width
@@ -32,21 +31,21 @@ public class Employees {
         searchPanel.add(searchButton, BorderLayout.EAST);
 
         // Create a table to display employee data
-        String[] columnNames = {"Name", "ID", "Department", "Employment Status"};
+        String[] columnNames = { "Name", "ID", "Department", "Employment Status" };
         Object[][] data = {
-                {"Aela Cruz, Juan C.", 1, "Sales", "Regular"},
-                {"Bela Cruz, Juan C.", 23, "Sales", "Regular"},
-                {"Cela Cruz, Juan C.", 31, "Production(Pre-Press)", "Regular"},
-                {"Dela Cruz, Juan C.", 14, "Production(Pre-Press)", "Regular"},
-                {"Eela Cruz, Juan C.", 25, "Production(Pre-Press)", "Regular"},
-                {"Fela Cruz, Juan C.", 36, "Production (Press)", "Regular"},
-                {"Gela Cruz, Juan C.", 15, "Production(Pre-Press)", "Regular"},
-                {"Hela Cruz, Juan C.", 4, "Production(Pre-Press)", "Regular"},
-                {"Hela Cruz, Juan C.", 8, "Production (Post-Press)", "Regular"},
-                {"Iela Cruz, Juan C.", 10, "Production (Post-Press)", "Regular"},
-                {"Jela Cruz, Juan C.", 17, "Production (Quality Control)", "Regular"},
-                {"Jela Cruz, Juan C.", 22, "Production (Quality Control)", "Regular"},
-                {"Kela Cruz, Juan C.", 11, "Sales", "Regular"}
+                { "Aela Cruz, Juan C.", 1, "Sales", "Regular" },
+                { "Bela Cruz, Juan C.", 23, "Sales", "Regular" },
+                { "Cela Cruz, Juan C.", 31, "Production(Pre-Press)", "Regular" },
+                { "Dela Cruz, Juan C.", 14, "Production(Pre-Press)", "Regular" },
+                { "Eela Cruz, Juan C.", 25, "Production(Pre-Press)", "Regular" },
+                { "Fela Cruz, Juan C.", 36, "Production (Press)", "Regular" },
+                { "Gela Cruz, Juan C.", 15, "Production(Pre-Press)", "Regular" },
+                { "Hela Cruz, Juan C.", 4, "Production(Pre-Press)", "Regular" },
+                { "Hela Cruz, Juan C.", 8, "Production (Post-Press)", "Regular" },
+                { "Iela Cruz, Juan C.", 10, "Production (Post-Press)", "Regular" },
+                { "Jela Cruz, Juan C.", 17, "Production (Quality Control)", "Regular" },
+                { "Jela Cruz, Juan C.", 22, "Production (Quality Control)", "Regular" },
+                { "Kela Cruz, Juan C.", 11, "Sales", "Regular" }
         };
         JTable table = new JTable(new DefaultTableModel(data, columnNames));
         JScrollPane tableScrollPane = new JScrollPane(table);
@@ -77,7 +76,7 @@ public class Employees {
         JTextArea detailsArea = new JTextArea();
         detailsArea.setEditable(false);
         detailsPanel.add(new JScrollPane(detailsArea), BorderLayout.CENTER);
-        
+
         JPanel topButtonPanel = new JPanel(new BorderLayout());
         JPanel saveButtonPanel = new JPanel(new FlowLayout()); // Panel for the save button
 
@@ -220,7 +219,7 @@ public class Employees {
                     philhealthField.setText("02 – 385929672 – 8");
 
                     searchPanel.setVisible(false); // Hide search bar
-                    CardLayout cl = (CardLayout)(contentPanel.getLayout());
+                    CardLayout cl = (CardLayout) (contentPanel.getLayout());
                     cl.show(contentPanel, "DetailsView");
                 }
             }
@@ -230,7 +229,7 @@ public class Employees {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CardLayout cl = (CardLayout)(contentPanel.getLayout());
+                CardLayout cl = (CardLayout) (contentPanel.getLayout());
                 cl.show(contentPanel, "TableView");
                 searchPanel.setVisible(true); // Show search bar
             }
