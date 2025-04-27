@@ -46,24 +46,46 @@ public class EmployeeRegistration {
     }
 
     public static void main (String[] args){
-         int input_employee_id = 181;
-         String input_last_name = "Serrano";
-         String input_first_name = "Jerwin";
-         String input_middle_name = "Ceejay";
-         String input_tin_number = "000 – 123 – 456 – 001";
-         String input_philhealth_number = "12-123456789-1";
-         String input_pagibig_number = "1234-5678-9012";
-         float input_pay_rate = 500;
-         String input_employment_status = "Regular";
-         String input_department = "Human Resource";
-         String input_shift_start = "09:00:00";
-         String input_shift_end = "17:00:00";
+        Employee emp1 = new Employee(
+                182, "Del Rosario", "Marvin", "Santos",
+                "001-456-789-002", "12-987654321-2", "2345-6789-0123",
+                520, "Regular", "Finance",
+                "08:00:00", "16:00:00"
+        );
 
-        Employee emp = new Employee(input_employee_id,input_last_name, input_first_name, input_middle_name,
-                input_tin_number, input_philhealth_number, input_pagibig_number,input_pay_rate, input_employment_status,input_department,
-                input_shift_start,input_shift_end);
+        Employee emp2 = new Employee(
+                183, "Lopez", "Angela", "Marie",
+                "002-789-123-003", "12-112233445-3", "3456-7890-1234",
+                480, "Probationary", "Marketing",
+                "10:00:00", "18:00:00"
+        );
 
-        registerEmployee(emp);
+        Employee emp3 = new Employee(
+                184, "Cruz", "Jonathan", "Reyes",
+                "003-321-654-004", "12-556677889-4", "4567-8901-2345",
+                550, "Regular", "IT Department",
+                "07:00:00", "15:00:00"
+        );
+
+        Employee emp4 = new Employee(
+                185, "Garcia", "Patricia", "Anne",
+                "004-654-987-005", "12-998877665-5", "5678-9012-3456",
+                495, "Contractual", "Customer Service",
+                "11:00:00", "19:00:00"
+        );
+
+        Employee emp5 = new Employee(
+                186, "Morales", "Kevin", "Luis",
+                "005-987-321-006", "12-443322110-6", "6789-0123-4567",
+                530, "Regular", "Engineering",
+                "06:00:00", "14:00:00"
+        );
+
+        registerEmployee(emp1);
+        registerEmployee(emp2);
+        registerEmployee(emp3);
+        registerEmployee(emp4);
+        registerEmployee(emp5);
 
 
     }

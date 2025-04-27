@@ -1,11 +1,11 @@
 package Module.Payroll;
 
 import Config.JDBC;
-import Entity.PayrollSlip;
+import Entity.PayrollClass;
 import java.sql.*;
 
 public class Payroll {
-    public static void createPayroll(PayrollSlip payrollslip){
+    public static void createPayroll(PayrollClass payrollslip){
 
         String sql = """
         INSERT INTO payrollmsdb.payroll (
@@ -106,7 +106,7 @@ public class Payroll {
         float input_sub_total = 24000.0f;
         float input_grand_total = 24000.0f;
 
-        PayrollSlip payrollslip = new PayrollSlip(
+        PayrollClass payrollslip = new PayrollClass(
                 input_employee_id, input_period_start, input_period_end,
                 input_days_present, input_overtime_hours, input_nd_hours, input_sholiday_hours, input_lholiday_hours,
                 input_late_minutes, input_overtime_amount, input_nd_amount, input_sholiday_amount, input_lholiday_amount,

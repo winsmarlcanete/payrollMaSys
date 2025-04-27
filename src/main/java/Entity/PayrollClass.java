@@ -1,6 +1,6 @@
 package Entity;
 
-public class PayrollSlip {
+public class PayrollClass {
 
     private int employee_id;
     private String period_start;
@@ -33,10 +33,10 @@ public class PayrollSlip {
 
     // Constructor
 
-    public PayrollSlip(int employee_id, String period_start, String period_end, float days_present,
-                       float overtime_hours, float nd_hours, float sholiday_hours, float lholiday_hours, float late_minutes, float overtime_amount, float nd_amount, float sholiday_amount,
-                       float lholiday_amount, float late_amount, float wage, float philhealth_deduction, float sss_deduction, float pagibig_deduction, float efund_deduction, float other_deduction,
-                       float salary_adjustment, float allowance_adjustment, float other_compensations, float total_deduction, float gross_pay, float net_pay, float sub_total, float grand_total){
+    public PayrollClass(int employee_id, String period_start, String period_end, float days_present,
+                        float overtime_hours, float nd_hours, float sholiday_hours, float lholiday_hours, float late_minutes, float overtime_amount, float nd_amount, float sholiday_amount,
+                        float lholiday_amount, float late_amount, float wage, float philhealth_deduction, float sss_deduction, float pagibig_deduction, float efund_deduction, float other_deduction,
+                        float salary_adjustment, float allowance_adjustment, float other_compensations, float total_deduction, float gross_pay, float net_pay, float sub_total, float grand_total){
 
         this.employee_id = employee_id;
 
