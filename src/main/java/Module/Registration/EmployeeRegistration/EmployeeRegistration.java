@@ -46,7 +46,7 @@ public class EmployeeRegistration {
     }
 
     public static void main (String[] args){
-         int input_employee_id = 1;
+         int input_employee_id = 181;
          String input_last_name = "Serrano";
          String input_first_name = "Jerwin";
          String input_middle_name = "Ceejay";

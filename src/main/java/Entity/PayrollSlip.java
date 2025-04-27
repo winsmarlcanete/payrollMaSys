@@ -1,10 +1,8 @@
 package Entity;
 
-public class Payroll {
-    private int payroll_id;
+public class PayrollSlip {
+
     private int employee_id;
-    private String first_name;
-    private String last_name;
     private String period_start;
     private String period_end;
     private float days_present;
@@ -35,15 +33,13 @@ public class Payroll {
 
     // Constructor
 
-    public Payroll(int payroll_id, int employee_id, String first_name, String last_name, String period_start, String period_end, float days_present,
-                   float overtime_hours, float nd_hours, float sholiday_hours, float lholiday_hours, float late_minutes, float overtime_amount, float nd_amount, float sholiday_amount,
-                   float lholiday_amount, float late_amount, float wage, float philhealth_deduction, float sss_deduction, float pagibig_deduction, float efund_deduction, float other_deduction,
-                   float salary_adjustment, float allowance_adjustment, float other_compensations, float total_deduction, float gross_pay, float net_pay, float sub_total, float grand_total){
+    public PayrollSlip(int employee_id, String period_start, String period_end, float days_present,
+                       float overtime_hours, float nd_hours, float sholiday_hours, float lholiday_hours, float late_minutes, float overtime_amount, float nd_amount, float sholiday_amount,
+                       float lholiday_amount, float late_amount, float wage, float philhealth_deduction, float sss_deduction, float pagibig_deduction, float efund_deduction, float other_deduction,
+                       float salary_adjustment, float allowance_adjustment, float other_compensations, float total_deduction, float gross_pay, float net_pay, float sub_total, float grand_total){
 
-        this.payroll_id = payroll_id;
         this.employee_id = employee_id;
-        this.first_name = first_name;
-        this.last_name = last_name;
+
         this.period_start = period_start;
         this.period_end = period_end;
         this.days_present = days_present;
@@ -75,16 +71,10 @@ public class Payroll {
 
     //Getters and Setters
 
-    public int getPayroll_id(){return payroll_id;}
+
     public int getEmployee_id(){return employee_id;}
 
-    public String getFirst_name() {
-        return first_name;
-    }
 
-    public String getLast_name() {
-        return last_name;
-    }
 
     public String getPeriod_start() {
         return period_start;
