@@ -21,14 +21,14 @@ public class ResetPassword {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Logo
-        ImageIcon rawLogo = new ImageIcon("logo.png");
-        Image scaledImage = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH);
+        // Logo - Absolute path to the logo file
+        ImageIcon rawLogo = new ImageIcon("C:/Users/PC1/Desktop/SynRepo/payrollMaSys/src/main/java/Screens/logo.png");
+        Image scaledImage = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH); // Fixed size
         JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center the logo
         panel.add(logoLabel);
 
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Space between logo and title
 
         JLabel title = new JLabel("Payroll Management System");
         title.setFont(new Font("Arial", Font.BOLD, 20));
@@ -43,8 +43,9 @@ public class ResetPassword {
 
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
+        // Make email text field size match Login class
         RoundedTextField emailField = new RoundedTextField(20);
-        emailField.setMaximumSize(new Dimension(300, 40));
+        emailField.setMaximumSize(new Dimension(250, 30)); // Adjusted size
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(emailField);
 
@@ -53,7 +54,7 @@ public class ResetPassword {
         RoundedButton sendButton = new RoundedButton("Send Reset Code", 20);
         sendButton.setBackground(new Color(46, 204, 113));
         sendButton.setForeground(Color.WHITE);
-        sendButton.setMaximumSize(new Dimension(300, 40));
+        sendButton.setMaximumSize(new Dimension(250, 30)); // Adjusted size
         sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         sendButton.addActionListener(e -> {
             String email = emailField.getText();
@@ -85,14 +86,14 @@ class ResetPassword2 {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Logo
-        ImageIcon rawLogo = new ImageIcon("ae37f58d-efc0-47bc-95cd-19c058c6f708.png");
-        Image scaledImage = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH);
+        // Logo - Absolute path to the logo file
+        ImageIcon rawLogo = new ImageIcon("C:/Users/PC1/Desktop/SynRepo/payrollMaSys/src/main/java/Screens/logo.png");
+        Image scaledImage = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH); // Fixed size
         JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center the logo
         panel.add(logoLabel);
 
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Space between logo and title
 
         JLabel title = new JLabel("Payroll Management System");
         title.setFont(new Font("Arial", Font.BOLD, 20));
