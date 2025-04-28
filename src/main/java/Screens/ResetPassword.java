@@ -22,7 +22,7 @@ public class ResetPassword {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         // Logo
-        ImageIcon rawLogo = new ImageIcon("ae37f58d-efc0-47bc-95cd-19c058c6f708.png");
+        ImageIcon rawLogo = new ImageIcon("logo.png");
         Image scaledImage = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -36,25 +36,8 @@ public class Payroll {
             stmt.setFloat(7, payrollslip.getSholiday_hours()); // straight sholiday_hours
             stmt.setFloat(8, payrollslip.getLholiday_hours()); // straight lholiday_hours
             stmt.setFloat(9, payrollslip.getLate_minutes());
-            stmt.setFloat(10, payrollslip.getOvertime_amount());
-            stmt.setFloat(11, payrollslip.getNd_amount());
-            stmt.setFloat(12, payrollslip.getSholiday_amount());
-            stmt.setFloat(13, payrollslip.getLholiday_amount());
-            stmt.setFloat(14, payrollslip.getLate_amount());
-            stmt.setFloat(15, payrollslip.getWage());
-            stmt.setFloat(16, payrollslip.getPhilhealth_deduction());
-            stmt.setFloat(17, payrollslip.getSss_deduction());
-            stmt.setFloat(18, payrollslip.getPagibig_deduction());
-            stmt.setFloat(19, payrollslip.getEfund_deduction());
-            stmt.setFloat(20, payrollslip.getOther_deduction());
-            stmt.setFloat(21, payrollslip.getSalary_adjustment());
-            stmt.setFloat(22, payrollslip.getAllowance_adjustment());
-            stmt.setFloat(23, payrollslip.getOther_compensations());
-            stmt.setFloat(24, payrollslip.getTotal_deduction());
-            stmt.setFloat(25, payrollslip.getGross_pay());
-            stmt.setFloat(26, payrollslip.getNet_pay());
-            stmt.setFloat(27, payrollslip.getSub_total());
-            stmt.setFloat(28, payrollslip.getGrand_total());
+
+
 
             stmt.executeUpdate();
 
