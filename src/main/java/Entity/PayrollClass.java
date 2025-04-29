@@ -5,38 +5,38 @@ public class PayrollClass {
     private int employee_id;
     private String period_start;
     private String period_end;
-    private float days_present;
-    private float overtime_hours;
-    private float nd_hours;
-    private float sholiday_hours;
-    private float lholiday_hours;
-    private float late_minutes;
-    private float overtime_amount;
-    private float nd_amount;
-    private float sholiday_amount;
-    private float lholiday_amount;
-    private float late_amount;
-    private float wage;
-    private float philhealth_deduction;
-    private float sss_deduction;
-    private float pagibig_deduction;
-    private float efund_deduction;
-    private float other_deduction;
-    private float salary_adjustment;
-    private float allowance_adjustment;
-    private float other_compensations;
-    private float total_deduction;
-    private float gross_pay;
-    private float net_pay;
-    private float sub_total;
-    private float grand_total;
+    private double days_present;
+    private double overtime_hours;
+    private double nd_hours;
+    private double sholiday_hours;
+    private double lholiday_hours;
+    private double late_minutes;
+    private double overtime_amount;
+    private double nd_amount;
+    private double sholiday_amount;
+    private double lholiday_amount;
+    private double late_amount;
+    private double wage;
+    private double philhealth_deduction;
+    private double sss_deduction;
+    private double pagibig_deduction;
+    private double efund_deduction;
+    private double other_deduction;
+    private double salary_adjustment;
+    private double allowance_adjustment;
+    private double other_compensations;
+    private double total_deduction;
+    private double gross_pay;
+    private double net_pay;
+    private double sub_total;
+    private double grand_total;
 
     // Constructor
 
-    public PayrollClass(int employee_id, String period_start, String period_end, float days_present,
-                        float overtime_hours, float nd_hours, float sholiday_hours, float lholiday_hours, float late_minutes, float overtime_amount, float nd_amount, float sholiday_amount,
-                        float lholiday_amount, float late_amount, float wage, float philhealth_deduction, float sss_deduction, float pagibig_deduction, float efund_deduction, float other_deduction,
-                        float salary_adjustment, float allowance_adjustment, float other_compensations, float total_deduction, float gross_pay, float net_pay, float sub_total, float grand_total){
+    public PayrollClass(int employee_id, String period_start, String period_end, double days_present,
+                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, double overtime_amount, double nd_amount, double sholiday_amount,
+                        double lholiday_amount, double late_amount, double wage, double philhealth_deduction, double sss_deduction, double pagibig_deduction, double efund_deduction, double other_deduction,
+                        double salary_adjustment, double allowance_adjustment, double other_compensations, double total_deduction, double gross_pay, double net_pay, double sub_total, double grand_total){
 
         this.employee_id = employee_id;
 
@@ -84,103 +84,103 @@ public class PayrollClass {
         return period_end;
     }
 
-    public float getDays_present() {
+    public double getDays_present() {
         return days_present;
     }
 
-    public float getOvertime_hours() {
+    public double getOvertime_hours() {
         return overtime_hours;
     }
 
-    public float getNd_hours() {
+    public double getNd_hours() {
         return nd_hours;
     }
 
-    public float getSholiday_hours() {
+    public double getSholiday_hours() {
         return sholiday_hours;
     }
 
-    public float getLholiday_hours() {
+    public double getLholiday_hours() {
         return lholiday_hours;
     }
 
-    public float getLate_minutes() {
+    public double getLate_minutes() {
         return late_minutes;
     }
 
-    public float getOvertime_amount() {
+    public double getOvertime_amount() {
         return overtime_amount;
     }
 
-    public float getNd_amount() {
+    public double getNd_amount() {
         return nd_amount;
     }
 
-    public float getSholiday_amount() {
+    public double getSholiday_amount() {
         return sholiday_amount;
     }
 
-    public float getLholiday_amount() {
+    public double getLholiday_amount() {
         return lholiday_amount;
     }
 
-    public float getLate_amount() {
+    public double getLate_amount() {
         return late_amount;
     }
 
-    public float getWage() {
+    public double getWage() {
         return wage;
     }
 
-    public float getPhilhealth_deduction() {
+    public double getPhilhealth_deduction() {
         return philhealth_deduction;
     }
 
-    public float getSss_deduction() {
+    public double getSss_deduction() {
         return sss_deduction;
     }
 
-    public float getPagibig_deduction() {
+    public double getPagibig_deduction() {
         return pagibig_deduction;
     }
 
-    public float getEfund_deduction() {
+    public double getEfund_deduction() {
         return efund_deduction;
     }
 
-    public float getOther_deduction() {
+    public double getOther_deduction() {
         return other_deduction;
     }
 
-    public float getSalary_adjustment() {
+    public double getSalary_adjustment() {
         return salary_adjustment;
     }
 
-    public float getAllowance_adjustment() {
+    public double getAllowance_adjustment() {
         return allowance_adjustment;
     }
 
-    public float getOther_compensations() {
+    public double getOther_compensations() {
         return other_compensations;
     }
 
-    public float getTotal_deduction() {
+    public double getTotal_deduction() {
         return total_deduction;
     }
 
-    public float getGross_pay() {
+    public double getGross_pay() {
         return gross_pay;
     }
 
-    public float getNet_pay() {
+    public double getNet_pay() {
         return net_pay;
     }
 
-    public float getSub_total() {
+    public double getSub_total() {
         return sub_total;
     }
 
-    public float getGrand_total() {
+    public double getGrand_total() {
         return grand_total;
     }
 }
