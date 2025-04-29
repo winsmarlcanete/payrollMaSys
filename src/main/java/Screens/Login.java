@@ -19,13 +19,14 @@ public class Login extends JFrame {
         centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Logo
-        JLabel logoLabel = new JLabel("SynergyGrafixCorp.");
-        logoLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        ImageIcon rawLogo = new ImageIcon("C:/Users/PC1/Desktop/SynRepo/payrollMaSys/src/main/java/Screens/logo.png");
+        Image scaledLogo = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH); // Fixed size
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoLabel.setForeground(new Color(0, 153, 0)); // Greenish
 
+        // System Label
         JLabel systemLabel = new JLabel("Payroll Management System");
-        systemLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        systemLabel.setFont(new Font("Arial", Font.BOLD, 18));
         systemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Email field
@@ -34,7 +35,7 @@ public class Login extends JFrame {
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
         emailField.setBorder(BorderFactory.createTitledBorder("Email"));
 
-        // =============== Password field =============== 
+        // =============== Password field ===============
         // Create the password panel with titled border
         JPanel passwordPanel = new JPanel();
         passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.X_AXIS));
@@ -65,7 +66,7 @@ public class Login extends JFrame {
         passwordPanel.add(passwordField);
         passwordPanel.add(Box.createHorizontalStrut(5));
         passwordPanel.add(toggleButton);
-        passwordPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passwordPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // Ensure password panel is centered
 
         // Buttons
         JButton loginButton = new JButton("Log In");
@@ -98,10 +99,16 @@ public class Login extends JFrame {
             dispose(); // Close the login screen
         });
 
+        // Forgot Password Button will redirect to ResetPassword.java
+        forgotPasswordButton.addActionListener(e -> {
+            ResetPassword.main(new String[] {});
+            dispose();
+        });
+
         // Add components to the panel
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(logoLabel);
-        centerPanel.add(systemLabel);
+        centerPanel.add(systemLabel); // Now systemLabel is declared before being added
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(emailField);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -119,7 +126,7 @@ public class Login extends JFrame {
         wrapper.add(centerPanel);
 
         add(wrapper);
-        pack();
+        pack(); // Call pack() after adding components
     }
 
     public static void main(String[] args) {
