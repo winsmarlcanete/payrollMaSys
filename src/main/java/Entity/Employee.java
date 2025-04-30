@@ -31,7 +31,7 @@ public class Employee {
         this.shift_end = shift_end;
     }
 
-    public Employee(int employee_id, String last_name, String first_name, float pay_rate, String department){
+    public Employee(int employee_id, String last_name, String first_name, double pay_rate, String department){
             this.employee_id = employee_id;
             this.last_name = last_name;
             this.first_name = first_name;
@@ -39,6 +39,8 @@ public class Employee {
             this.department = department;
 
     }
+
+    public Employee(){}
 
     //Getters and Setters
     public int getEmployee_id() {return employee_id;}

@@ -3,17 +3,24 @@ package Module.Payroll;
 import Config.JDBC;
 import Entity.Employee;
 import Entity.PayrollClass;
+
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Payroll {
-    public static List<Integer> retreiveAllEmployee(){
-        List<Integer> employeeIds = new ArrayList<>();
+    public static List<Employee> retreiveAllEmployee(){
+        List<Employee> employees = new ArrayList<>();
         Connection conn;
 
         try{
-            String sql = "SELECT `employees`.`employee_id`\n" +
+            String sql = "SELECT `employees`.`employee_id`,\n" +
+                    "    `employees`.`last_name`,\n" +
+                    "    `employees`.`first_name`,\n" +
+                    "    `employees`.`pay_rate`,\n" +
+                    "    `employees`.`department`\n" +
                     "FROM `payrollmsdb`.`employees`;";
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -21,7 +28,14 @@ public class Payroll {
 
             while (rs.next()) {
                 int employeeId = rs.getInt("employee_id");
-                employeeIds.add(employeeId);
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                BigDecimal payRateB = rs.getBigDecimal("pay_rate");
+                Double payRate = payRateB.doubleValue();
+                String department = rs.getString("department");
+
+                Employee emp = new Employee(employeeId, lastName, firstName, payRate, department);
+                employees.add(emp);
             }
 
             stmt.close();
@@ -30,25 +44,20 @@ public class Payroll {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return employeeIds;
+        return employees;
     }
 
-    public static void createPayroll(Employee emp){
+    public static void createPayroll(Employee emp, String period_start, String period_end){
 
         Connection conn;
         try{
-            String sql = "String sql = \"INSERT INTO `payrollmsdb`.`payroll` (\" +\n" +
-                    "    \"`employee_id`, \" +\n" +
-                    "    \"`period_start`, `period_end`, `days_present`, `overtime_hours`, `nd_hours`, \" +\n" +
-                    "    \"`sholiday_hours`, `lholiday_hours`, `late_minutes`, \" +\n" +
-                    "    \"`overtime_amount`, `nd_amount`, `sholiday_amount`, `lholiday_amount`, `late_amount`, `wage`, \" +\n" +
-                    "    \"`philhealth_deduction`, `sss_deduction`, `pagibig_deduction`, `efund_deduction`, `other_deduction`, \" +\n" +
-                    "    \"`salary_adjustment`, `allowance_adjustment`, `other_compensations`, \" +\n" +
-                    "    \"`total_deduction`, `gross_pay`, `net_pay`) \" +\n" +
-                    "\"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);\";\n";
+            String sql = "INSERT INTO payrollmsdb.payroll (employee_id, period_start, period_end) VALUES (?, ?, ?)";
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1,emp.getEmployee_id());
+            stmt.setString(2, period_start);
+            stmt.setString(3, period_end);
 
 
             stmt.executeUpdate();
@@ -69,21 +78,16 @@ public class Payroll {
 
     }
     public static void main (String[] args){
-        int input_employee_id = 1;
-        String input_period_start = "2025-03-01";
-        String input_period_end = "2025-03-31";
-        float input_days_present = 22.5f;
-        float input_overtime_hours = 10.5f;
-        float input_nd_hours = 2.0f;
-        float input_sholiday_hours = 4.0f;
-        float input_lholiday_hours = 3.0f;
-        float input_late_minutes = 15.0f;
+        java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
+        String period_start = sqlDate.toString(); //Date picker
+        String period_end = sqlDate.toString(); // Date picker
+        List<Employee> emp = retreiveAllEmployee();
 
-        List<Integer> ids = retreiveAllEmployee();
-
-        for (Integer id : ids) {
-            System.out.println(id);
+        for (Employee employees  : emp) {
+            createPayroll(employees, period_start, period_end);
         }
+
+
 
     }
 

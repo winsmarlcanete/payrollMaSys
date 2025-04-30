@@ -1,5 +1,7 @@
 package Entity;
 
+import java.math.BigDecimal;
+
 public class Formula {
 
     public static double computeLateAmount(double pay_rate, double late_minutes) {
