@@ -1,8 +1,12 @@
 package Screens;
 
+import Entity.User;
+import Module.Registration.UserRegistration.UserRegistration;
+
 import javax.swing.*;
 
 import java.awt.*;
+import java.time.LocalDate;
 
 public class Register extends JFrame {
     public Register() {
@@ -184,12 +188,34 @@ public class Register extends JFrame {
 
         // Buttons
         JButton regButton = new JButton("Register");
-
         Dimension buttonSize = new Dimension(200, 30);
         regButton.setMaximumSize(buttonSize);
         regButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         regButton.setBackground(new Color(0, 153, 0));
         regButton.setForeground(Color.WHITE);
+
+        regButton.addActionListener(e -> {
+            String first_name = fnameField.getText();
+            String last_name = lnameField.getText();
+            String email = emailField.getText();
+            char[] passwordChar = passwordField.getPassword();
+            String password = new String(passwordChar);
+            int access_level;
+            if(hrButton.isSelected()){
+                access_level = 2;
+            } else {
+                access_level = 3;
+            }
+            int account_status = 0;
+            String user_name = fnameField.getText();
+
+            User user = new User(first_name,last_name,email,password,
+                    access_level,account_status,user_name);
+
+            UserRegistration.registerUser(user);
+
+
+        });
         mainPanel.add(regButton);
 
         // Wrapper panel to center everything on the screen
