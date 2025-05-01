@@ -3,11 +3,9 @@ package Module.Registration.UserRegistration;
 import Config.JDBC;
 import Entity.User;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserRegistration {
@@ -39,6 +37,46 @@ public class UserRegistration {
 
         }
 
+    }
+
+    public static List<String> checkUserEmail() {
+        String sql = "SELECT `users`.`email`,\n" +
+                "    `users`.`password` FROM `payrollmsdb`.`users`;";
+        List<String> emails = new ArrayList<>();
+
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                emails.add(rs.getString("email"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return emails;
+    }
+
+    public static String getPasswordByEmail(String email) {
+        String sql = "SELECT `password` FROM `payrollmsdb`.`users` WHERE `email` = ?;";
+        String password = null;
+
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ) {
+
+            stmt.setString(1, email);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                password = rs.getString("password");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return password;
     }
 
     public static void main (String[] args){

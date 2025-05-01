@@ -1,7 +1,16 @@
 package Screens;
 
+import Module.Registration.UserRegistration.UserRegistration;
+
 import javax.swing.*;
 import java.awt.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import static Module.Registration.UserRegistration.UserRegistration.checkUserEmail;
 
 public class Login extends JFrame {
     public Login() {
@@ -73,6 +82,28 @@ public class Login extends JFrame {
         JButton createAccountButton = new JButton("Create Account");
         JButton forgotPasswordButton = new JButton("Forgot Password");
 
+
+        //Action Listener
+        loginButton.addActionListener(e -> {
+            String input_email = emailField.getText();
+            if(emailExists(input_email)) {
+                System.out.print("Email found");
+                String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
+                char[] passwordChars = passwordField.getPassword();
+                String passwordInput = new String(passwordChars);
+                if (Objects.equals(passwordFromDB, passwordInput)){
+                    System.out.println(" and password matched!");
+                } else {
+                    System.out.println(" but password incorrect!");
+                }
+            } else {
+                System.out.println("Couldn't find account");
+            }
+
+        });
+
+
+
         Dimension buttonSize = new Dimension(200, 30);
         loginButton.setMaximumSize(buttonSize);
         createAccountButton.setMaximumSize(buttonSize);
@@ -127,6 +158,16 @@ public class Login extends JFrame {
 
         add(wrapper);
         pack(); // Call pack() after adding components
+    }
+
+    public static boolean emailExists(String targetEmail) {
+        List<String> emails = checkUserEmail();
+        for (String email : emails) {
+            if (email.equalsIgnoreCase(targetEmail)) {
+                return true; // Found a match
+            }
+        }
+        return false; // No match found
     }
 
     public static void main(String[] args) {
