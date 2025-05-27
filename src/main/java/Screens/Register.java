@@ -2,6 +2,7 @@ package Screens;
 
 import Entity.User;
 import Module.Registration.UserRegistration.UserRegistration;
+import Algorithms.sha256;
 
 import javax.swing.*;
 
@@ -200,6 +201,8 @@ public class Register extends JFrame {
             String email = emailField.getText();
             char[] passwordChar = passwordField.getPassword();
             String password = new String(passwordChar);
+            sha256 sha256 = new sha256();
+            String passwordHashed = sha256.stringToSHA256(password);
             int access_level;
             if(hrButton.isSelected()){
                 access_level = 2;
@@ -209,7 +212,7 @@ public class Register extends JFrame {
             int account_status = 0;
             String user_name = fnameField.getText();
 
-            User user = new User(first_name,last_name,email,password,
+            User user = new User(first_name,last_name,email,passwordHashed,
                     access_level,account_status,user_name);
 
             UserRegistration.registerUser(user);

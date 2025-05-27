@@ -93,6 +93,11 @@ public class Login extends JFrame {
                 String passwordInput = new String(passwordChars);
                 if (Objects.equals(passwordFromDB, passwordInput)){
                     System.out.println(" and password matched!");
+
+                    Screens.Employees.main(null);
+                    dispose();
+
+
                 } else {
                     System.out.println(" but password incorrect!");
                 }
