@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 
 public class Formula {
 
+    public static double computeDays(double hours_clocked){
+        return (hours_clocked/8);
+    }
+
     public static double computeLateAmount(double pay_rate, double late_minutes) {
         return ((pay_rate/8)/60) * (late_minutes);
     }
