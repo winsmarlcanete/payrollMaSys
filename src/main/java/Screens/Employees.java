@@ -1,32 +1,21 @@
 package Screens;
 
-import Components.MenuPanel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Employees {
-    public static void main(String[] args) {
-        // Create the main frame
-        JFrame frame = new JFrame("Employees");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-
-        // Ensure the frame starts in maximized mode
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-        // Create a panel for navigation tabs
-        MenuPanel tabPanel = new MenuPanel(frame);
+public class Employees extends JPanel {
+    public Employees(JFrame parentFrame) {
+        setLayout(new BorderLayout());
 
         // Create a search bar
         JPanel searchPanel = new JPanel();
-        // Adjust the search text field to occupy the entire width
         searchPanel.setLayout(new BorderLayout());
         JTextField searchField = new JTextField();
         JButton searchButton = new JButton("Search");
-        searchField.setPreferredSize(null); // Allow it to stretch
+        searchField.setPreferredSize(null);
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
 
@@ -57,11 +46,6 @@ public class Employees {
         table.getTableHeader().setFont(font);
         searchField.setFont(font);
         searchButton.setFont(font);
-        for (Component component : tabPanel.getComponents()) {
-            if (component instanceof JButton) {
-                component.setFont(font);
-            }
-        }
 
         // Adjust layout to always display tabs/menus on top
         JPanel contentPanel = new JPanel(new CardLayout());
@@ -78,31 +62,27 @@ public class Employees {
         detailsPanel.add(new JScrollPane(detailsArea), BorderLayout.CENTER);
 
         JPanel topButtonPanel = new JPanel(new BorderLayout());
-        JPanel saveButtonPanel = new JPanel(new FlowLayout()); // Panel for the save button
+        JPanel saveButtonPanel = new JPanel(new FlowLayout());
 
-        // Create the buttons
         JButton backButton = new JButton("Back");
-        backButton.setPreferredSize(new Dimension(100, 30)); // Set preferred size for the button
+        backButton.setPreferredSize(new Dimension(100, 30));
         JButton editButton = new JButton("Edit");
-        editButton.setPreferredSize(new Dimension(100, 30)); // Set preferred size for the button
+        editButton.setPreferredSize(new Dimension(100, 30));
         JButton saveButton = new JButton("Save");
-        saveButton.setPreferredSize(new Dimension(100, 30)); // Set preferred size for the button
+        saveButton.setPreferredSize(new Dimension(100, 30));
 
-        // Add buttons to opposite sides
         topButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        topButtonPanel.add(backButton, BorderLayout.WEST); // Left side
-        topButtonPanel.add(editButton, BorderLayout.EAST); // Right side
+        topButtonPanel.add(backButton, BorderLayout.WEST);
+        topButtonPanel.add(editButton, BorderLayout.EAST);
 
         saveButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         saveButtonPanel.add(saveButton);
-        saveButtonPanel.setPreferredSize(new Dimension(0, 50)); // Always 50px tall
-        saveButton.setVisible(false); // Initially hidden
+        saveButtonPanel.setPreferredSize(new Dimension(0, 50));
+        saveButton.setVisible(false);
 
-        // Ensure the back button is properly added and visible
         detailsPanel.add(topButtonPanel, BorderLayout.NORTH);
-        detailsPanel.add(saveButtonPanel, BorderLayout.SOUTH); // Add to the frame
+        detailsPanel.add(saveButtonPanel, BorderLayout.SOUTH);
 
-        // Add additional fields for employee details
         JPanel combinedDetailsPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -191,16 +171,12 @@ public class Employees {
 
         detailsPanel.add(combinedDetailsPanel, BorderLayout.CENTER);
 
-        // Add both panels to the content panel
         contentPanel.add(tablePanel, "TableView");
         contentPanel.add(detailsPanel, "DetailsView");
 
-        // Add tabPanel and contentPanel to the frame
-        frame.setLayout(new BorderLayout());
-        frame.add(tabPanel, BorderLayout.NORTH);
-        frame.add(contentPanel, BorderLayout.CENTER);
+        setLayout(new BorderLayout());
+        add(contentPanel, BorderLayout.CENTER);
 
-        // Add action listener to the table for row clicks
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -211,35 +187,31 @@ public class Employees {
                     departmentField.setText(table.getValueAt(row, 2).toString());
                     employmentStatusField.setText(table.getValueAt(row, 3).toString());
 
-                    // Placeholder values for additional fields
                     rateField.setText("₱ 610.00");
                     tinField.setText("000 – 123 – 456 – 001");
                     pagibigField.setText("1234 – 5678 – 9101");
                     sssField.setText("02 – 1234567 – 9");
                     philhealthField.setText("02 – 385929672 – 8");
 
-                    searchPanel.setVisible(false); // Hide search bar
+                    searchPanel.setVisible(false);
                     CardLayout cl = (CardLayout) (contentPanel.getLayout());
                     cl.show(contentPanel, "DetailsView");
                 }
             }
         });
 
-        // Add action listener to the back button
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 CardLayout cl = (CardLayout) (contentPanel.getLayout());
                 cl.show(contentPanel, "TableView");
-                searchPanel.setVisible(true); // Show search bar
+                searchPanel.setVisible(true);
             }
         });
 
-        // Add action listener to the edit button
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Make fields editable
                 nameField.setEditable(true);
                 idField.setEditable(true);
                 departmentField.setEditable(true);
@@ -250,7 +222,6 @@ public class Employees {
                 sssField.setEditable(true);
                 philhealthField.setEditable(true);
 
-                // Hide edit button and show save button
                 saveButton.setVisible(true);
                 editButton.setVisible(false);
                 topButtonPanel.revalidate();
@@ -258,11 +229,9 @@ public class Employees {
                 saveButtonPanel.revalidate();
                 saveButtonPanel.repaint();
 
-                // Add action listener to the save button
                 saveButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        // Make fields non-editable
                         nameField.setEditable(false);
                         idField.setEditable(false);
                         departmentField.setEditable(false);
@@ -273,19 +242,6 @@ public class Employees {
                         sssField.setEditable(false);
                         philhealthField.setEditable(false);
 
-                        // Display updated details (temporary change)
-                        System.out.println("Updated Details:");
-                        System.out.println("Name: " + nameField.getText());
-                        System.out.println("ID: " + idField.getText());
-                        System.out.println("Department: " + departmentField.getText());
-                        System.out.println("Employment Status: " + employmentStatusField.getText());
-                        System.out.println("Rate / Hour: " + rateField.getText());
-                        System.out.println("TIN No.: " + tinField.getText());
-                        System.out.println("Pag-Ibig No.: " + pagibigField.getText());
-                        System.out.println("SSS No.: " + sssField.getText());
-                        System.out.println("PhilHealth No.: " + philhealthField.getText());
-
-                        // Hide save button and show edit button
                         saveButton.setVisible(false);
                         editButton.setVisible(true);
                         topButtonPanel.revalidate();
@@ -297,16 +253,14 @@ public class Employees {
             }
         });
 
-        // Make the table cells non-editable
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Disable editing for all cells
+                return false;
             }
         };
         table.setModel(model);
 
-        // Fix pointer location row highlight feature
         table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
@@ -319,7 +273,6 @@ public class Employees {
             }
         });
 
-        // Fix search functionality to filter rows
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -339,7 +292,7 @@ public class Employees {
             private void filterTable() {
                 String searchText = searchField.getText().toLowerCase();
                 DefaultTableModel model = (DefaultTableModel) table.getModel();
-                model.setRowCount(0); // Clear the table
+                model.setRowCount(0);
                 if (searchText.isEmpty()) {
                     for (Object[] row : data) {
                         model.addRow(row);
@@ -361,7 +314,6 @@ public class Employees {
             }
         });
 
-        // Set font size of employee details to match the table
         Font detailsFont = new Font("Arial", Font.PLAIN, 16);
         nameLabel.setFont(detailsFont);
         nameField.setFont(detailsFont);
@@ -381,8 +333,5 @@ public class Employees {
         sssField.setFont(detailsFont);
         philhealthLabel.setFont(detailsFont);
         philhealthField.setFont(detailsFont);
-
-        // Make the frame visible
-        frame.setVisible(true);
     }
 }

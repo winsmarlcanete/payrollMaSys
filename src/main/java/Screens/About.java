@@ -3,19 +3,15 @@ package Screens;
 import javax.swing.*;
 import java.awt.*;
 
-public class About extends JFrame {
+public class About extends JPanel {
     public About() {
-        setTitle("About - SynergyGrafixCorp.");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 650);
-        setLocationRelativeTo(null);
-        setResizable(false);
+        setBackground(Color.WHITE);
+        setLayout(new BorderLayout());
 
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 153, 0), 8)); // green border
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        add(mainPanel);
 
         // Logo and Title
         JPanel logoPanel = new JPanel();
@@ -26,8 +22,7 @@ public class About extends JFrame {
         logoLabel.setIcon(new ImageIcon(scaledLogo));
 
         JLabel titleLabel = new JLabel();
-        titleLabel
-                .setText("<html><span style='color:#009900;font-weight:bold;'>Synergy</span><i>GrafixCorp.</i></html>");
+        titleLabel.setText("<html><span style='color:#009900;font-weight:bold;'>Synergy</span><i>GrafixCorp.</i></html>");
         titleLabel.setFont(new Font("SansSerif", Font.PLAIN, 24));
 
         logoPanel.add(logoLabel);
@@ -95,7 +90,7 @@ public class About extends JFrame {
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(devs);
 
-        setVisible(true);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     private void styleTextArea(JTextArea area) {
@@ -104,9 +99,5 @@ public class About extends JFrame {
         area.setBackground(Color.WHITE);
         area.setFont(new Font("SansSerif", Font.PLAIN, 14));
         area.setMargin(new Insets(5, 20, 5, 20));
-    }
-
-    public static void main(String[] args) {
-        new About();
     }
 }
