@@ -1,15 +1,17 @@
 package Entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Formula {
 
-    public static double computeDays(double hours_clocked){
-        return (hours_clocked/8);
-    }
 
-    public static double computeLateAmount(double pay_rate, double late_minutes) {
-        return ((pay_rate/8)/60) * (late_minutes);
+
+    public static BigDecimal computeLateAmount(BigDecimal pay_rate, double late_minutes) {
+        return pay_rate
+                .divide(new BigDecimal("8"), 2, RoundingMode.HALF_UP)
+                .divide(new BigDecimal("60"), 2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(late_minutes));
     }
 
     public static double computeWage(double pay_rate, double late_amount, double days_present ) {

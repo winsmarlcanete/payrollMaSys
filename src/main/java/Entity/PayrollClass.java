@@ -1,7 +1,10 @@
 package Entity;
 
+import java.math.BigDecimal;
+
 public class PayrollClass {
 
+    private int payroll_id;
     private int employee_id;
     private String period_start;
     private String period_end;
@@ -11,35 +14,34 @@ public class PayrollClass {
     private double sholiday_hours;
     private double lholiday_hours;
     private double late_minutes;
-    private double overtime_amount;
-    private double nd_amount;
-    private double sholiday_amount;
-    private double lholiday_amount;
-    private double late_amount;
-    private double wage;
-    private double philhealth_deduction;
-    private double sss_deduction;
-    private double pagibig_deduction;
-    private double efund_deduction;
-    private double other_deduction;
-    private double salary_adjustment;
-    private double allowance_adjustment;
-    private double other_compensations;
-    private double total_deduction;
-    private double gross_pay;
-    private double net_pay;
-    private double sub_total;
-    private double grand_total;
+    private BigDecimal overtime_amount;
+    private BigDecimal nd_amount;
+    private BigDecimal sholiday_amount;
+    private BigDecimal lholiday_amount;
+    private BigDecimal late_amount;
+    private BigDecimal pay_rate;
+    private BigDecimal philhealth_deduction;
+    private BigDecimal sss_deduction;
+    private BigDecimal pagibig_deduction;
+    private BigDecimal efund_deduction;
+    private BigDecimal other_deduction;
+    private BigDecimal salary_adjustment;
+    private BigDecimal allowance_adjustment;
+    private BigDecimal other_compensations;
+    private BigDecimal total_deduction;
+    private BigDecimal gross_pay;
+    private BigDecimal net_pay;
+    private BigDecimal sub_total;
+    private BigDecimal grand_total;
 
     // Constructor
 
-    public PayrollClass(int employee_id, String period_start, String period_end, double days_present,
-                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, double overtime_amount, double nd_amount, double sholiday_amount,
-                        double lholiday_amount, double late_amount, double wage, double philhealth_deduction, double sss_deduction, double pagibig_deduction, double efund_deduction, double other_deduction,
-                        double salary_adjustment, double allowance_adjustment, double other_compensations, double total_deduction, double gross_pay, double net_pay, double sub_total, double grand_total){
-
+    public PayrollClass(int payroll_id, int employee_id, String period_start, String period_end, double days_present,
+                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, BigDecimal overtime_amount, BigDecimal nd_amount, BigDecimal sholiday_amount,
+                        BigDecimal lholiday_amount, BigDecimal late_amount, BigDecimal pay_rate, BigDecimal philhealth_deduction, BigDecimal sss_deduction, BigDecimal pagibig_deduction, BigDecimal efund_deduction, BigDecimal other_deduction,
+                        BigDecimal salary_adjustment, BigDecimal allowance_adjustment, BigDecimal other_compensations, BigDecimal total_deduction, BigDecimal gross_pay, BigDecimal net_pay, BigDecimal sub_total, BigDecimal grand_total){
+        this.payroll_id = payroll_id;
         this.employee_id = employee_id;
-
         this.period_start = period_start;
         this.period_end = period_end;
         this.days_present = days_present;
@@ -53,7 +55,7 @@ public class PayrollClass {
         this.sholiday_amount = sholiday_amount;
         this.lholiday_amount = lholiday_amount;
         this.late_amount = late_amount;
-        this.wage = wage;
+        this.pay_rate = pay_rate;
         this.philhealth_deduction = philhealth_deduction;
         this.sss_deduction = sss_deduction;
         this.pagibig_deduction = pagibig_deduction;
@@ -69,12 +71,41 @@ public class PayrollClass {
         this.grand_total = grand_total;
     }
 
-    //Getters and Setters
+    public PayrollClass(int employee_id, String period_start, String period_end, double days_present,
+                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes){
+        this.employee_id = employee_id;
+        this.period_start = period_start;
+        this.period_end = period_end;
+        this.days_present = days_present;
+        this.overtime_hours = overtime_hours;
+        this.nd_hours = nd_hours;
+        this.sholiday_hours = sholiday_hours;
+        this.lholiday_hours = lholiday_hours;
+        this.late_minutes = late_minutes;
+    }
+
+    @Override
+    public String toString() {
+        return "PayrollClass{" +
+                "employee_id=" + employee_id +
+                ", period_start='" + period_start + '\'' +
+                ", period_end='" + period_end + '\'' +
+                '}';
+    }
+
+    public PayrollClass(int employee_id, String period_start, String period_end, BigDecimal pay_rate){
+        this.employee_id = employee_id;
+        this.period_start = period_start;
+        this.period_end = period_end;
+        this.pay_rate = pay_rate;
+    }
+
+    //Getters
 
 
     public int getEmployee_id(){return employee_id;}
 
-
+    public int getPayroll_id(){return payroll_id;}
 
     public String getPeriod_start() {
         return period_start;
@@ -108,79 +139,195 @@ public class PayrollClass {
         return late_minutes;
     }
 
-    public double getOvertime_amount() {
+    public BigDecimal getOvertime_amount() {
         return overtime_amount;
     }
 
-    public double getNd_amount() {
+    public BigDecimal getNd_amount() {
         return nd_amount;
     }
 
-    public double getSholiday_amount() {
+    public BigDecimal getSholiday_amount() {
         return sholiday_amount;
     }
 
-    public double getLholiday_amount() {
+    public BigDecimal getLholiday_amount() {
         return lholiday_amount;
     }
 
-    public double getLate_amount() {
+    public BigDecimal getLate_amount() {
         return late_amount;
     }
 
-    public double getWage() {
-        return wage;
-    }
+    public BigDecimal getPayrate() {return pay_rate;}
 
-    public double getPhilhealth_deduction() {
+    public BigDecimal getPhilhealth_deduction() {
         return philhealth_deduction;
     }
 
-    public double getSss_deduction() {
+    public BigDecimal getSss_deduction() {
         return sss_deduction;
     }
 
-    public double getPagibig_deduction() {
+    public BigDecimal getPagibig_deduction() {
         return pagibig_deduction;
     }
 
-    public double getEfund_deduction() {
+    public BigDecimal getEfund_deduction() {
         return efund_deduction;
     }
 
-    public double getOther_deduction() {
+    public BigDecimal getOther_deduction() {
         return other_deduction;
     }
 
-    public double getSalary_adjustment() {
+    public BigDecimal getSalary_adjustment() {
         return salary_adjustment;
     }
 
-    public double getAllowance_adjustment() {
+    public BigDecimal getAllowance_adjustment() {
         return allowance_adjustment;
     }
 
-    public double getOther_compensations() {
+    public BigDecimal getOther_compensations() {
         return other_compensations;
     }
 
-    public double getTotal_deduction() {
+    public BigDecimal getTotal_deduction() {
         return total_deduction;
     }
 
-    public double getGross_pay() {
+    public BigDecimal getGross_pay() {
         return gross_pay;
     }
 
-    public double getNet_pay() {
+    public BigDecimal getNet_pay() {
         return net_pay;
     }
 
-    public double getSub_total() {
+    public BigDecimal getSub_total() {
         return sub_total;
     }
 
-    public double getGrand_total() {
+    public BigDecimal getGrand_total() {
         return grand_total;
     }
+
+    //Setters
+    public void setEmployee_id(int employee_id) {
+        this.employee_id = employee_id;
+    }
+
+    public void setPayroll_id(int payroll_id) {
+        this.payroll_id = payroll_id;
+    }
+
+    public void setPeriod_start(String period_start) {
+        this.period_start = period_start;
+    }
+
+    public void setPeriod_end(String period_end) {
+        this.period_end = period_end;
+    }
+
+    public void setDays_present(double days_present) {
+        this.days_present = days_present;
+    }
+
+    public void setOvertime_hours(double overtime_hours) {
+        this.overtime_hours = overtime_hours;
+    }
+
+    public void setNd_hours(double nd_hours) {
+        this.nd_hours = nd_hours;
+    }
+
+    public void setSholiday_hours(double sholiday_hours) {
+        this.sholiday_hours = sholiday_hours;
+    }
+
+    public void setLholiday_hours(double lholiday_hours) {
+        this.lholiday_hours = lholiday_hours;
+    }
+
+    public void setLate_minutes(double late_minutes) {
+        this.late_minutes = late_minutes;
+    }
+
+    public void setOvertime_amount(BigDecimal overtime_amount) {
+        this.overtime_amount = overtime_amount;
+    }
+
+    public void setNd_amount(BigDecimal nd_amount) {
+        this.nd_amount = nd_amount;
+    }
+
+    public void setSholiday_amount(BigDecimal sholiday_amount) {
+        this.sholiday_amount = sholiday_amount;
+    }
+
+    public void setLholiday_amount(BigDecimal lholiday_amount) {
+        this.lholiday_amount = lholiday_amount;
+    }
+
+    public void setLate_amount(BigDecimal late_amount) {
+        this.late_amount = late_amount;
+    }
+
+    public void setPayrate(BigDecimal pay_rate) {
+        this.pay_rate = pay_rate;
+    }
+
+    public void setPhilhealth_deduction(BigDecimal philhealth_deduction) {
+        this.philhealth_deduction = philhealth_deduction;
+    }
+
+    public void setSss_deduction(BigDecimal sss_deduction) {
+        this.sss_deduction = sss_deduction;
+    }
+
+    public void setPagibig_deduction(BigDecimal pagibig_deduction) {
+        this.pagibig_deduction = pagibig_deduction;
+    }
+
+    public void setEfund_deduction(BigDecimal efund_deduction) {
+        this.efund_deduction = efund_deduction;
+    }
+
+    public void setOther_deduction(BigDecimal other_deduction) {
+        this.other_deduction = other_deduction;
+    }
+
+    public void setSalary_adjustment(BigDecimal salary_adjustment) {
+        this.salary_adjustment = salary_adjustment;
+    }
+
+    public void setAllowance_adjustment(BigDecimal allowance_adjustment) {
+        this.allowance_adjustment = allowance_adjustment;
+    }
+
+    public void setOther_compensations(BigDecimal other_compensations) {
+        this.other_compensations = other_compensations;
+    }
+
+    public void setTotal_deduction(BigDecimal total_deduction) {
+        this.total_deduction = total_deduction;
+    }
+
+    public void setGross_pay(BigDecimal gross_pay) {
+        this.gross_pay = gross_pay;
+    }
+
+    public void setNet_pay(BigDecimal net_pay) {
+        this.net_pay = net_pay;
+    }
+
+    public void setSub_total(BigDecimal sub_total) {
+        this.sub_total = sub_total;
+    }
+
+    public void setGrand_total(BigDecimal grand_total) {
+        this.grand_total = grand_total;
+    }
+
 }
