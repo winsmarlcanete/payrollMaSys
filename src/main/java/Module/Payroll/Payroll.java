@@ -162,8 +162,122 @@ public class Payroll {
         }
     }
 
-    public static void viewPayroll(){
+    public static void viewPayroll(PayrollClass payroll) {
+        String sql = "SELECT `payroll`.`payroll_id`,\n" +
+                "    `payroll`.`employee_id`,\n" +
+                "    `payroll`.`period_start`,\n" +
+                "    `payroll`.`period_end`,\n" +
+                "    `payroll`.`days_present`,\n" +
+                "    `payroll`.`overtime_hours`,\n" +
+                "    `payroll`.`nd_hours`,\n" +
+                "    `payroll`.`sholiday_hours`,\n" +
+                "    `payroll`.`lholiday_hours`,\n" +
+                "    `payroll`.`late_minutes`,\n" +
+                "    `payroll`.`overtime_amount`,\n" +
+                "    `payroll`.`nd_amount`,\n" +
+                "    `payroll`.`sholiday_amount`,\n" +
+                "    `payroll`.`lholiday_amount`,\n" +
+                "    `payroll`.`late_amount`,\n" +
+                "    `payroll`.`wage`,\n" +
+                "    `payroll`.`philhealth_deduction`,\n" +
+                "    `payroll`.`sss_deduction`,\n" +
+                "    `payroll`.`pagibig_deduction`,\n" +
+                "    `payroll`.`efund_deduction`,\n" +
+                "    `payroll`.`other_deduction`,\n" +
+                "    `payroll`.`salary_adjustment`,\n" +
+                "    `payroll`.`allowance_adjustment`,\n" +
+                "    `payroll`.`other_compensations`,\n" +
+                "    `payroll`.`total_deduction`,\n" +
+                "    `payroll`.`gross_pay`,\n" +
+                "    `payroll`.`net_pay`\n" +
+                "FROM `payrollmsdb`.`payroll` \n" +
+                "WHERE employee_id = ?;";
 
+        Connection conn;
+
+        try {
+            conn = JDBC.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, payroll.getEmployee_id());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    payroll.setPayroll_id(rs.getInt("payroll_id"));
+                    payroll.setEmployee_id(rs.getInt("employee_id"));
+                    payroll.setPeriod_start(rs.getDate("period_start").toString());
+                    payroll.setPeriod_end(rs.getDate("period_end").toString());
+                    payroll.setDays_present(rs.getInt("days_present"));
+                    payroll.setOvertime_hours(rs.getDouble("overtime_hours"));
+                    payroll.setNd_hours(rs.getDouble("nd_hours"));
+                    payroll.setSholiday_hours(rs.getDouble("sholiday_hours"));
+                    payroll.setLholiday_hours(rs.getDouble("lholiday_hours"));
+                    payroll.setLate_minutes(rs.getInt("late_minutes"));
+                    payroll.setOvertime_amount(rs.getBigDecimal("overtime_amount"));
+                    payroll.setNd_amount(rs.getBigDecimal("nd_amount"));
+                    payroll.setSholiday_amount(rs.getBigDecimal("sholiday_amount"));
+                    payroll.setLholiday_amount(rs.getBigDecimal("lholiday_amount"));
+                    payroll.setLate_amount(rs.getBigDecimal("late_amount"));
+                    payroll.setWage(rs.getBigDecimal("wage"));
+                    payroll.setPhilhealth_deduction(rs.getBigDecimal("philhealth_deduction"));
+                    payroll.setSss_deduction(rs.getBigDecimal("sss_deduction"));
+                    payroll.setPagibig_deduction(rs.getBigDecimal("pagibig_deduction"));
+                    payroll.setEfund_deduction(rs.getBigDecimal("efund_deduction"));
+                    payroll.setOther_deduction(rs.getBigDecimal("other_deduction"));
+                    payroll.setSalary_adjustment(rs.getBigDecimal("salary_adjustment"));
+                    payroll.setAllowance_adjustment(rs.getBigDecimal("allowance_adjustment"));
+                    payroll.setOther_compensations(rs.getBigDecimal("other_compensations"));
+                    payroll.setTotal_deduction(rs.getBigDecimal("total_deduction"));
+                    payroll.setGross_pay(rs.getBigDecimal("gross_pay"));
+                    payroll.setNet_pay(rs.getBigDecimal("net_pay"));
+
+                    // Print all values
+                    System.out.println("Payroll ID: " + payroll.getPayroll_id());
+                    System.out.println("Employee ID: " + payroll.getEmployee_id());
+                    System.out.println("Period Start: " + payroll.getPeriod_start());
+                    System.out.println("Period End: " + payroll.getPeriod_end());
+                    System.out.println("Days Present: " + payroll.getDays_present());
+                    System.out.println("Overtime Hours: " + payroll.getOvertime_hours());
+                    System.out.println("Night Differential Hours: " + payroll.getNd_hours());
+                    System.out.println("Special Holiday Hours: " + payroll.getSholiday_hours());
+                    System.out.println("Legal Holiday Hours: " + payroll.getLholiday_hours());
+                    System.out.println("Late Minutes: " + payroll.getLate_minutes());
+
+                    System.out.println("Overtime Amount: " + payroll.getOvertime_amount());
+                    System.out.println("Night Differential Amount: " + payroll.getNd_amount());
+                    System.out.println("Special Holiday Amount: " + payroll.getSholiday_amount());
+                    System.out.println("Legal Holiday Amount: " + payroll.getLholiday_amount());
+                    System.out.println("Late Amount: " + payroll.getLate_amount());
+
+                    System.out.println("Wage: " + payroll.getWage());
+                    System.out.println("PhilHealth Deduction: " + payroll.getPhilhealth_deduction());
+                    System.out.println("SSS Deduction: " + payroll.getSss_deduction());
+                    System.out.println("Pag-IBIG Deduction: " + payroll.getPagibig_deduction());
+                    System.out.println("Efund Deduction: " + payroll.getEfund_deduction());
+                    System.out.println("Other Deduction: " + payroll.getOther_deduction());
+
+                    System.out.println("Salary Adjustment: " + payroll.getSalary_adjustment());
+                    System.out.println("Allowance Adjustment: " + payroll.getAllowance_adjustment());
+                    System.out.println("Other Compensations: " + payroll.getOther_compensations());
+
+                    System.out.println("Total Deduction: " + payroll.getTotal_deduction());
+                    System.out.println("Gross Pay: " + payroll.getGross_pay());
+                    System.out.println("Net Pay: " + payroll.getNet_pay());
+
+                } else {
+                    System.out.println("No payroll record found for employee_id: " + payroll.getEmployee_id());
+                }
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
     public static void main (String[] args){
         java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
@@ -200,7 +314,9 @@ public class Payroll {
         payrollMap.get(182).setLate_minutes(late_minutes);
 
 
-        updatePayroll(payrollMap.get(182));
+        //updatePayroll(payrollMap.get(182));
+
+        viewPayroll(payrollMap.get(182));
 
 
 
