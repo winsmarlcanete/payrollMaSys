@@ -83,7 +83,7 @@ public class Payroll {
                     "lholiday_hours = ?, " +
                     "late_minutes = ?, " +
                     "wage = ? " +
-                    "WHERE payroll_id = ?";
+                    "WHERE employee_id = ?";
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -94,19 +94,65 @@ public class Payroll {
             stmt.setDouble(5, Payroll.getLholiday_hours());
             stmt.setDouble(6, Payroll.getLate_minutes());
             stmt.setBigDecimal(7, Payroll.getPayrate());
-            stmt.setInt(8, Payroll.getPayroll_id());
+            stmt.setInt(8, Payroll.getEmployee_id());
 
             stmt.executeUpdate();
             stmt.close();
 
+            //Calculation
+
+            Payroll.setLate_amount(Formula.computeLateAmount(Payroll.getPayrate(), Payroll.getLate_minutes()));
+            Payroll.setWage(Formula.computeWage(Payroll.getPayrate(),Payroll.getLate_amount(),Payroll.getDays_present()));
+            Payroll.setOvertime_amount(Formula.computeOvertimeAmount(Payroll.getPayrate(), Payroll.getOvertime_hours()));
+            Payroll.setNd_amount(Formula.computeNightDifferentialAmount(Payroll.getPayrate(), Payroll.getNd_hours()));
+            Payroll.setSholiday_amount(Formula.computeSpecialHolidayAmount(Payroll.getPayrate(), Payroll.getSholiday_hours()));
+            Payroll.setLholiday_amount(Formula.computeLegalHolidayAmount(Payroll.getPayrate(), Payroll.getLholiday_hours()));
+            Payroll.setGross_pay(Formula.computeTotalGrossAmount(Payroll.getWage(),Payroll.getOvertime_amount(), Payroll.getNd_amount(), Payroll.getSholiday_amount(), Payroll.getLholiday_amount()));
+            Payroll.setTotal_deduction(Formula.computeTotalDeductionAmount(Payroll.getSss_deduction(), Payroll.getPhilhealth_deduction(),Payroll.getPagibig_deduction(), Payroll.getEfund_deduction(), Payroll.getOther_deduction()));
+            Payroll.setNet_pay(Formula.computeNetPay(Payroll.getGross_pay(), Payroll.getTotal_deduction(), Payroll.getAllowance_adjustment(), Payroll.getSalary_adjustment(), Payroll.getOther_compensations()));
+
             String sql1 = "UPDATE payrollmsdb.payroll SET " +
-                    "late_amount = ? " +
+                    "overtime_amount = ?, " +
+                    "nd_amount = ?, " +
+                    "sholiday_amount = ?, " +
+                    "lholiday_amount = ?, " +
+                    "late_amount = ?, " +
+                    "wage = ?, " +
+                    "philhealth_deduction = ?, " +
+                    "sss_deduction = ?, " +
+                    "pagibig_deduction = ?, " +
+                    "efund_deduction = ?, " +
+                    "other_deduction = ?, " +
+                    "salary_adjustment = ?, " +
+                    "allowance_adjustment = ?, " +
+                    "other_compensations = ?, " +
+                    "total_deduction = ?, " +
+                    "gross_pay = ?, " +
+                    "net_pay = ? " +
                     "WHERE employee_id = ?";
 
 
             PreparedStatement stmt1 = conn.prepareStatement(sql1);
-            stmt1.setBigDecimal(1,Formula.computeLateAmount(Payroll.getPayrate(),Payroll.getLate_minutes()));
-            stmt1.setInt(2, Payroll.getEmployee_id());
+            stmt1.setBigDecimal(1, Payroll.getOvertime_amount());
+            stmt1.setBigDecimal(2, Payroll.getNd_amount());
+            stmt1.setBigDecimal(3, Payroll.getSholiday_amount());
+            stmt1.setBigDecimal(4, Payroll.getLholiday_amount());
+            stmt1.setBigDecimal(5, Payroll.getLate_amount());
+            stmt1.setBigDecimal(6, Payroll.getWage());
+            stmt1.setBigDecimal(7, Payroll.getPhilhealth_deduction());
+            stmt1.setBigDecimal(8, Payroll.getSss_deduction());
+            stmt1.setBigDecimal(9, Payroll.getPagibig_deduction());
+            stmt1.setBigDecimal(10, Payroll.getEfund_deduction());
+            stmt1.setBigDecimal(11, Payroll.getOther_deduction());
+            stmt1.setBigDecimal(12, Payroll.getSalary_adjustment());
+            stmt1.setBigDecimal(13, Payroll.getAllowance_adjustment());
+            stmt1.setBigDecimal(14, Payroll.getOther_compensations());
+            stmt1.setBigDecimal(15, Payroll.getTotal_deduction());
+            stmt1.setBigDecimal(16, Payroll.getGross_pay());
+            stmt1.setBigDecimal(17, Payroll.getNet_pay());
+            stmt1.setInt(18, Payroll.getEmployee_id());
+
+
             stmt1.executeUpdate();
             stmt1.close();
             conn.close();
@@ -143,8 +189,17 @@ public class Payroll {
         double lholiday_hours = 1.0;
         double late_minutes = 15.0;
         BigDecimal pay_rate = new BigDecimal("2000");
+
         payrollMap.get(182).setPayrate(pay_rate);
         payrollMap.get(182).setLate_minutes(15.0);
+        payrollMap.get(182).setDays_present(days_present);
+        payrollMap.get(182).setOvertime_hours(overtime_hours);
+        payrollMap.get(182).setNd_hours(nd_hours);
+        payrollMap.get(182).setSholiday_hours(sholiday_hours);
+        payrollMap.get(182).setLholiday_hours(lholiday_hours);
+        payrollMap.get(182).setLate_minutes(late_minutes);
+
+
         updatePayroll(payrollMap.get(182));
 
 
