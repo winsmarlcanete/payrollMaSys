@@ -20,6 +20,7 @@ public class PayrollClass {
     private BigDecimal lholiday_amount;
     private BigDecimal late_amount;
     private BigDecimal pay_rate;
+    private BigDecimal wage;
     private BigDecimal philhealth_deduction;
     private BigDecimal sss_deduction;
     private BigDecimal pagibig_deduction;
@@ -38,7 +39,7 @@ public class PayrollClass {
 
     public PayrollClass(int payroll_id, int employee_id, String period_start, String period_end, double days_present,
                         double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, BigDecimal overtime_amount, BigDecimal nd_amount, BigDecimal sholiday_amount,
-                        BigDecimal lholiday_amount, BigDecimal late_amount, BigDecimal pay_rate, BigDecimal philhealth_deduction, BigDecimal sss_deduction, BigDecimal pagibig_deduction, BigDecimal efund_deduction, BigDecimal other_deduction,
+                        BigDecimal lholiday_amount, BigDecimal late_amount, BigDecimal wage, BigDecimal philhealth_deduction, BigDecimal sss_deduction, BigDecimal pagibig_deduction, BigDecimal efund_deduction, BigDecimal other_deduction,
                         BigDecimal salary_adjustment, BigDecimal allowance_adjustment, BigDecimal other_compensations, BigDecimal total_deduction, BigDecimal gross_pay, BigDecimal net_pay, BigDecimal sub_total, BigDecimal grand_total){
         this.payroll_id = payroll_id;
         this.employee_id = employee_id;
@@ -55,7 +56,7 @@ public class PayrollClass {
         this.sholiday_amount = sholiday_amount;
         this.lholiday_amount = lholiday_amount;
         this.late_amount = late_amount;
-        this.pay_rate = pay_rate;
+        this.wage = wage;
         this.philhealth_deduction = philhealth_deduction;
         this.sss_deduction = sss_deduction;
         this.pagibig_deduction = pagibig_deduction;
@@ -160,6 +161,7 @@ public class PayrollClass {
     }
 
     public BigDecimal getPayrate() {return pay_rate;}
+    public BigDecimal getWage() {return wage;}
 
     public BigDecimal getPhilhealth_deduction() {
         return philhealth_deduction;
@@ -276,6 +278,10 @@ public class PayrollClass {
 
     public void setPayrate(BigDecimal pay_rate) {
         this.pay_rate = pay_rate;
+    }
+
+    public void setWage(BigDecimal wage) {
+        this.wage = wage;
     }
 
     public void setPhilhealth_deduction(BigDecimal philhealth_deduction) {
