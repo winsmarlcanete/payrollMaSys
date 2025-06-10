@@ -2,6 +2,7 @@ package Module.Registration.EmployeeRegistration;
 
 import Entity.Employee;
 import Config.JDBC;
+import com.zkteco.biometric.FingerprintSensorEx;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -45,6 +46,8 @@ public class EmployeeRegistration {
         }
 
     }
+
+
 
     public static void main (String[] args){
         Employee emp1 = new Employee(

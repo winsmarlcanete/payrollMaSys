@@ -1,5 +1,6 @@
 package Screens;
 
+import Algorithms.sha256;
 import Module.Registration.UserRegistration.UserRegistration;
 
 import javax.swing.*;
@@ -93,7 +94,7 @@ public class Login extends JFrame {
                 System.out.print("Email found");
                 String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
                 char[] passwordChars = passwordField.getPassword();
-                String passwordInput = new String(passwordChars);
+                String passwordInput = sha256.stringToSHA256(new String(passwordChars));
                 if (Objects.equals(passwordFromDB, passwordInput)){
                     System.out.println(" and password matched!");
 
@@ -109,7 +110,6 @@ public class Login extends JFrame {
             } else {
                 System.out.println("Couldn't find account");
             }
-
         });
 
 

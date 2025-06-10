@@ -279,21 +279,25 @@ public class Payroll {
             e.printStackTrace();
         }
     }
+
+    public static Map<Integer, PayrollClass> generatePayrollMap(String period_start, String period_end) {
+        List<Employee> emplist = retrieveAllEmployee();
+        Map<Integer, PayrollClass> payrollMap = new HashMap<>();
+
+        for (Employee employee : emplist) {
+            PayrollClass payroll = createPayroll(employee, period_start, period_end);
+            payrollMap.put(employee.getEmployee_id(), payroll);
+        }
+
+        return payrollMap;
+    }
     public static void main (String[] args){
         java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
         String period_start = sqlDate.toString(); //Date picker
         String period_end = sqlDate.toString(); // Date picker
 
-        List<Employee> emplist = retrieveAllEmployee();
-        Map<Integer, PayrollClass> payrollMap = new HashMap<>();
-
-        for (Employee employee  : emplist) {
-            PayrollClass payroll = createPayroll(employee, period_start, period_end);
-            payrollMap.put(employee.getEmployee_id(), payroll);
-        }
-
-        System.out.println(payrollMap.get(182));
-
+        //Button to create payroll period
+        Map<Integer, PayrollClass> payrollMap = generatePayrollMap(period_start,period_end);
 
 
         double days_present = 20.0;
@@ -314,7 +318,7 @@ public class Payroll {
         payrollMap.get(182).setLate_minutes(late_minutes);
 
 
-        //updatePayroll(payrollMap.get(182));
+        updatePayroll(payrollMap.get(182));
 
         viewPayroll(payrollMap.get(182));
 
