@@ -7,7 +7,7 @@ import Algorithms.sha256;
 import javax.swing.*;
 
 import java.awt.*;
-import java.time.LocalDate;
+// import java.time.LocalDate;
 
 public class Register extends JFrame {
     public Register() {

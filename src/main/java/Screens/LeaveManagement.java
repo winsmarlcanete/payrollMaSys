@@ -1,8 +1,18 @@
 package Screens;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
 public class LeaveManagement extends JPanel {
     private JTextField searchField;
@@ -85,103 +95,148 @@ public class LeaveManagement extends JPanel {
 
         Font detailsFont = new Font("Arial", Font.PLAIN, 18);
 
-        JTextField nameField = new JTextField();
-        JTextField idField = new JTextField();
-        JTextField departmentField = new JTextField();
-        JTextField employmentStatusField = new JTextField();
-        JComboBox<String> yearCombo = new JComboBox<>(new String[]{"2024", "2023", "2022"});
-        JTextField leavesUsedField = new JTextField();
-        JTextField remainingSILField = new JTextField();
-        JComboBox<String> typeOfLeave1 = new JComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        JComboBox<String> typeOfLeave2 = new JComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        JComboBox<String> typeOfLeave3 = new JComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        JComboBox<String> typeOfLeave4 = new JComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        JComboBox<String> typeOfLeave5 = new JComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        JTextField dateField1 = new JTextField();
-        JTextField dateField2 = new JTextField();
-        JTextField dateField3 = new JTextField();
-        JTextField dateField4 = new JTextField();
-        JTextField dateField5 = new JTextField();
+        // ...existing code...
+        RoundedTextField nameField = new RoundedTextField(10);
+        nameField.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        RoundedTextField idField = new RoundedTextField(10);
+        idField.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        RoundedTextField departmentField = new RoundedTextField(10);
+        departmentField.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        RoundedTextField employmentStatusField = new RoundedTextField(10);
+        employmentStatusField.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        RoundedTextField leavesUsedField = new RoundedTextField(10);
+        leavesUsedField.setHorizontalAlignment(JTextField.CENTER);
+        RoundedTextField remainingSILField = new RoundedTextField(10);
+        remainingSILField.setHorizontalAlignment(JTextField.CENTER);
+        RoundedTextField dateField1 = new RoundedTextField(10);
+        RoundedTextField dateField2 = new RoundedTextField(10);
+        RoundedTextField dateField3 = new RoundedTextField(10);
+        RoundedTextField dateField4 = new RoundedTextField(10);
+        RoundedTextField dateField5 = new RoundedTextField(10);
+
+        RoundedComboBox<String> typeOfLeave1 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
+        RoundedComboBox<String> typeOfLeave2 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
+        RoundedComboBox<String> typeOfLeave3 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
+        RoundedComboBox<String> typeOfLeave4 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
+        RoundedComboBox<String> typeOfLeave5 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
+        // ...existing code...
+        // JTextField dateField1 = new JTextField();
+        // JTextField dateField2 = new JTextField();
+        // JTextField dateField3 = new JTextField();
+        // JTextField dateField4 = new JTextField();
+        // JTextField dateField5 = new JTextField();
 
         // Set bounds and add components (adjust as needed for your layout)
-        int x = 140, y = 70, w = 220, h = 35, gap = 50;
+        int x = 440, y = 70, w = 220, h = 35, gap = 50;
         JLabel nameLabel = new JLabel("Name");
-        nameLabel.setBounds(x, y, w, 25);
-        nameField.setBounds(x, y + 25, w, h);
+        int nameW = w + 80;
+        nameLabel.setBounds(x, y, nameW, 25);
+        nameField.setBounds(x, y + 25, nameW, h);
         nameField.setFont(detailsFont);
+        nameLabel.setForeground(Color.WHITE);
         nameField.setEditable(false);
         detailsPanel.add(nameLabel); detailsPanel.add(nameField);
 
+        // ID (a little longer, right of Name)
         JLabel idLabel = new JLabel("ID");
-        idLabel.setBounds(x + 260, y, w, 25);
-        idField.setBounds(x + 260, y + 25, w, h);
+        int idX = x + nameW + 20;
+        int idW = 140;
+        idLabel.setBounds(idX, y, idW, 25);
+        idField.setBounds(idX, y + 25, idW, h);
         idField.setFont(detailsFont);
+        idLabel.setForeground(Color.WHITE);
         idField.setEditable(false);
         detailsPanel.add(idLabel); detailsPanel.add(idField);
 
+        // Department (right of ID)
         JLabel departmentLabel = new JLabel("Department");
-        departmentLabel.setBounds(x + 520, y, w, 25);
-        departmentField.setBounds(x + 520, y + 25, w, h);
+        int deptX = idX + idW + 20;
+        departmentLabel.setBounds(deptX, y, w, 25);
+        departmentField.setBounds(deptX, y + 25, w, h);
         departmentField.setFont(detailsFont);
+        departmentLabel.setForeground(Color.WHITE);
         departmentField.setEditable(false);
         detailsPanel.add(departmentLabel); detailsPanel.add(departmentField);
 
+        // Employment Status (right of Department)
         JLabel employmentStatusLabel = new JLabel("Employment Status");
-        employmentStatusLabel.setBounds(x + 780, y, w, 25);
-        employmentStatusField.setBounds(x + 780, y + 25, w, h);
+        int empStatX = deptX + w + 20;
+        employmentStatusLabel.setBounds(empStatX, y, w, 25);
+        employmentStatusField.setBounds(empStatX, y + 25, w, h);
         employmentStatusField.setFont(detailsFont);
+        employmentStatusLabel.setForeground(Color.WHITE);
         employmentStatusField.setEditable(false);
         detailsPanel.add(employmentStatusLabel); detailsPanel.add(employmentStatusField);
 
+        // Year, Leaves Used, Remaining SIL (below Name+ID)
+        int row2Y = y + 25 + h + 20;
+        int belowNameIdX = x;
         JLabel yearLabel = new JLabel("Year");
-        yearLabel.setBounds(x, y + 80, w, 25);
-        yearCombo.setBounds(x, y + 105, w, h);
+        yearLabel.setBounds(belowNameIdX, row2Y, 80, 25);
+        yearLabel.setForeground(Color.WHITE);
+        RoundedComboBox<String> yearCombo = new RoundedComboBox<>(new String[]{"2024", "2023", "2022"});
+        yearCombo.setBounds(belowNameIdX, row2Y + 25, 140, h);
         yearCombo.setFont(detailsFont);
+        ((javax.swing.JLabel)yearCombo.getRenderer()).setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         detailsPanel.add(yearLabel); detailsPanel.add(yearCombo);
 
         JLabel leavesUsedLabel = new JLabel("Leaves Used");
-        leavesUsedLabel.setBounds(x + 260, y + 80, w, 25);
-        leavesUsedField.setBounds(x + 260, y + 105, w, h);
+        leavesUsedLabel.setBounds(belowNameIdX + 160, row2Y, 120, 25);
+        leavesUsedField.setBounds(belowNameIdX + 160, row2Y + 25, 140, h);
         leavesUsedField.setFont(detailsFont);
+        leavesUsedLabel.setForeground(Color.WHITE);
         leavesUsedField.setEditable(false);
         detailsPanel.add(leavesUsedLabel); detailsPanel.add(leavesUsedField);
 
         JLabel remainingSILLabel = new JLabel("Remaining SIL");
-        remainingSILLabel.setBounds(x + 520, y + 80, w, 25);
-        remainingSILField.setBounds(x + 520, y + 105, w, h);
+        remainingSILLabel.setBounds(belowNameIdX + 320, row2Y, 120, 25);
+        remainingSILField.setBounds(belowNameIdX + 320, row2Y + 25, 140, h);
         remainingSILField.setFont(detailsFont);
+        remainingSILLabel.setForeground(Color.WHITE);
         remainingSILField.setEditable(false);
         detailsPanel.add(remainingSILLabel); detailsPanel.add(remainingSILField);
 
-        // Type of Leave and Date fields (repeat for up to 5)
+        // Type of Leave comboboxes (below Department)
+        int typeOfLeaveY = y + 25 + h + 20;
         JLabel typeOfLeaveLabel = new JLabel("Type of Leave");
-        typeOfLeaveLabel.setBounds(x + 780, y + 80, w, 25);
+        typeOfLeaveLabel.setForeground(Color.WHITE);
+        typeOfLeaveLabel.setBounds(deptX, typeOfLeaveY, w, 25);
         detailsPanel.add(typeOfLeaveLabel);
 
-        typeOfLeave1.setBounds(x + 780, y + 105, w, h);
-        typeOfLeave2.setBounds(x + 780, y + 105 + gap, w, h);
-        typeOfLeave3.setBounds(x + 780, y + 105 + gap * 2, w, h);
-        typeOfLeave4.setBounds(x + 780, y + 105 + gap * 3, w, h);
-        typeOfLeave5.setBounds(x + 780, y + 105 + gap * 4, w, h);
+        typeOfLeave1.setBounds(deptX, typeOfLeaveY + 25, w, h);
+        typeOfLeave2.setBounds(deptX, typeOfLeaveY + 25 + gap, w, h);
+        typeOfLeave3.setBounds(deptX, typeOfLeaveY + 25 + gap * 2, w, h);
+        typeOfLeave4.setBounds(deptX, typeOfLeaveY + 25 + gap * 3, w, h);
+        typeOfLeave5.setBounds(deptX, typeOfLeaveY + 25 + gap * 4, w, h);
+
+        typeOfLeave1.setFont(detailsFont);
+        typeOfLeave2.setFont(detailsFont);
+        typeOfLeave3.setFont(detailsFont);
+        typeOfLeave4.setFont(detailsFont);
+        typeOfLeave5.setFont(detailsFont);
+
         detailsPanel.add(typeOfLeave1); detailsPanel.add(typeOfLeave2);
         detailsPanel.add(typeOfLeave3); detailsPanel.add(typeOfLeave4); detailsPanel.add(typeOfLeave5);
 
+        // Date textfields (below Employment Status)
+        int dateY = y + 25 + h + 20;
         JLabel dateLabel = new JLabel("Date");
-        dateLabel.setBounds(x + 1040, y + 80, w, 25);
+        dateLabel.setBounds(empStatX, dateY, w, 25);
+        dateLabel.setForeground(Color.WHITE);
         detailsPanel.add(dateLabel);
 
-        dateField1.setBounds(x + 1040, y + 105, w, h);
-        dateField2.setBounds(x + 1040, y + 105 + gap, w, h);
-        dateField3.setBounds(x + 1040, y + 105 + gap * 2, w, h);
-        dateField4.setBounds(x + 1040, y + 105 + gap * 3, w, h);
-        dateField5.setBounds(x + 1040, y + 105 + gap * 4, w, h);
+        dateField1.setBounds(empStatX, dateY + 25, w, h);
+        dateField2.setBounds(empStatX, dateY + 25 + gap, w, h);
+        dateField3.setBounds(empStatX, dateY + 25 + gap * 2, w, h);
+        dateField4.setBounds(empStatX, dateY + 25 + gap * 3, w, h);
+        dateField5.setBounds(empStatX, dateY + 25 + gap * 4, w, h);
         dateField1.setFont(detailsFont); dateField2.setFont(detailsFont);
         dateField3.setFont(detailsFont); dateField4.setFont(detailsFont); dateField5.setFont(detailsFont);
         detailsPanel.add(dateField1); detailsPanel.add(dateField2);
         detailsPanel.add(dateField3); detailsPanel.add(dateField4); detailsPanel.add(dateField5);
 
         JButton saveButton = new JButton("Save");
-        saveButton.setBounds(x + 1040, y + 105 + gap * 5 + 20, 120, 40);
+        saveButton.setBounds(x + 1340, y + 575 + gap * 5 + 20, 120, 40);
         detailsPanel.add(saveButton);
 
         // --- Add panels to CardLayout ---
@@ -195,6 +250,8 @@ public class LeaveManagement extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {
+                    searchField.setText("");
+
                     nameField.setText(table.getValueAt(row, 0).toString());
                     idField.setText(table.getValueAt(row, 1).toString());
                     departmentField.setText(table.getValueAt(row, 2).toString());
