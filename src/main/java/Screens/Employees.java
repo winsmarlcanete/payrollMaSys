@@ -7,13 +7,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Employees extends JPanel {
+    private JTextField searchField;
+
+    public void clearSearchField() {
+        searchField.setText("");
+    }
+
     public Employees(JFrame parentFrame) {
         setLayout(new BorderLayout());
 
         // Create a search bar
+        // JPanel searchPanel = new JPanel();
+        // searchPanel.setLayout(new BorderLayout());
+        // JTextField searchField = new JTextField();
+        // JButton searchButton = new JButton("Search");
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout());
-        JTextField searchField = new JTextField();
+        searchField = new JTextField(); // <-- update this line
         JButton searchButton = new JButton("Search");
         searchField.setPreferredSize(null);
         searchPanel.add(searchField, BorderLayout.CENTER);
