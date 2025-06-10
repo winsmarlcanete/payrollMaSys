@@ -3,6 +3,9 @@ package Screens;
 import Module.Registration.UserRegistration.UserRegistration;
 
 import javax.swing.*;
+
+import org.payroll.MainWindow;
+
 import java.awt.*;
 
 import java.util.Arrays;
@@ -94,7 +97,9 @@ public class Login extends JFrame {
                 if (Objects.equals(passwordFromDB, passwordInput)){
                     System.out.println(" and password matched!");
 
-                    Screens.Employees.main(null);
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.setVisible(true);
+                    mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
                     dispose();
 
 

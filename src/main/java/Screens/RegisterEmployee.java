@@ -1,10 +1,9 @@
 package Screens;
 
-import Components.MenuPanel;
 import javax.swing.*;
 import java.awt.*;
 
-public class RegisterEmployee extends JFrame {
+public class RegisterEmployee extends JPanel {
 
     private final JTextField firstNameField = new JTextField(15);
     private final JTextField middleNameField = new JTextField(15);
@@ -22,18 +21,8 @@ public class RegisterEmployee extends JFrame {
             new String[] { "Regular", "Part-time", "Contract" });
 
     public RegisterEmployee() {
-        setTitle("Register Employee");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
-        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-
-        // Maximize the window
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-        // Add MenuPanel to the top of the frame
-        MenuPanel menuPanel = new MenuPanel(this);
-        add(menuPanel, BorderLayout.NORTH);
+        setBackground(Color.WHITE);
 
         add(createContentPanel(), BorderLayout.CENTER);
     }
@@ -75,9 +64,12 @@ public class RegisterEmployee extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.gridwidth = 1;
-        panel.add(new JLabel(label), gbc);
+        JLabel jLabel = new JLabel(label);
+        jLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        panel.add(jLabel, gbc);
 
         gbc.gridx = 1;
+        component.setFont(new Font("Arial", Font.PLAIN, 16));
         panel.add(component, gbc);
 
         return row + 1;
@@ -91,14 +83,10 @@ public class RegisterEmployee extends JFrame {
         button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setPreferredSize(new Dimension(150, 40));
         button.addActionListener(e -> JOptionPane.showMessageDialog(
-                RegisterEmployee.this,
+                this,
                 "Employee Registered Successfully!",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE));
         return button;
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new RegisterEmployee().setVisible(true));
     }
 }

@@ -4,30 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import Components.MenuPanel;
 
-public class Help extends JFrame {
+public class Help extends JPanel {
 
     public Help() {
-        // Set up the frame
-        setTitle("Help");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
-        // Maximize the frame on launch
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                setExtendedState(JFrame.MAXIMIZED_BOTH);
-            }
-        });
-
-        // Add the menu panel for navigation
-        MenuPanel tabPanel = new MenuPanel(this); // Use 'this' to refer to the current Help frame
-        add(tabPanel, BorderLayout.NORTH);
+        setBackground(Color.WHITE);
 
         // Create the main content panel
         JPanel contentPanel = new JPanel();
@@ -43,14 +25,13 @@ public class Help extends JFrame {
         // Add the instructional guide link
         JLabel guideLabel = new JLabel("<html><a href='#'>Instructional Guide</a></html>", JLabel.CENTER);
         guideLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        guideLabel.setForeground(Color.BLUE);  // Make it visually clear it's a link
-        guideLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));  // Show a hand cursor on hover
+        guideLabel.setForeground(Color.BLUE);
+        guideLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         // Add MouseListener to handle click event
         guideLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Handle the click event (for now, just show a message)
                 JOptionPane.showMessageDialog(Help.this, "Instructional Guide clicked.");
             }
 
@@ -82,14 +63,7 @@ public class Help extends JFrame {
 
         contentPanel.add(contactPanel, BorderLayout.SOUTH);
 
-        // Add the content panel to the frame
+        // Add the content panel to this JPanel
         add(contentPanel, BorderLayout.CENTER);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Help helpFrame = new Help();
-            helpFrame.setVisible(true);
-        });
     }
 }
