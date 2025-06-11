@@ -1,7 +1,13 @@
 package Screens;
-
+import Config.ZkFinger;
+import Entity.Employee;
+import com.zkteco.biometric.FingerprintSensorEx;
+import Module.Registration.EmployeeRegistration.EmployeeRegistration;
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
 
 public class RegisterEmployee extends JPanel {
 
@@ -14,11 +20,24 @@ public class RegisterEmployee extends JPanel {
     private final JTextField sssNoField = new JTextField(15);
     private final JTextField pagIbigNoField = new JTextField(15);
     private final JTextField philHealthNoField = new JTextField(15);
+
+    private final JSpinner shiftStartSpinner = new JSpinner(new SpinnerDateModel());
+    private final JSpinner shiftEndSpinner = new JSpinner(new SpinnerDateModel());
+
+    {
+        shiftStartSpinner.setEditor(new JSpinner.DateEditor(shiftStartSpinner, "HH:mm:ss"));
+        shiftEndSpinner.setEditor(new JSpinner.DateEditor(shiftEndSpinner, "HH:mm:ss"));
+    }
+
+
     private final JComboBox<String> departmentBox = new JComboBox<>(
             new String[] { "Human Resource", "Accounting", "Sales", "Production (Pre-Press)",
                     "Production (Press)", "Production (Post-Press)", "Production (Quality Control)" });
     private final JComboBox<String> employmentStatusBox = new JComboBox<>(
             new String[] { "Regular", "Part-time", "Contract" });
+
+    private final ZkFinger zkFinger = new ZkFinger();
+
 
     public RegisterEmployee() {
         setLayout(new BorderLayout());
@@ -40,7 +59,6 @@ public class RegisterEmployee extends JPanel {
         row = addField(panel, gbc, row, "First Name", firstNameField);
         row = addField(panel, gbc, row, "Middle Name", middleNameField);
         row = addField(panel, gbc, row, "Last Name", lastNameField);
-        row = addField(panel, gbc, row, "Employee ID", employeeIdField);
         row = addField(panel, gbc, row, "Department", departmentBox);
         row = addField(panel, gbc, row, "Employment Status", employmentStatusBox);
         row = addField(panel, gbc, row, "Rate / Hour (₱)", ratePerHourField);
@@ -48,6 +66,10 @@ public class RegisterEmployee extends JPanel {
         row = addField(panel, gbc, row, "SSS no.", sssNoField);
         row = addField(panel, gbc, row, "Pag-Ibig no.", pagIbigNoField);
         row = addField(panel, gbc, row, "PhilHealth no.", philHealthNoField);
+        row = addField(panel, gbc, row, "Shift start", shiftStartSpinner);
+        row = addField(panel, gbc, row, "Shift end", shiftEndSpinner);
+
+
 
         // Register Button
         JButton registerButton = createRegisterButton();
@@ -56,6 +78,70 @@ public class RegisterEmployee extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(registerButton, gbc);
+
+        // === Create image label ===
+        JLabel imageLabel = new JLabel();
+        imageLabel.setPreferredSize(new Dimension(500, 500));
+        imageLabel.setMinimumSize(new Dimension(500, 500));
+        imageLabel.setMaximumSize(new Dimension(500, 500));
+        imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+// === Create fingerprint button ===
+        JButton scanFingerprintButton = new JButton("Scan Fingerprint");
+        scanFingerprintButton.setFocusPainted(false);
+        scanFingerprintButton.setBackground(new Color(0, 102, 204));
+        scanFingerprintButton.setForeground(Color.WHITE);
+        scanFingerprintButton.setFont(new Font("Arial", Font.BOLD, 14));
+        scanFingerprintButton.setPreferredSize(new Dimension(200, 40));
+
+        JLabel statusLabel = new JLabel(" ");
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        statusLabel.setForeground(Color.DARK_GRAY);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center the label
+
+// You can add an ActionListener here to trigger fingerprint scanning
+        scanFingerprintButton.addActionListener(e -> {
+            try {
+                zkFinger.init();
+                int value = Integer.parseInt(employeeIdField.getText().trim());
+                ZkFinger.FingerprintTemplate enrolled = zkFinger.enrollFingerprint(imageLabel);
+                if (enrolled != null) {
+                    boolean success = zkFinger.saveTemplateToDatabase(value, enrolled);
+                    statusLabel.setText(success ? "✅ Fingerprint saved!" : "❌ Save failed.");
+                } else {
+                    statusLabel.setText("❌ Enrollment failed. Try again.");
+                }
+            } catch (NumberFormatException ex) {
+                statusLabel.setText("⚠ Please enter a valid employee ID.");
+            }
+
+            zkFinger.close();
+        });
+
+
+// === Group image and button into a vertical panel ===
+        JPanel imagePanel = new JPanel();
+        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
+        imagePanel.setBackground(Color.WHITE);
+        imagePanel.add(imageLabel);
+        imagePanel.add(Box.createVerticalStrut(10));
+        imagePanel.add(scanFingerprintButton);
+        imagePanel.add(Box.createVerticalStrut(5));
+        imagePanel.add(statusLabel);
+
+
+// === Add the image panel to the main panel (right side) ===
+        GridBagConstraints imageGbc = new GridBagConstraints();
+        imageGbc.gridx = 2; // Rightmost column
+        imageGbc.gridy = 0; // Align to top
+        imageGbc.gridheight = row; // Span height of the form
+        imageGbc.insets = new Insets(10, 20, 10, 10);
+        imageGbc.fill = GridBagConstraints.NONE;
+        imageGbc.anchor = GridBagConstraints.CENTER;
+
+        panel.add(imagePanel, imageGbc);
+
 
         return panel;
     }
@@ -82,11 +168,44 @@ public class RegisterEmployee extends JPanel {
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setPreferredSize(new Dimension(150, 40));
-        button.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Employee Registered Successfully!",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE));
+
+        button.addActionListener(e -> {
+            try {
+                String firstName = firstNameField.getText().trim();
+                String middleName = middleNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String department = (String) departmentBox.getSelectedItem();
+                String employmentStatus = (String) employmentStatusBox.getSelectedItem();
+                BigDecimal ratePerHour = new BigDecimal(ratePerHourField.getText().trim());
+                String tin = tinNoField.getText().trim();
+                String philhealth = philHealthNoField.getText().trim();
+                String pagibig = pagIbigNoField.getText().trim();
+                String sss = sssNoField.getText().trim();
+                java.util.Date shiftStartUtilDate = (java.util.Date) shiftStartSpinner.getValue();
+                java.util.Date shiftEndUtilDate = (java.util.Date) shiftEndSpinner.getValue();
+
+
+                Time shiftStart = new Time(shiftStartUtilDate.getTime());
+                Time shiftEnd = new Time(shiftEndUtilDate.getTime());
+
+                Employee emp = new Employee(firstName, lastName, middleName, department,
+                        employmentStatus, ratePerHour, tin, philhealth, pagibig, sss, shiftStart, shiftEnd);
+
+                System.out.println("Shift Start: " + shiftStart);
+                System.out.println("Shift End: " + shiftEnd);
+
+                EmployeeRegistration.registerEmployee(emp);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Please enter a valid numeric value for Rate per Hour.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         return button;
     }
+
+
+
 }
