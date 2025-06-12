@@ -38,6 +38,10 @@ public class RegisterEmployee extends JPanel {
 
     private final ZkFinger zkFinger = new ZkFinger();
 
+    private ZkFinger.FingerprintTemplate enrolled = null;
+
+
+
 
     public RegisterEmployee() {
         setLayout(new BorderLayout());
@@ -81,9 +85,9 @@ public class RegisterEmployee extends JPanel {
 
         // === Create image label ===
         JLabel imageLabel = new JLabel();
-        imageLabel.setPreferredSize(new Dimension(500, 500));
-        imageLabel.setMinimumSize(new Dimension(500, 500));
-        imageLabel.setMaximumSize(new Dimension(500, 500));
+        imageLabel.setPreferredSize(new Dimension(350, 400));
+        imageLabel.setMinimumSize(new Dimension(350, 400));
+        imageLabel.setMaximumSize(new Dimension(350, 400));
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -102,21 +106,20 @@ public class RegisterEmployee extends JPanel {
 
 // You can add an ActionListener here to trigger fingerprint scanning
         scanFingerprintButton.addActionListener(e -> {
-            try {
+            new Thread(() -> {
                 zkFinger.init();
-                int value = Integer.parseInt(employeeIdField.getText().trim());
-                ZkFinger.FingerprintTemplate enrolled = zkFinger.enrollFingerprint(imageLabel);
-                if (enrolled != null) {
-                    boolean success = zkFinger.saveTemplateToDatabase(value, enrolled);
-                    statusLabel.setText(success ? "✅ Fingerprint saved!" : "❌ Save failed.");
-                } else {
-                    statusLabel.setText("❌ Enrollment failed. Try again.");
-                }
-            } catch (NumberFormatException ex) {
-                statusLabel.setText("⚠ Please enter a valid employee ID.");
-            }
+                enrolled = zkFinger.enrollFingerprint(imageLabel);
 
-            zkFinger.close();
+                SwingUtilities.invokeLater(() -> {
+                    if (enrolled != null) {
+                        statusLabel.setText("✅ Fingerprint registered!");
+                    } else {
+                        statusLabel.setText("❌ Fingerprint registration failed.");
+                    }
+                });
+            }).start();
+
+
         });
 
 
@@ -189,13 +192,16 @@ public class RegisterEmployee extends JPanel {
                 Time shiftEnd = new Time(shiftEndUtilDate.getTime());
 
                 Employee emp = new Employee(firstName, lastName, middleName, department,
-                        employmentStatus, ratePerHour, tin, philhealth, pagibig, sss, shiftStart, shiftEnd);
+                        employmentStatus, ratePerHour, tin, philhealth, pagibig, sss, shiftStart, shiftEnd, enrolled);
 
                 System.out.println("Shift Start: " + shiftStart);
                 System.out.println("Shift End: " + shiftEnd);
 
+
+                zkFinger.close();
+
                 EmployeeRegistration.registerEmployee(emp);
-            } catch (NumberFormatException ex) {
+                } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this,
                         "Please enter a valid numeric value for Rate per Hour.",
                         "Invalid Input",

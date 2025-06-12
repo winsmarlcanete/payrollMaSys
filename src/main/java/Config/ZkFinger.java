@@ -97,20 +97,34 @@ public class ZkFinger {
 
         byte[] img = new byte[width * height];
         byte[] template = new byte[2048];
-        int[] size = new int[1];
-        size[0] = 2048;
+        int[] size = new int[]{2048};
 
-        int result = FingerprintSensorEx.AcquireFingerprint(devHandle, img, template, size);
-        if (result == 0) {
-            System.out.println("Enrollment successful. Template size: " + size[0]);
-            ImageIcon icon = createFingerprintImage(img, width, height);
-            imageLabel.setIcon(icon);
-            return new FingerprintTemplate(template, size[0]);
-        } else {
-            System.out.println("Enrollment failed. Error code: " + result);
-            return null;
+        int result = -1;
+        int attempts = 30;
+
+        while (attempts-- > 0) {
+            result = FingerprintSensorEx.AcquireFingerprint(devHandle, img, template, size);
+            if (result == 0) {
+                ImageIcon icon = createFingerprintImage(img, width, height);
+                if (imageLabel != null) {
+                    SwingUtilities.invokeLater(() -> {
+                        imageLabel.setIcon(null); // force reset
+                        imageLabel.setIcon(icon); // then show new icon
+                    });
+                }
+                return new FingerprintTemplate(template, size[0]);
+            }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        return null;
     }
+
 
 
     public boolean saveTemplateToDatabase(int employeeId, FingerprintTemplate fingerprint) {
@@ -144,3 +158,6 @@ public class ZkFinger {
 
 
 }
+
+
+

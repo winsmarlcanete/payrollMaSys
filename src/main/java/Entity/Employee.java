@@ -1,6 +1,9 @@
 package Entity;
 
+import Config.ZkFinger;
+
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Time;
 
 public class Employee {
@@ -17,6 +20,7 @@ public class Employee {
     private String department;
     private Time shift_start;
     private Time shift_end;
+    private ZkFinger.FingerprintTemplate fingerprint;
 
     // Constructor
 
@@ -44,7 +48,7 @@ public class Employee {
 
     }
 
-    public Employee(String first_name, String last_name, String middle_name, String department, String employment_status, BigDecimal pay_rate, String tin_number, String philhealth_number, String pagibig_number, String sss_number, Time shift_start, Time shift_end){
+    public Employee(String first_name, String last_name, String middle_name, String department, String employment_status, BigDecimal pay_rate, String tin_number, String philhealth_number, String pagibig_number, String sss_number, Time shift_start, Time shift_end, ZkFinger.FingerprintTemplate fingerprint){
         this.first_name = first_name;
         this.last_name = last_name;
         this.middle_name = middle_name;
@@ -57,6 +61,7 @@ public class Employee {
         this.sss_number = sss_number;
         this.shift_start = shift_start;
         this.shift_end = shift_end;
+        this.fingerprint = fingerprint;
     }
 
     //Getters and Setters
@@ -73,6 +78,7 @@ public class Employee {
     public String getDepartment(){return department;}
     public Time getShift_start(){return shift_start;}
     public Time getShift_end(){return shift_end;}
+    public ZkFinger.FingerprintTemplate getFingerprint(){return  fingerprint;}
 
 
 }

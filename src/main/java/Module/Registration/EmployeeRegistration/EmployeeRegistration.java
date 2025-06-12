@@ -15,8 +15,8 @@ public class EmployeeRegistration {
     public static void registerEmployee(Employee emp){
         String sql = "INSERT INTO payrollmsdb.employees " +
                 "(last_name, first_name, middle_name, tin_number, " +
-                "philhealth_number, pagibig_number, sss_number, pay_rate, employment_status, department, shift_start, shift_end) " +
-                "VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)";
+                "philhealth_number, pagibig_number, sss_number, pay_rate, employment_status, department, shift_start, shift_end, fingerprint) " +
+                "VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?)";
         Connection conn;
         try{
             conn = JDBC.getConnection();
@@ -35,6 +35,7 @@ public class EmployeeRegistration {
             stmt.setTime(11, shiftStart);
             Time shiftEnd = emp.getShift_end();
             stmt.setTime(12, shiftEnd);
+            stmt.setBytes(13,java.util.Arrays.copyOf(emp.getFingerprint().getTemplate(), emp.getFingerprint().getSize()));
 
 
             stmt.executeUpdate();
