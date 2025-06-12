@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
+
+import Components.TableStyler;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -67,8 +70,8 @@ public class Attendance extends JPanel {
         };
 
         model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(model);
-        styleTable(table);
+        JTable table = new JTable(model);   
+        TableStyler.styleTable(table);
 
         TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>(model);
         table.setRowSorter(rowSorter);
@@ -92,6 +95,19 @@ public class Attendance extends JPanel {
                     rowSorter.setRowFilter(null);
                 } else {
                     rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text, 0));
+                }
+            }
+        });
+
+        // Highlight row on mouse hover
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row != -1) {
+                    table.setRowSelectionInterval(row, row);
+                } else {
+                    table.clearSelection();
                 }
             }
         });
@@ -171,24 +187,6 @@ public class Attendance extends JPanel {
         }
 
         return detailsPanel;
-    }
-
-    private void styleTable(JTable table) {
-        table.setRowHeight(35);
-        table.setGridColor(new Color(0, 128, 0));
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(0, 128, 0));
-        header.setForeground(Color.WHITE);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        ((DefaultTableCellRenderer) header.getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
     }
 
     public static void main(String[] args) {
