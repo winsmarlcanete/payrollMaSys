@@ -71,6 +71,7 @@ public class LeaveManagement extends JPanel {
             }
         };
         JTable table = new JTable(model);
+        table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
 

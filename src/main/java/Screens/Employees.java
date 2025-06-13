@@ -99,6 +99,7 @@ public class Employees extends JPanel {
                 { "Jela Cruz, Juan C.", 70, "Production (Post-Press)", "Regular" }
         };
         JTable table = new JTable(new DefaultTableModel(data, columnNames));
+        table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
 
