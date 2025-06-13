@@ -3,8 +3,14 @@ package Screens;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -13,6 +19,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+import Components.RoundedButton;
+import Components.RoundedComboBox;
+import Components.RoundedTextField;
+import Components.TableStyler;
 
 public class LeaveManagement extends JPanel {
     private JTextField searchField;
@@ -24,6 +35,7 @@ public class LeaveManagement extends JPanel {
     public LeaveManagement() {
         setBackground(Color.WHITE);
         setLayout(new BorderLayout());
+        getCursor();
 
         // CardLayout for switching views
         CardLayout cardLayout = new CardLayout();
@@ -59,6 +71,7 @@ public class LeaveManagement extends JPanel {
             }
         };
         JTable table = new JTable(model);
+        TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
 
         Font font = new Font("Arial", Font.PLAIN, 16);
@@ -85,17 +98,15 @@ public class LeaveManagement extends JPanel {
         tablePanel.add(tableScrollPane, BorderLayout.CENTER);
 
         // --- Details View ---
-        JPanel detailsPanel = new JPanel();
+        JPanel detailsPanel = new JPanel(new GridBagLayout());
         detailsPanel.setBackground(new Color(34, 177, 76)); // green background
-        detailsPanel.setLayout(null);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBounds(20, 20, 100, 30);
-        detailsPanel.add(backButton);
+        // Container panel to group and center the fields
+        JPanel groupPanel = new JPanel(null); // We'll use absolute layout for the group, but center the group itself
+        groupPanel.setOpaque(false);
 
         Font detailsFont = new Font("Arial", Font.PLAIN, 18);
 
-        // ...existing code...
         RoundedTextField nameField = new RoundedTextField(10);
         nameField.setMargin(new java.awt.Insets(0, 5, 0, 0));
         RoundedTextField idField = new RoundedTextField(10);
@@ -119,15 +130,8 @@ public class LeaveManagement extends JPanel {
         RoundedComboBox<String> typeOfLeave3 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
         RoundedComboBox<String> typeOfLeave4 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
         RoundedComboBox<String> typeOfLeave5 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
-        // ...existing code...
-        // JTextField dateField1 = new JTextField();
-        // JTextField dateField2 = new JTextField();
-        // JTextField dateField3 = new JTextField();
-        // JTextField dateField4 = new JTextField();
-        // JTextField dateField5 = new JTextField();
 
-        // Set bounds and add components (adjust as needed for your layout)
-        int x = 440, y = 70, w = 220, h = 35, gap = 50;
+        int x = 20, y = 20, w = 220, h = 35, gap = 50;
         JLabel nameLabel = new JLabel("Name");
         int nameW = w + 80;
         nameLabel.setBounds(x, y, nameW, 25);
@@ -135,9 +139,8 @@ public class LeaveManagement extends JPanel {
         nameField.setFont(detailsFont);
         nameLabel.setForeground(Color.WHITE);
         nameField.setEditable(false);
-        detailsPanel.add(nameLabel); detailsPanel.add(nameField);
+        groupPanel.add(nameLabel); groupPanel.add(nameField);
 
-        // ID (a little longer, right of Name)
         JLabel idLabel = new JLabel("ID");
         int idX = x + nameW + 20;
         int idW = 140;
@@ -146,9 +149,8 @@ public class LeaveManagement extends JPanel {
         idField.setFont(detailsFont);
         idLabel.setForeground(Color.WHITE);
         idField.setEditable(false);
-        detailsPanel.add(idLabel); detailsPanel.add(idField);
+        groupPanel.add(idLabel); groupPanel.add(idField);
 
-        // Department (right of ID)
         JLabel departmentLabel = new JLabel("Department");
         int deptX = idX + idW + 20;
         departmentLabel.setBounds(deptX, y, w, 25);
@@ -156,9 +158,8 @@ public class LeaveManagement extends JPanel {
         departmentField.setFont(detailsFont);
         departmentLabel.setForeground(Color.WHITE);
         departmentField.setEditable(false);
-        detailsPanel.add(departmentLabel); detailsPanel.add(departmentField);
+        groupPanel.add(departmentLabel); groupPanel.add(departmentField);
 
-        // Employment Status (right of Department)
         JLabel employmentStatusLabel = new JLabel("Employment Status");
         int empStatX = deptX + w + 20;
         employmentStatusLabel.setBounds(empStatX, y, w, 25);
@@ -166,7 +167,7 @@ public class LeaveManagement extends JPanel {
         employmentStatusField.setFont(detailsFont);
         employmentStatusLabel.setForeground(Color.WHITE);
         employmentStatusField.setEditable(false);
-        detailsPanel.add(employmentStatusLabel); detailsPanel.add(employmentStatusField);
+        groupPanel.add(employmentStatusLabel); groupPanel.add(employmentStatusField);
 
         // Year, Leaves Used, Remaining SIL (below Name+ID)
         int row2Y = y + 25 + h + 20;
@@ -177,8 +178,9 @@ public class LeaveManagement extends JPanel {
         RoundedComboBox<String> yearCombo = new RoundedComboBox<>(new String[]{"2024", "2023", "2022"});
         yearCombo.setBounds(belowNameIdX, row2Y + 25, 140, h);
         yearCombo.setFont(detailsFont);
+        yearCombo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         ((javax.swing.JLabel)yearCombo.getRenderer()).setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        detailsPanel.add(yearLabel); detailsPanel.add(yearCombo);
+        groupPanel.add(yearLabel); groupPanel.add(yearCombo);
 
         JLabel leavesUsedLabel = new JLabel("Leaves Used");
         leavesUsedLabel.setBounds(belowNameIdX + 160, row2Y, 120, 25);
@@ -186,7 +188,7 @@ public class LeaveManagement extends JPanel {
         leavesUsedField.setFont(detailsFont);
         leavesUsedLabel.setForeground(Color.WHITE);
         leavesUsedField.setEditable(false);
-        detailsPanel.add(leavesUsedLabel); detailsPanel.add(leavesUsedField);
+        groupPanel.add(leavesUsedLabel); groupPanel.add(leavesUsedField);
 
         JLabel remainingSILLabel = new JLabel("Remaining SIL");
         remainingSILLabel.setBounds(belowNameIdX + 320, row2Y, 120, 25);
@@ -194,14 +196,14 @@ public class LeaveManagement extends JPanel {
         remainingSILField.setFont(detailsFont);
         remainingSILLabel.setForeground(Color.WHITE);
         remainingSILField.setEditable(false);
-        detailsPanel.add(remainingSILLabel); detailsPanel.add(remainingSILField);
+        groupPanel.add(remainingSILLabel); groupPanel.add(remainingSILField);
 
         // Type of Leave comboboxes (below Department)
         int typeOfLeaveY = y + 25 + h + 20;
         JLabel typeOfLeaveLabel = new JLabel("Type of Leave");
         typeOfLeaveLabel.setForeground(Color.WHITE);
         typeOfLeaveLabel.setBounds(deptX, typeOfLeaveY, w, 25);
-        detailsPanel.add(typeOfLeaveLabel);
+        groupPanel.add(typeOfLeaveLabel);
 
         typeOfLeave1.setBounds(deptX, typeOfLeaveY + 25, w, h);
         typeOfLeave2.setBounds(deptX, typeOfLeaveY + 25 + gap, w, h);
@@ -215,15 +217,108 @@ public class LeaveManagement extends JPanel {
         typeOfLeave4.setFont(detailsFont);
         typeOfLeave5.setFont(detailsFont);
 
-        detailsPanel.add(typeOfLeave1); detailsPanel.add(typeOfLeave2);
-        detailsPanel.add(typeOfLeave3); detailsPanel.add(typeOfLeave4); detailsPanel.add(typeOfLeave5);
+        typeOfLeave1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        typeOfLeave2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        typeOfLeave3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        typeOfLeave4.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        typeOfLeave5.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Set initial enabled/disabled state for typeOfLeave comboboxes and date fields
+        typeOfLeave1.setEnabled(true);
+        typeOfLeave2.setEnabled(false);
+        typeOfLeave3.setEnabled(false);
+        typeOfLeave4.setEnabled(false);
+        typeOfLeave5.setEnabled(false);
+
+        dateField1.setEnabled(true);
+        dateField2.setEnabled(false);
+        dateField3.setEnabled(false);
+        dateField4.setEnabled(false);
+        dateField5.setEnabled(false);
+
+        // Add listeners to enable the next combobox and date field only if the current one is filled
+        typeOfLeave1.addActionListener(e -> {
+            boolean filled = typeOfLeave1.getSelectedIndex() > 0;
+            typeOfLeave2.setEnabled(filled);
+            dateField2.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave2.setSelectedIndex(0);
+                typeOfLeave3.setEnabled(false); typeOfLeave3.setSelectedIndex(0);
+                typeOfLeave4.setEnabled(false); typeOfLeave4.setSelectedIndex(0);
+                typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
+
+                dateField2.setText(""); dateField2.setEnabled(false);
+                dateField3.setText(""); dateField3.setEnabled(false);
+                dateField4.setText(""); dateField4.setEnabled(false);
+                dateField5.setText(""); dateField5.setEnabled(false);
+            }
+        });
+        typeOfLeave2.addActionListener(e -> {
+            boolean filled = typeOfLeave2.getSelectedIndex() > 0;
+            typeOfLeave3.setEnabled(filled);
+            dateField3.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave3.setSelectedIndex(0);
+                typeOfLeave4.setEnabled(false); typeOfLeave4.setSelectedIndex(0);
+                typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
+
+                dateField3.setText(""); dateField3.setEnabled(false);
+                dateField4.setText(""); dateField4.setEnabled(false);
+                dateField5.setText(""); dateField5.setEnabled(false);
+            }
+        });
+        typeOfLeave3.addActionListener(e -> {
+            boolean filled = typeOfLeave3.getSelectedIndex() > 0;
+            typeOfLeave4.setEnabled(filled);
+            dateField4.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave4.setSelectedIndex(0);
+                typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
+
+                dateField4.setText(""); dateField4.setEnabled(false);
+                dateField5.setText(""); dateField5.setEnabled(false);
+            }
+        });
+        typeOfLeave4.addActionListener(e -> {
+            boolean filled = typeOfLeave4.getSelectedIndex() > 0;
+            typeOfLeave5.setEnabled(filled);
+            dateField5.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave5.setSelectedIndex(0);
+                dateField5.setText(""); dateField5.setEnabled(false);
+            }
+        });
+        groupPanel.add(typeOfLeave1); groupPanel.add(typeOfLeave2);
+        groupPanel.add(typeOfLeave3); groupPanel.add(typeOfLeave4); groupPanel.add(typeOfLeave5);
+
+        // Add hover effect to type of leave and year comboboxes
+        Color comboDefaultBg = Color.WHITE;
+        Color comboHoverBg = new Color(230, 255, 230); // light greenish
+
+        JComboBox<?>[] comboBoxes = {typeOfLeave1, typeOfLeave2, typeOfLeave3, typeOfLeave4, typeOfLeave5, yearCombo};
+        for (JComboBox<?> combo : comboBoxes) {
+            combo.setBackground(comboDefaultBg);
+            combo.setOpaque(false);
+            combo.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    if (combo.isEnabled()) {
+                        combo.setBackground(comboHoverBg);
+                    }
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    combo.setBackground(comboDefaultBg);
+                }
+            });
+        }
 
         // Date textfields (below Employment Status)
         int dateY = y + 25 + h + 20;
         JLabel dateLabel = new JLabel("Date");
         dateLabel.setBounds(empStatX, dateY, w, 25);
         dateLabel.setForeground(Color.WHITE);
-        detailsPanel.add(dateLabel);
+        groupPanel.add(dateLabel);
 
         dateField1.setBounds(empStatX, dateY + 25, w, h);
         dateField2.setBounds(empStatX, dateY + 25 + gap, w, h);
@@ -232,12 +327,111 @@ public class LeaveManagement extends JPanel {
         dateField5.setBounds(empStatX, dateY + 25 + gap * 4, w, h);
         dateField1.setFont(detailsFont); dateField2.setFont(detailsFont);
         dateField3.setFont(detailsFont); dateField4.setFont(detailsFont); dateField5.setFont(detailsFont);
-        detailsPanel.add(dateField1); detailsPanel.add(dateField2);
-        detailsPanel.add(dateField3); detailsPanel.add(dateField4); detailsPanel.add(dateField5);
+        groupPanel.add(dateField1); groupPanel.add(dateField2);
+        groupPanel.add(dateField3); groupPanel.add(dateField4); groupPanel.add(dateField5);
 
-        JButton saveButton = new JButton("Save");
-        saveButton.setBounds(x + 1340, y + 575 + gap * 5 + 20, 120, 40);
-        detailsPanel.add(saveButton);
+        // Set preferred size for the group panel to match its content, not too wide
+        groupPanel.setPreferredSize(new java.awt.Dimension(990, 400)); // Adjust width as needed
+
+        // --- Place components in detailsPanel using GridBagLayout ---
+
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        int buttonWidth = 160; // wider if you want
+        int buttonHeight = h;  // same as your text fields
+        int arc = 20; 
+
+        // Back button (upper left)
+        RoundedButton backButton = new RoundedButton("Back", arc);
+        backButton.setFont(detailsFont);
+        backButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight)); // width increased, height same as text fields
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createEmptyBorder());
+        backButton.setContentAreaFilled(false);
+        backButton.setOpaque(false);
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Hover and click effect for back button
+        backButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                backButton.setBackground(new Color(30, 30, 30)); // Slightly lighter black
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                backButton.setBackground(Color.BLACK);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                backButton.setBackground(new Color(60, 60, 60)); // Even lighter on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                backButton.setBackground(backButton.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+            }
+        });
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(25, 30, 0, 0); // Top, Left, Bottom, Right
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        detailsPanel.add(backButton, gbc);
+
+        // Centered groupPanel
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(0, 10, 0, 0);
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        detailsPanel.add(groupPanel, gbc);
+
+        // Save button (bottom right)
+        RoundedButton saveButton = new RoundedButton("Save", arc);
+        saveButton.setFont(detailsFont);
+        saveButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight)); // width increased, height same as text fields
+        saveButton.setBackground(Color.WHITE);
+        saveButton.setForeground(new Color(0, 153, 0));
+        saveButton.setFocusPainted(false);
+        saveButton.setBorder(BorderFactory.createEmptyBorder());
+        saveButton.setContentAreaFilled(false);
+        saveButton.setOpaque(false);
+        saveButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Hover and click effect for save button
+        saveButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(new Color(140, 153, 140)); // Light greenish white
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(Color.WHITE);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(new Color(200, 240, 200)); // Slightly darker greenish white
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(saveButton.getBounds().contains(e.getPoint()) ? new Color(230, 255, 230) : Color.WHITE);
+            }
+        });
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
+        gbc.insets = new Insets(0, 0, 30, 35); // Top, Left, Bottom, Right
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        detailsPanel.add(saveButton, gbc);
 
         // --- Add panels to CardLayout ---
         contentPanel.add(tablePanel, "TableView");

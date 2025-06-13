@@ -2,10 +2,14 @@ package Screens;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import Components.TableStyler;
 
 public class Employees extends JPanel {
     private JTextField searchField;
@@ -41,10 +45,110 @@ public class Employees extends JPanel {
                 { "Iela Cruz, Juan C.", 10, "Production (Post-Press)", "Regular" },
                 { "Jela Cruz, Juan C.", 17, "Production (Quality Control)", "Regular" },
                 { "Jela Cruz, Juan C.", 22, "Production (Quality Control)", "Regular" },
-                { "Kela Cruz, Juan C.", 11, "Sales", "Regular" }
+                { "Kela Cruz, Juan C.", 11, "Sales", "Regular" },
+                { "Lela Cruz, Juan C.", 12, "Sales", "Regular" },
+                { "Mela Cruz, Juan C.", 13, "Sales", "Regular" },
+                { "Nela Cruz, Juan C.", 16, "Production (Press)", "Regular" },
+                { "Oela Cruz, Juan C.", 18, "Production (Press)", "Regular" },
+                { "Pela Cruz, Juan C.", 19, "Production (Post-Press)", "Regular" },
+                { "Qela Cruz, Juan C.", 20, "Production (Post-Press)", "Regular" },
+                { "Rela Cruz, Juan C.", 21, "Production (Quality Control)", "Regular" },
+                { "Sela Cruz, Juan C.", 24, "Production (Quality Control)", "Regular" },
+                { "Tela Cruz, Juan C.", 26, "Sales", "Regular" },
+                { "Uela Cruz, Juan C.", 27, "Sales", "Regular" },
+                { "Vela Cruz, Juan C.", 28, "Sales", "Regular" },
+                { "Wela Cruz, Juan C.", 29, "Production (Press)", "Regular" },
+                { "Xela Cruz, Juan C.", 30, "Production (Press)", "Regular" },
+                { "Yela Cruz, Juan C.", 32, "Production (Post-Press)", "Regular" },
+                { "Zela Cruz, Juan C.", 33, "Production (Post-Press)", "Regular" },
+                { "Aela Cruz, Juan C.", 34, "Production (Quality Control)", "Regular" },
+                { "Bela Cruz, Juan C.", 35, "Production (Quality Control)", "Regular" },
+                { "Cela Cruz, Juan C.", 37, "Sales", "Regular" },
+                { "Dela Cruz, Juan C.", 38, "Sales", "Regular" },
+                { "Eela Cruz, Juan C.", 39, "Sales", "Regular" },
+                { "Fela Cruz, Juan C.", 40, "Production (Press)", "Regular" },
+                { "Gela Cruz, Juan C.", 41, "Production (Press)", "Regular" },
+                { "Hela Cruz, Juan C.", 42, "Production (Post-Press)", "Regular" },
+                { "Iela Cruz, Juan C.", 43, "Production (Post-Press)", "Regular" },
+                { "Jela Cruz, Juan C.", 44, "Production (Quality Control)", "Regular" },
+                { "Kela Cruz, Juan C.", 45, "Production (Quality Control)", "Regular" },
+                { "Lela Cruz, Juan C.", 46, "Sales", "Regular" },
+                { "Mela Cruz, Juan C.", 47, "Sales", "Regular" },
+                { "Nela Cruz, Juan C.", 48, "Sales", "Regular" },
+                { "Oela Cruz, Juan C.", 49, "Production (Press)", "Regular" },
+                { "Pela Cruz, Juan C.", 50, "Production (Press)", "Regular" },
+                { "Qela Cruz, Juan C.", 51, "Production (Post-Press)", "Regular" },
+                { "Rela Cruz, Juan C.", 52, "Production (Post-Press)", "Regular" },
+                { "Sela Cruz, Juan C.", 53, "Production (Quality Control)", "Regular" },
+                { "Tela Cruz, Juan C.", 54, "Production (Quality Control)", "Regular" },
+                { "Uela Cruz, Juan C.", 55, "Sales", "Regular" },
+                { "Vela Cruz, Juan C.", 56, "Sales", "Regular" },
+                { "Wela Cruz, Juan C.", 57, "Sales", "Regular" },
+                { "Xela Cruz, Juan C.", 58, "Production (Press)", "Regular" },
+                { "Yela Cruz, Juan C.", 59, "Production (Press)", "Regular" },
+                { "Zela Cruz, Juan C.", 60, "Production (Post-Press)", "Regular" },
+                { "Aela Cruz, Juan C.", 61, "Production (Post-Press)", "Regular" },
+                { "Bela Cruz, Juan C.", 62, "Production (Quality Control)", "Regular" },
+                { "Cela Cruz, Juan C.", 63, "Production (Quality Control)", "Regular" },
+                { "Dela Cruz, Juan C.", 64, "Sales", "Regular" },
+                { "Eela Cruz, Juan C.", 65, "Sales", "Regular" },
+                { "Fela Cruz, Juan C.", 66, "Sales", "Regular" },
+                { "Gela Cruz, Juan C.", 67, "Production (Press)", "Regular" },
+                { "Hela Cruz, Juan C.", 68, "Production (Press)", "Regular" },
+                { "Iela Cruz, Juan C.", 69, "Production (Post-Press)", "Regular" },
+                { "Jela Cruz, Juan C.", 70, "Production (Post-Press)", "Regular" }
         };
         JTable table = new JTable(new DefaultTableModel(data, columnNames));
+        TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
+
+        // Set table header background to green and foreground to white
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(0, 128, 0)); // green
+        header.setForeground(Color.WHITE);
+
+        // Remove the up/down arrow buttons from the vertical scrollbar
+        tableScrollPane.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                button.setVisible(false);
+                return button;
+            }
+
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(34, 177, 76); // green
+                this.trackColor = new Color(220, 255, 220); // light green track
+            }
+
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(34, 177, 76)); // green
+                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(new Color(220, 255, 220)); // light green
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                g2.dispose();
+            }
+        });
 
         // Font
         Font font = new Font("Arial", Font.PLAIN, 16);

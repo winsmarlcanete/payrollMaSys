@@ -13,8 +13,22 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         setTitle("Synergy Grafix Corporation PMS");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(rootPane);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1020, 600));
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
+
+        addWindowStateListener(e -> {
+            // If restoring from maximized (not from minimized)
+            if ((e.getOldState() & Frame.MAXIMIZED_BOTH) != 0 &&
+                (e.getNewState() & Frame.MAXIMIZED_BOTH) == 0) {
+                
+                SwingUtilities.invokeLater(() -> {
+                    setSize(1020, 600);            // Set your preferred restored size
+                    setLocationRelativeTo(null);  // Center on screen
+                });
+            }
+        });
+
+
 
         // Set the look and feel to FlatLaf (optional)
         // try {
