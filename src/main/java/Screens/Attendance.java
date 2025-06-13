@@ -70,7 +70,8 @@ public class Attendance extends JPanel {
         };
 
         model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(model);   
+        JTable table = new JTable(model);
+        table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
 
         TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>(model);

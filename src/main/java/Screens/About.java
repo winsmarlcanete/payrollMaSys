@@ -17,7 +17,7 @@ public class About extends JPanel {
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground(Color.WHITE);
         JLabel logoLabel = new JLabel();
-        ImageIcon logoIcon = new ImageIcon("logo.png"); // Make sure logo.png exists
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/Components/whole_logo.png"));
         Image scaledLogo = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         logoLabel.setIcon(new ImageIcon(scaledLogo));
 
