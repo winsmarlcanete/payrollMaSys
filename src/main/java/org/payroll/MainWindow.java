@@ -15,7 +15,7 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1020, 600));
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
-        ImageIcon windowIcon = new ImageIcon(getClass().getResource("/Components/logo_only.png"));
+        ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
         setIconImage(windowIcon.getImage());
 
         addWindowStateListener(e -> {
