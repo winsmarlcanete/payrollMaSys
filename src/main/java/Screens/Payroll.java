@@ -5,11 +5,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.plaf.basic.ComboPopup;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
 
 import Components.TableStyler;
+import Components.RoundedComboBox;
 
 public class Payroll extends JPanel {
     private JTextField searchField;
@@ -26,6 +29,7 @@ public class Payroll extends JPanel {
         searchField.setFont(new Font("Arial", Font.PLAIN, 16));
         searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
         searchField.setPreferredSize(new Dimension(180, 36));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Add left/right padding
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
 
@@ -36,48 +40,164 @@ public class Payroll extends JPanel {
         topGroupPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         // Logo (leftmost)
-        JLabel logoLabel = new JLabel();
-        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/Components/whole_logo.png"));
         int targetHeight = 30;
+        // Load and scale the logo image
+        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
         int origWidth = logoIcon.getIconWidth();
         int origHeight = logoIcon.getIconHeight();
         int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
         Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        logoLabel.setIcon(new ImageIcon(scaledLogo));
+
+        // Create a rounded JLabel for the logo
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        logoLabel.setPreferredSize(new Dimension(targetWidth + 40, targetHeight)); // Add 20px left/right padding
         logoLabel.setOpaque(true);
-        logoLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 20));
 
         // Dropdown
-        JComboBox<String> sortCombo = new JComboBox<>(new String[] {
-            "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
+        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
+            "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
+        }) {
+            @Override
+            protected void paintBorder(Graphics g) {
+                // Do nothing: no border for this instance
+            }
+        };
+        sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
+        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // right padding 10
+        sortCombo.setBackground(Color.WHITE);
+        sortCombo.setFocusable(false);
+        sortCombo.setMaximumRowCount(12);
+        ((JLabel)sortCombo.getRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
+
+        // Custom renderer for hover effect in dropdown list
+        sortCombo.setRenderer(new DefaultListCellRenderer() {
+            private int hoveredIndex = -1;
+            {
+                // Add mouse motion listener to popup list for hover effect
+                sortCombo.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+                        JList<?> list = getPopupList();
+                        if (list != null) {
+                            list.addMouseMotionListener(new MouseMotionAdapter() {
+                                @Override
+                                public void mouseMoved(MouseEvent e) {
+                                    hoveredIndex = list.locationToIndex(e.getPoint());
+                                    list.repaint();
+                                }
+                            });
+                            list.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mouseExited(MouseEvent e) {
+                                    hoveredIndex = -1;
+                                    list.repaint();
+                                }
+                            });
+                        }
+                    }
+                    @Override public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {}
+                    @Override public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {}
+                    private JList<?> getPopupList() {
+                        ComboPopup popup = (ComboPopup) sortCombo.getUI().getAccessibleChild(sortCombo, 0);
+                        return popup != null ? popup.getList() : null;
+                    }
+                });
+            }
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (index >= 0 && index == hoveredIndex && !isSelected) {
+                    c.setBackground(new Color(230, 255, 230)); // light greenish
+                }
+                return c;
+            }
         });
-        sortCombo.setFont(new Font("Arial", Font.PLAIN, 16));
-        sortCombo.setPreferredSize(new Dimension(260, 36));
+
+        // Add hover effect (like LeaveManagement)
+        Color comboDefaultBg = Color.WHITE;
+        Color comboHoverBg = new Color(230, 255, 230); // light greenish
+        sortCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (sortCombo.isEnabled()) {
+                    sortCombo.setBackground(comboHoverBg);
+                }
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                sortCombo.setBackground(comboDefaultBg);
+            }
+        });
 
         // Use GridBagLayout for vertical centering
         JPanel comboPanel = new JPanel(new GridBagLayout());
-        comboPanel.setOpaque(false);
         GridBagConstraints gbcCombo = new GridBagConstraints();
         gbcCombo.gridx = 0;
         gbcCombo.gridy = 0;
         gbcCombo.anchor = GridBagConstraints.CENTER;
-        comboPanel.add(new JLabel("Sort By Department: "), gbcCombo);
+        JLabel sortLabel = new JLabel("Sort By Department: ");
+        sortLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        sortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
+        comboPanel.add(sortLabel, gbcCombo);
 
         gbcCombo.gridx = 1;
         comboPanel.add(sortCombo, gbcCombo);
         comboPanel.setOpaque(true);
+        comboPanel.setBackground(Color.WHITE);
 
         // Button
         JButton createPeriodBtn = new JButton("Create New Payroll Period");
-        createPeriodBtn.setFont(new Font("Arial", Font.PLAIN, 16));
-        createPeriodBtn.setPreferredSize(new Dimension(220, 36));
+        createPeriodBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        createPeriodBtn.setPreferredSize(new Dimension(250, 36));
+        createPeriodBtn.setBackground(Color.WHITE);
+        createPeriodBtn.setFocusable(false);
+        createPeriodBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        // Hover and click effect
+        Color btnDefaultBg = Color.WHITE;
+        Color btnHoverBg = new Color(230, 255, 230); // light greenish
+        Color btnPressedBg = new Color(200, 240, 200); // slightly darker green
+
+        createPeriodBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            if (createPeriodBtn.isEnabled()) {
+                createPeriodBtn.setBackground(btnHoverBg);
+            }
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+            createPeriodBtn.setBackground(btnDefaultBg);
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+            if (createPeriodBtn.isEnabled()) {
+                createPeriodBtn.setBackground(btnPressedBg);
+            }
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            if (createPeriodBtn.isEnabled() && createPeriodBtn.getBounds().contains(e.getPoint())) {
+                createPeriodBtn.setBackground(btnHoverBg);
+            } else {
+                createPeriodBtn.setBackground(btnDefaultBg);
+            }
+            }
+        });
+
         // Use GridBagLayout for vertical centering
         JPanel btnPanel = new JPanel(new GridBagLayout());
         btnPanel.setOpaque(false);
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding   
         GridBagConstraints gbcBtn = new GridBagConstraints();
         gbcBtn.gridx = 0;
         gbcBtn.gridy = 0;
         gbcBtn.anchor = GridBagConstraints.CENTER;
+        // Make the button fill vertical space
+        gbcBtn.fill = GridBagConstraints.VERTICAL;
+        gbcBtn.weighty = 1.0;
+        createPeriodBtn.setPreferredSize(new Dimension(220, 36)); // You may adjust width if needed
         btnPanel.add(createPeriodBtn, gbcBtn);
 
         // Right panel (dropdown + button)
@@ -88,7 +208,7 @@ public class Payroll extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(0, 0, 0, 10);
+        gbc.insets = new Insets(0, 0, 0, 0);
         rightPanel.add(comboPanel, gbc);
 
         gbc.gridx = 1;
@@ -128,13 +248,66 @@ public class Payroll extends JPanel {
         periodLabel.setFont(new Font("Arial", Font.BOLD, 22));
         periodLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
+        // Load calendar icon from resources
+        ImageIcon calendarIcon = new ImageIcon(
+            new ImageIcon(getClass().getClassLoader().getResource("Calendar.png"))
+            .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+        );
+
         // Replace JTextField with JButton for date selection
         JButton fromDateBtn = new JButton("Oct 21, 2024");
+        JButton toDateBtn = new JButton("Nov 5,2024"); // Declare toDateBtn before using it
         fromDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
         fromDateBtn.setBackground(Color.BLACK);
         fromDateBtn.setForeground(Color.WHITE);
         fromDateBtn.setFocusPainted(false);
+        fromDateBtn.setIcon(calendarIcon);
+        fromDateBtn.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        fromDateBtn.setIconTextGap(12); // Space between text and icon
+
+        // Add hover effect and hand cursor
+        fromDateBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         fromDateBtn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+        fromDateBtn.addMouseListener(new MouseAdapter() {
+            Color normalBg = Color.BLACK;
+            Color hoverBg = new Color(34, 177, 76);
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                fromDateBtn.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                fromDateBtn.setBackground(normalBg);
+            }
+        });
+
+        toDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        toDateBtn.setBackground(Color.BLACK);
+        toDateBtn.setForeground(Color.WHITE);
+        toDateBtn.setFocusPainted(false);
+        toDateBtn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+        toDateBtn.setIcon(calendarIcon);
+        toDateBtn.setHorizontalTextPosition(SwingConstants.LEFT);
+        toDateBtn.setIconTextGap(12);
+        
+        // Add hover effect and hand cursor
+        toDateBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        toDateBtn.addMouseListener(new MouseAdapter() {
+            Color normalBg = Color.BLACK;
+            Color hoverBg = new Color(34, 177, 76);
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                toDateBtn.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                toDateBtn.setBackground(normalBg);
+            }
+        });
+
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy");
+        final java.util.Date[] fromDate = {null};
+        final java.util.Date[] toDate = {null};
 
         // Show date picker dialog on click
         fromDateBtn.addActionListener(e -> {
@@ -142,12 +315,33 @@ public class Payroll extends JPanel {
             java.util.Properties p = new java.util.Properties();
             org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
             org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
             int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy");
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    fromDate[0] = selectedDate;
                     fromDateBtn.setText(sdf.format(selectedDate));
+                    // If toDate is before new fromDate, reset toDate
+                    if (toDate[0] != null && toDate[0].before(fromDate[0])) {
+                        toDate[0] = null;
+                        toDateBtn.setText("Select End Date");
+                    }
                 }
             }
         });
@@ -157,24 +351,37 @@ public class Payroll extends JPanel {
         dashLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
         // Repeat for toDate
-        JButton toDateBtn = new JButton("Nov 5,2024");
-        toDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
-        toDateBtn.setBackground(Color.BLACK);
-        toDateBtn.setForeground(Color.WHITE);
-        toDateBtn.setFocusPainted(false);
-        toDateBtn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
         toDateBtn.addActionListener(e -> {
             org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
             java.util.Properties p = new java.util.Properties();
             org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
             org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            java.util.Date today = new java.util.Date();
+            java.util.Date minDate = fromDate[0];
+            if (minDate == null) {
+            JOptionPane.showMessageDialog(null, "Please select a start date first.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+            }
+
+            // Set picker to minDate by default
+            model.setValue(minDate);
+
             int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
-                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
-                if (selectedDate != null) {
-                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy");
-                    toDateBtn.setText(sdf.format(selectedDate));
+            java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+            if (selectedDate != null) {
+                if (selectedDate.before(minDate)) {
+                JOptionPane.showMessageDialog(null, "End date cannot be before start date.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                return;
                 }
+                if (selectedDate.after(today)) {
+                JOptionPane.showMessageDialog(null, "End date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                return;
+                }
+                toDate[0] = selectedDate;
+                toDateBtn.setText(sdf.format(selectedDate));
+            }
             }
         });
 
