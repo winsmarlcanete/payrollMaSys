@@ -12,6 +12,9 @@ public class User {
     private String user_name;
     private int otp;
 
+    private String security_question;
+    private String security_answer;
+
     //Constructor
     public User(String first_name,String last_name, String email, String password, int access_level,int account_status, String user_name ){
     this.first_name = first_name;
@@ -35,4 +38,12 @@ public class User {
     public int getAccount_status(){return account_status;}
     public String getUser_name(){return user_name;}
     public int getOtp(){return otp;}
+
+    public String getSecurity_question() {
+        return security_question;
+    }
+
+    public String getSecurity_answer() {
+        return security_answer;
+    }
 }

@@ -7,7 +7,12 @@ import Components.RoundedTextField;
 
 import java.awt.*;
 
+import Algorithms.OTPGenerator;
+import Config.EmailService;
+
 public class ResetPassword {
+
+    public static String userEmail;
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new ResetPassword().createAndShowGUI());
     }
@@ -64,6 +69,10 @@ public class ResetPassword {
             if (email.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter your email.");
             } else {
+
+                userEmail = email;
+                String otp = OTPGenerator.generateOTP();
+                EmailService.sendEmail(userEmail,otp);
                 frame.dispose();
                 ResetPassword2.showNewPasswordScreen();
             }
