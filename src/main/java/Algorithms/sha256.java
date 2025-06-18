@@ -2,6 +2,9 @@ package Algorithms;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+
+
 public class sha256 {
     public static String stringToSHA256(String input) {
         try {

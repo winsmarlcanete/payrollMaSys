@@ -9,6 +9,8 @@ import java.awt.*;
 
 import Algorithms.OTPGenerator;
 import Config.EmailService;
+import Config.JDBC;
+import Module.Security.ForgotPassword;
 
 public class ResetPassword {
 
@@ -73,6 +75,7 @@ public class ResetPassword {
                 userEmail = email;
                 String otp = OTPGenerator.generateOTP();
                 EmailService.sendEmail(userEmail,otp);
+                ForgotPassword.saveOtp(userEmail,otp);
                 frame.dispose();
                 ResetPassword2.showNewPasswordScreen();
             }

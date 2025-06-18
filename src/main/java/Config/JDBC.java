@@ -1,6 +1,7 @@
 package Config;
 
 import java.sql.*;
+import Algorithms.sha256;
 
 public class JDBC {
     public static void closeResources(Connection conn, Statement stmt) {
@@ -25,10 +26,7 @@ public class JDBC {
 
     }
 
-    public static void main(String[] args) {
-        getConnection();
-
 
     }
 
-}
+
