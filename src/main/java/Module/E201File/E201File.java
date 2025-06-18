@@ -2,6 +2,8 @@ package Module.E201File;
 import Config.JDBC;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class E201File {
 
@@ -64,6 +66,40 @@ public class E201File {
         }
 
     }
+
+        public static Object[][] getEmployeeTableData() {
+            List<Object[]> dataList = new ArrayList<>();
+
+            String query = """
+            SELECT employee_id, last_name, first_name, middle_name, 
+                   department, employment_status
+            FROM employees""";
+
+            try (Connection conn = JDBC.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(query)) {
+
+                while (rs.next()) {
+                    int id = rs.getInt("employee_id");
+                    String lastName = rs.getString("last_name");
+                    String firstName = rs.getString("first_name");
+                    String middleName = rs.getString("middle_name");
+                    String department = rs.getString("department");
+                    String employmentStatus = rs.getString("employment_status");
+
+                    String fullName = String.format("%s, %s %s", lastName, firstName, middleName != null ? middleName : "");
+
+                    Object[] row = { fullName.trim(), id, department, employmentStatus };
+                    dataList.add(row);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return dataList.toArray(new Object[0][]);
+        }
+
 
     public static void main(String[] args){
         displayEmployeeGeneral();

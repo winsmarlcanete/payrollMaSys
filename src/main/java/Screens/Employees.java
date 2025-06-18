@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import Components.TableStyler;
+import Module.E201File.E201File;
 
 public class Employees extends JPanel {
     private JTextField searchField;
@@ -32,72 +33,9 @@ public class Employees extends JPanel {
 
         // Table data
         String[] columnNames = { "Name", "ID", "Department", "Employment Status" };
-        Object[][] data = {
-                { "Aela Cruz, Juan C.", 1, "Sales", "Regular" },
-                { "Bela Cruz, Juan C.", 23, "Sales", "Regular" },
-                { "Cela Cruz, Juan C.", 31, "Production(Pre-Press)", "Regular" },
-                { "Dela Cruz, Juan C.", 14, "Production(Pre-Press)", "Regular" },
-                { "Eela Cruz, Juan C.", 25, "Production(Pre-Press)", "Regular" },
-                { "Fela Cruz, Juan C.", 36, "Production (Press)", "Regular" },
-                { "Gela Cruz, Juan C.", 15, "Production(Pre-Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 4, "Production(Pre-Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 8, "Production (Post-Press)", "Regular" },
-                { "Iela Cruz, Juan C.", 10, "Production (Post-Press)", "Regular" },
-                { "Jela Cruz, Juan C.", 17, "Production (Quality Control)", "Regular" },
-                { "Jela Cruz, Juan C.", 22, "Production (Quality Control)", "Regular" },
-                { "Kela Cruz, Juan C.", 11, "Sales", "Regular" },
-                { "Lela Cruz, Juan C.", 12, "Sales", "Regular" },
-                { "Mela Cruz, Juan C.", 13, "Sales", "Regular" },
-                { "Nela Cruz, Juan C.", 16, "Production (Press)", "Regular" },
-                { "Oela Cruz, Juan C.", 18, "Production (Press)", "Regular" },
-                { "Pela Cruz, Juan C.", 19, "Production (Post-Press)", "Regular" },
-                { "Qela Cruz, Juan C.", 20, "Production (Post-Press)", "Regular" },
-                { "Rela Cruz, Juan C.", 21, "Production (Quality Control)", "Regular" },
-                { "Sela Cruz, Juan C.", 24, "Production (Quality Control)", "Regular" },
-                { "Tela Cruz, Juan C.", 26, "Sales", "Regular" },
-                { "Uela Cruz, Juan C.", 27, "Sales", "Regular" },
-                { "Vela Cruz, Juan C.", 28, "Sales", "Regular" },
-                { "Wela Cruz, Juan C.", 29, "Production (Press)", "Regular" },
-                { "Xela Cruz, Juan C.", 30, "Production (Press)", "Regular" },
-                { "Yela Cruz, Juan C.", 32, "Production (Post-Press)", "Regular" },
-                { "Zela Cruz, Juan C.", 33, "Production (Post-Press)", "Regular" },
-                { "Aela Cruz, Juan C.", 34, "Production (Quality Control)", "Regular" },
-                { "Bela Cruz, Juan C.", 35, "Production (Quality Control)", "Regular" },
-                { "Cela Cruz, Juan C.", 37, "Sales", "Regular" },
-                { "Dela Cruz, Juan C.", 38, "Sales", "Regular" },
-                { "Eela Cruz, Juan C.", 39, "Sales", "Regular" },
-                { "Fela Cruz, Juan C.", 40, "Production (Press)", "Regular" },
-                { "Gela Cruz, Juan C.", 41, "Production (Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 42, "Production (Post-Press)", "Regular" },
-                { "Iela Cruz, Juan C.", 43, "Production (Post-Press)", "Regular" },
-                { "Jela Cruz, Juan C.", 44, "Production (Quality Control)", "Regular" },
-                { "Kela Cruz, Juan C.", 45, "Production (Quality Control)", "Regular" },
-                { "Lela Cruz, Juan C.", 46, "Sales", "Regular" },
-                { "Mela Cruz, Juan C.", 47, "Sales", "Regular" },
-                { "Nela Cruz, Juan C.", 48, "Sales", "Regular" },
-                { "Oela Cruz, Juan C.", 49, "Production (Press)", "Regular" },
-                { "Pela Cruz, Juan C.", 50, "Production (Press)", "Regular" },
-                { "Qela Cruz, Juan C.", 51, "Production (Post-Press)", "Regular" },
-                { "Rela Cruz, Juan C.", 52, "Production (Post-Press)", "Regular" },
-                { "Sela Cruz, Juan C.", 53, "Production (Quality Control)", "Regular" },
-                { "Tela Cruz, Juan C.", 54, "Production (Quality Control)", "Regular" },
-                { "Uela Cruz, Juan C.", 55, "Sales", "Regular" },
-                { "Vela Cruz, Juan C.", 56, "Sales", "Regular" },
-                { "Wela Cruz, Juan C.", 57, "Sales", "Regular" },
-                { "Xela Cruz, Juan C.", 58, "Production (Press)", "Regular" },
-                { "Yela Cruz, Juan C.", 59, "Production (Press)", "Regular" },
-                { "Zela Cruz, Juan C.", 60, "Production (Post-Press)", "Regular" },
-                { "Aela Cruz, Juan C.", 61, "Production (Post-Press)", "Regular" },
-                { "Bela Cruz, Juan C.", 62, "Production (Quality Control)", "Regular" },
-                { "Cela Cruz, Juan C.", 63, "Production (Quality Control)", "Regular" },
-                { "Dela Cruz, Juan C.", 64, "Sales", "Regular" },
-                { "Eela Cruz, Juan C.", 65, "Sales", "Regular" },
-                { "Fela Cruz, Juan C.", 66, "Sales", "Regular" },
-                { "Gela Cruz, Juan C.", 67, "Production (Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 68, "Production (Press)", "Regular" },
-                { "Iela Cruz, Juan C.", 69, "Production (Post-Press)", "Regular" },
-                { "Jela Cruz, Juan C.", 70, "Production (Post-Press)", "Regular" }
-        };
+        Object[][] data = E201File.getEmployeeTableData();
+
+
         JTable table = new JTable(new DefaultTableModel(data, columnNames));
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
