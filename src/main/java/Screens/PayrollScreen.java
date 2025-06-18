@@ -11,13 +11,42 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
 
+
+import java.util.List;
+
 import Components.TableStyler;
 import Components.RoundedComboBox;
+import Entity.Employee;
+import Module.Payroll.Payroll;
 
-public class Payroll extends JPanel {
+public class PayrollScreen extends JPanel {
     private JTextField searchField;
 
-    public Payroll() {
+    private Object[][] convertToTableData(List<Employee> employees) {
+        Object[][] data = new Object[employees.size()][13]; // 13 fields based on your getters
+
+        for (int i = 0; i < employees.size(); i++) {
+            Employee emp = employees.get(i);
+
+            data[i][0] = emp.getEmployee_id();
+            data[i][1] = emp.getLast_name();
+            data[i][2] = emp.getFirst_name();
+            data[i][3] = emp.getMiddle_name();
+            data[i][4] = emp.getTin_number();
+            data[i][5] = emp.getPhilhealth_number();
+            data[i][6] = emp.getPagibig_number();
+            data[i][7] = emp.getSss_number();
+            data[i][8] = emp.getPay_rate();
+            data[i][9] = emp.getEmployment_status();
+            data[i][10] = emp.getDepartment();
+            data[i][11] = emp.getShift_start();
+            data[i][12] = emp.getShift_end();
+        }
+
+        return data;
+    }
+
+    public PayrollScreen() {
         setLayout(new BorderLayout());
         setBackground(new Color(34, 177, 76)); // green
 
@@ -401,50 +430,26 @@ public class Payroll extends JPanel {
         periodPanel.add(Box.createHorizontalStrut(10));
         periodPanel.add(adminLabel);
 
+
+
+        Payroll payrollLogic = new Payroll();
+        List<Employee> employees = payrollLogic.retrieveAllEmployee();
+        Object[][] data = convertToTableData(employees);
+
+        Object[][] dest = new Object[data.length][];
+
+        for (int i = 0; i < data.length; i++) {
+            dest[i] = new Object[data[i].length]; // allocate each row
+            System.arraycopy(data[i], 0, dest[i], 0, data[i].length);
+        }
+
+
         // --- Table data ---
         String[] columnNames = {
             "Last Name", "First Name", "Rate", "Rate Per Hour", "Days Present", "OT in Hours",
             "Pag-Ibig", "New Deduction", "Total Deduction", "Compensation", "Total Compensation", "Net Pay"
         };
-        Object[][] data = {
-            { "Aela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Bela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Cela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Dela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Eela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Fela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Gela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Hela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Iela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Jela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Kela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Lela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Mela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Nela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Oela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Pela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Qela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Rela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Sela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Tela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Uela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Vela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Wela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Xela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Yela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Zela Cruz", "Juan", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Aela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Bela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Cela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Dela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Eela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Fela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Gela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Hela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Iela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Jela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" },
-            { "Kela Cruz", "Maria", "1007.86", "125.98", "15", "-", "100", "0", "100", "1000", "1100", "900" }
-        };
+
 
         // --- Frozen columns setup ---
         String[] frozenColumns = Arrays.copyOfRange(columnNames, 0, 2);

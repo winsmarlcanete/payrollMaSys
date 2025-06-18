@@ -53,7 +53,7 @@ public class MainWindow extends JFrame {
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
         LeaveManagement leavemanagement = new LeaveManagement();
-        Payroll payroll = new Payroll();
+        PayrollScreen payroll = new PayrollScreen();
         Reports reports = new Reports();
         Help help = new Help();
         About about = new About();
@@ -110,6 +110,10 @@ public class MainWindow extends JFrame {
                             employees.clearSearchField();
                             employeeTableData = E201File.getEmployeeTableData();
                             employees.loadEmployeeTabledata();
+                        }
+
+                        if (name.equals("Attendance")) {
+                            attendance.loadEmployeeTabledata(); // 👈 this refreshes the table
                         }
                         // Clear Leave Management search field when switching to Leave Management panel
                         if (name.equals("Leave Management")) {

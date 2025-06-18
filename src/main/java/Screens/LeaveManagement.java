@@ -25,10 +25,18 @@ import Components.RoundedButton;
 import Components.RoundedComboBox;
 import Components.RoundedTextField;
 import Components.TableStyler;
+import Module.E201File.E201File;
 
 public class LeaveManagement extends JPanel {
     private JTextField searchField;
 
+    private static DefaultTableModel employeeTableModel;
+    private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
+    private JTable table;
+    public static void loadEmployeeTabledata() {
+        Object[][] data = E201File.getEmployeeTableData(); // query your source
+        employeeTableModel.setDataVector(data, columnHeaders);
+    }
     public void clearSearchField() {
         searchField.setText("");
     }
@@ -49,29 +57,16 @@ public class LeaveManagement extends JPanel {
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
 
-        String[] columnNames = { "Name", "ID", "Department", "Employment Status" };
-        Object[][] data = {
-                { "Aela Cruz, Juan C.", 1, "Sales", "Regular" },
-                { "Bela Cruz, Juan C.", 23, "Sales", "Regular" },
-                { "Cela Cruz, Juan C.", 31, "Production(Pre-Press)", "Regular" },
-                { "Dela Cruz, Juan C.", 14, "Production(Pre-Press)", "Regular" },
-                { "Eela Cruz, Juan C.", 25, "Production(Pre-Press)", "Regular" },
-                { "Fela Cruz, Juan C.", 36, "Production (Press)", "Regular" },
-                { "Gela Cruz, Juan C.", 15, "Production(Pre-Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 4, "Production(Pre-Press)", "Regular" },
-                { "Hela Cruz, Juan C.", 8, "Production (Post-Press)", "Regular" },
-                { "Iela Cruz, Juan C.", 10, "Production (Post-Press)", "Regular" },
-                { "Jela Cruz, Juan C.", 17, "Production (Quality Control)", "Regular" },
-                { "Jela Cruz, Juan C.", 22, "Production (Quality Control)", "Regular" },
-                { "Kela Cruz, Juan C.", 11, "Sales", "Regular" }
-        };
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+
+        Object[][] data = E201File.getEmployeeTableData();
+        employeeTableModel = new DefaultTableModel(data, columnHeaders) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        JTable table = new JTable(model);
+        table = new JTable(employeeTableModel);
+
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
@@ -503,9 +498,9 @@ public class LeaveManagement extends JPanel {
             public void changedUpdate(javax.swing.event.DocumentEvent e) { filterTable(); }
             private void filterTable() {
                 String searchText = searchField.getText().toLowerCase();
-                model.setRowCount(0);
+                employeeTableModel.setRowCount(0);
                 if (searchText.isEmpty()) {
-                    for (Object[] row : data) model.addRow(row);
+                    for (Object[] row : data) employeeTableModel.addRow(row);
                 } else {
                     for (Object[] row : data) {
                         boolean matchFound = false;
@@ -514,7 +509,7 @@ public class LeaveManagement extends JPanel {
                                 matchFound = true; break;
                             }
                         }
-                        if (matchFound) model.addRow(row);
+                        if (matchFound) employeeTableModel.addRow(row);
                     }
                 }
             }

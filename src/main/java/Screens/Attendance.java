@@ -6,6 +6,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 
 import Components.TableStyler; // Assuming this class exists and works as intended
+import Module.E201File.E201File;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,7 +15,15 @@ public class Attendance extends JPanel {
 
     private CardLayout cardLayout;
     private JPanel mainContainer;
-    private DefaultTableModel model;
+
+    private static DefaultTableModel employeeTableModel;
+    private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
+    private JTable table;
+
+    public static void loadEmployeeTabledata() {
+        Object[][] data = E201File.getEmployeeTableData(); // query your source
+        employeeTableModel.setDataVector(data, columnHeaders);
+    }
 
     public Attendance() {
         setLayout(new BorderLayout());
@@ -50,28 +59,19 @@ public class Attendance extends JPanel {
         topPanel.add(searchPanel, BorderLayout.CENTER);
         topPanel.add(backupButton, BorderLayout.EAST);
 
-        String[] columnNames = { "Name", "ID", "Department", "Employment Status" };
-        Object[][] data = {
-                { "Aela Cruz, Juan C.", "1", "Sales", "Regular" },
-                { "Bela Cruz, Juan C.", "23", "Sales", "Regular" },
-                { "Cela Cruz, Juan C.", "31", "Production (Pre-Press)", "Regular" },
-                { "Dela Cruz, Juan C.", "14", "Production (Pre-Press)", "Regular" },
-                { "Eela Cruz, Juan C.", "25", "Production (Pre-Press)", "Regular" },
-                { "Fela Cruz, Juan C.", "36", "Production (Press)", "Regular" },
-                { "Gela Cruz, Juan C.", "15", "Production (Press)", "Regular" },
-                { "Hela Cruz, Juan C.", "4", "Production (Press)", "Regular" },
-                { "Hela Cruz, Juan C.", "8", "Production (Post-Press)", "Regular" },
-                { "Iela Cruz, Juan C.", "10", "Production (Post-Press)", "Regular" },
-                { "Jela Cruz, Juan C.", "17", "Production (Quality Control)", "Regular" },
-                { "Kela Cruz, Juan C.", "22", "Production (Quality Control)", "Regular" },
+        Object[][] data = E201File.getEmployeeTableData();
+        employeeTableModel = new DefaultTableModel(data, columnHeaders) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
+        table = new JTable(employeeTableModel);
 
-        model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(model);
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
 
-        TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>(model);
+        TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>(employeeTableModel);
         table.setRowSorter(rowSorter);
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -118,7 +118,7 @@ public class Attendance extends JPanel {
                     int modelRow = table.convertRowIndexToModel(row);
                     Object[] rowData = new Object[table.getColumnCount()];
                     for (int i = 0; i < table.getColumnCount(); i++) {
-                        rowData[i] = model.getValueAt(modelRow, i);
+                        rowData[i] = employeeTableModel.getValueAt(modelRow, i);
                     }
                     JPanel detailPanel = createDetailsPanel(rowData);
                     mainContainer.add(detailPanel, "details");
@@ -210,7 +210,7 @@ public class Attendance extends JPanel {
         // ID
         gbc.gridx = 1;
         gbc.gridy = 0;
-        employeeDetailsPanel.add(createStyledField("ID", (String) employeeData[1], 80, Color.WHITE, Color.BLACK), gbc);
+        employeeDetailsPanel.add(createStyledField("ID", String.valueOf(employeeData[1]), 80, Color.WHITE, Color.BLACK), gbc);
 
         // Add an empty space to push the first row fields to the left (similar to
         // FlowLayout.LEFT behavior)

@@ -199,6 +199,7 @@ public class RegisterEmployee extends JPanel {
                 System.out.println("Shift End: " + shiftEnd);
 
                 Employees.loadEmployeeTabledata();
+                Attendance.loadEmployeeTabledata();
 
                 zkFinger.close();
 
