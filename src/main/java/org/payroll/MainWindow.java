@@ -7,9 +7,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import Module.E201File.E201File;
 import Screens.*;
 
 public class MainWindow extends JFrame {
+
+    private Object[][] employeeTableData;
     public MainWindow() {
         setTitle("Synergy Grafix Corporation PMS");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,7 +48,8 @@ public class MainWindow extends JFrame {
         JPanel cardPanel = new JPanel(cardLayout);
 
         // Create panels for each section
-        Employees employees = new Employees(this);
+        employeeTableData = E201File.getEmployeeTableData();
+        Employees employees = new Employees(this, employeeTableData);
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
         LeaveManagement leavemanagement = new LeaveManagement();
@@ -103,6 +108,8 @@ public class MainWindow extends JFrame {
                         // Clear Employees search field when switching to Employees panel
                         if (name.equals("Employees")) {
                             employees.clearSearchField();
+                            employeeTableData = E201File.getEmployeeTableData();
+                            employees.loadEmployeeTabledata();
                         }
                         // Clear Leave Management search field when switching to Leave Management panel
                         if (name.equals("Leave Management")) {

@@ -13,13 +13,25 @@ import Components.TableStyler;
 import Module.E201File.E201File;
 
 public class Employees extends JPanel {
+
+    private static DefaultTableModel employeeTableModel;
+    private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
+    private JTable table;
     private JTextField searchField;
+
+    public static void loadEmployeeTabledata() {
+        Object[][] data = E201File.getEmployeeTableData(); // query your source
+        employeeTableModel.setDataVector(data, columnHeaders);
+    }
+
 
     public void clearSearchField() {
         searchField.setText("");
     }
 
-    public Employees(JFrame parentFrame) {
+
+
+    public Employees(JFrame parentFrame, Object[][] employeeTableData) {
         setLayout(new BorderLayout());
 
         // Search bar
@@ -32,11 +44,17 @@ public class Employees extends JPanel {
         searchPanel.add(searchButton, BorderLayout.EAST);
 
         // Table data
-        String[] columnNames = { "Name", "ID", "Department", "Employment Status" };
-        Object[][] data = E201File.getEmployeeTableData();
+        Object[][] data = employeeTableData;
 
 
-        JTable table = new JTable(new DefaultTableModel(data, columnNames));
+        employeeTableModel = new DefaultTableModel(data, columnHeaders) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        table = new JTable(employeeTableModel);
+
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
@@ -223,7 +241,7 @@ public class Employees extends JPanel {
         contentPanel.add(tablePanel, "TableView");
         contentPanel.add(detailsPanel, "DetailsView");
 
-        setLayout(new BorderLayout());
+
         add(contentPanel, BorderLayout.CENTER);
 
         // Store default border and insets for restoration and spacing
@@ -376,13 +394,7 @@ public class Employees extends JPanel {
             }
         });
 
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        table.setModel(model);
+
 
         table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override

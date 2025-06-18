@@ -8,6 +8,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
+import Screens.Employees;
 
 public class RegisterEmployee extends JPanel {
 
@@ -197,6 +198,7 @@ public class RegisterEmployee extends JPanel {
                 System.out.println("Shift Start: " + shiftStart);
                 System.out.println("Shift End: " + shiftEnd);
 
+                Employees.loadEmployeeTabledata();
 
                 zkFinger.close();
 
