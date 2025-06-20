@@ -14,19 +14,20 @@ public class JDBC {
     }
     public static Connection getConnection() {
         try {
-            final  String URL = "jdbc:mysql://127.0.0.1:3306/payrollmsdb";
-            final  String USER = "root";
-            final  String PASSWORD = "wpc";
-            return DriverManager.getConnection(URL,USER,PASSWORD);
-            }
-        catch (SQLException e) {
+            // specify the database name directly in the URL
+            final String URL = "jdbc:mysql://127.0.0.1:3306/payrollmsdb";
+            final String USER = "root";
+            final String PASSWORD = "jerwinpaul";
+
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
-
     }
 
 
-    }
+
+}
 
 
