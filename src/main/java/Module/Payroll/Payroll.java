@@ -68,7 +68,7 @@ public class Payroll {
             stmt.close();
             conn.close();
 
-            return new PayrollClass(emp.getEmployee_id(), period_start,period_end, emp.getPay_rate());
+            return new PayrollClass(emp.getEmployee_id(), period_start,period_end, emp.getPay_rate(), emp.getLast_name() + " " + emp.getFirst_name());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -79,15 +79,20 @@ public class Payroll {
         Connection conn;
 
         try {
-            String sql = "SELECT `employee_id`, `period_start`, `period_end`, `days_present`, " +
-                    "`overtime_hours`, `nd_hours`, `sholiday_hours`, `lholiday_hours`, `late_minutes` " +
-                    "FROM `payrollmsdb`.`payroll`";
+            String sql = "SELECT p.employee_id, p.period_start, p.period_end, p.days_present, " +
+                    "p.overtime_hours, p.nd_hours, p.sholiday_hours, p.lholiday_hours, p.late_minutes, " +
+                    "e.first_name, e.last_name, e.pay_rate " +
+                    "FROM payrollmsdb.payroll p " +
+                    "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id";
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                String employeeName = rs.getString("last_name") + " " + rs.getString("first_name");
+                BigDecimal payRate = rs.getBigDecimal("pay_rate");
+
                 PayrollClass payroll = new PayrollClass(
                         rs.getInt("employee_id"),
                         rs.getDate("period_start"),
@@ -97,7 +102,9 @@ public class Payroll {
                         rs.getDouble("nd_hours"),
                         rs.getDouble("sholiday_hours"),
                         rs.getDouble("lholiday_hours"),
-                        rs.getDouble("late_minutes")
+                        rs.getDouble("late_minutes"),
+                        payRate,
+                        employeeName
                 );
 
                 payrollList.add(payroll);
@@ -143,7 +150,7 @@ public class Payroll {
 
                 // Create and collect PayrollClass object
                 Employee emp = new Employee(employeeId, lastName, firstName, payRate, department);
-                PayrollClass payroll = new PayrollClass(employeeId, period_start, period_end, payRate);
+                PayrollClass payroll = new PayrollClass(employeeId, period_start, period_end, payRate, firstName + " " + lastName);
                 payrolls.add(payroll);
 
                 // Insert into payroll table

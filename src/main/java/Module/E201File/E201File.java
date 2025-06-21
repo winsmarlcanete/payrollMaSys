@@ -107,6 +107,43 @@ public class E201File {
         return dataList.toArray(new Object[0][]);
     }
 
+    public static void updateEmployeeData(String lastName, String firstName, String middleName,
+                                          String department, String employmentStatus, double payRate,
+                                          String tinNumber, String pagibigNumber, String sssNumber, String philhealthNumber, int employeeId) {
+        String query = """
+        UPDATE employees
+        SET last_name = ?, first_name = ?, middle_name = ?, department = ?, employment_status = ?,
+            pay_rate = ?, tin_number = ?, pagibig_number = ?, sss_number = ?, philhealth_number = ?
+        WHERE employee_id = ?
+    """;
+
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, lastName);
+            pstmt.setString(2, firstName);
+            pstmt.setString(3, middleName);
+            pstmt.setString(4, department);
+            pstmt.setString(5, employmentStatus);
+            pstmt.setDouble(6, payRate);
+            pstmt.setString(7, tinNumber);
+            pstmt.setString(8, pagibigNumber);
+            pstmt.setString(9, sssNumber);
+            pstmt.setString(10, philhealthNumber);
+            pstmt.setInt(11, employeeId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee data updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args){
         displayEmployeeGeneral();

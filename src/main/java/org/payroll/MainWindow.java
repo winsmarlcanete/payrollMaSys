@@ -5,10 +5,12 @@ import javax.swing.*;
 // import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import Module.E201File.E201File;
+import Module.Payroll.Payroll;
 import Screens.*;
 
 public class MainWindow extends JFrame {
@@ -118,6 +120,14 @@ public class MainWindow extends JFrame {
                         // Clear Leave Management search field when switching to Leave Management panel
                         if (name.equals("Leave Management")) {
                             leavemanagement.clearSearchField();
+                            leavemanagement.loadEmployeeTabledata();
+                        }
+
+                        if (name.equals("PayrollScreen")) {
+                            Payroll.retrieveAllPayrolls();
+                            java.sql.Date periodStart = java.sql.Date.valueOf("2024-10-21"); // Set to 2024-10-21
+                            java.sql.Date periodEnd = java.sql.Date.valueOf("2024-11-05");   // Set to 2024-11-05
+                            Payroll.loadTimecards(periodStart, periodEnd);
                         }
                     });
                 }
