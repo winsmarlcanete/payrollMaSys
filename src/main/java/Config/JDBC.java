@@ -17,7 +17,7 @@ public class JDBC {
             // specify the database name directly in the URL
             final String URL = "jdbc:mysql://127.0.0.1:3306/payrollmsdb";
             final String USER = "root";
-            final String PASSWORD = "jerwinpaul";
+            final String PASSWORD = "wpc";
 
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {

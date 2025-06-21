@@ -79,11 +79,13 @@ public class Payroll {
         Connection conn;
 
         try {
+            // Fetch the latest payroll record for each employee
             String sql = "SELECT p.employee_id, p.period_start, p.period_end, p.days_present, " +
                     "p.overtime_hours, p.nd_hours, p.sholiday_hours, p.lholiday_hours, p.late_minutes, " +
                     "e.first_name, e.last_name, e.pay_rate " +
                     "FROM payrollmsdb.payroll p " +
-                    "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id";
+                    "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
+                    "WHERE p.period_start = (SELECT MAX(period_start) FROM payrollmsdb.payroll WHERE employee_id = p.employee_id)";
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
