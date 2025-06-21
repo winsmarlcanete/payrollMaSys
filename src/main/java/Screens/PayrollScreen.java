@@ -9,42 +9,45 @@ import javax.swing.plaf.basic.ComboPopup;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import Components.TableStyler;
 import Components.RoundedComboBox;
 import Entity.Employee;
+import Entity.PayrollClass;
 import Module.Payroll.Payroll;
 
 public class PayrollScreen extends JPanel {
     private JTextField searchField;
 
-    private Object[][] convertToTableData(List<Employee> employees) {
-        Object[][] data = new Object[employees.size()][13]; // 13 fields based on your getters
+    private Object[][] convertToTableData(List<PayrollClass> payrollList) {
+        Object[][] data = new Object[payrollList.size()][9];
 
-        for (int i = 0; i < employees.size(); i++) {
-            Employee emp = employees.get(i);
-
-            data[i][0] = emp.getEmployee_id();
-            data[i][1] = emp.getLast_name();
-            data[i][2] = emp.getFirst_name();
-            data[i][3] = emp.getMiddle_name();
-            data[i][4] = emp.getTin_number();
-            data[i][5] = emp.getPhilhealth_number();
-            data[i][6] = emp.getPagibig_number();
-            data[i][7] = emp.getSss_number();
-            data[i][8] = emp.getPay_rate();
-            data[i][9] = emp.getEmployment_status();
-            data[i][10] = emp.getDepartment();
-            data[i][11] = emp.getShift_start();
-            data[i][12] = emp.getShift_end();
+        for (int i = 0; i < payrollList.size(); i++) {
+            PayrollClass p = payrollList.get(i);
+            data[i][0] = p.getEmployee_id();         // Replace with actual employee name if needed
+            data[i][1] = "";                        // Rate - not in class
+            data[i][2] = "";                        // Rate/hour - not in class
+            data[i][3] = p.getDays_present();
+            data[i][4] = p.getOvertime_hours();
+            data[i][5] = p.getNd_hours();
+            data[i][6] = p.getSholiday_hours();
+            data[i][7] = p.getLholiday_hours();
+            data[i][8] = p.getLate_minutes();
         }
 
         return data;
     }
+
+
 
     public PayrollScreen() {
         setLayout(new BorderLayout());
@@ -203,6 +206,9 @@ public class PayrollScreen extends JPanel {
             public void mousePressed(MouseEvent e) {
             if (createPeriodBtn.isEnabled()) {
                 createPeriodBtn.setBackground(btnPressedBg);
+
+                List<PayrollClass> payrolls = Payroll.generatePayrollForAllEmployees(java.sql.Date.valueOf("2024-10-21"), java.sql.Date.valueOf("2024-11-5"));
+
             }
             }
             @Override
@@ -214,6 +220,8 @@ public class PayrollScreen extends JPanel {
             }
             }
         });
+
+
 
         // Use GridBagLayout for vertical centering
         JPanel btnPanel = new JPanel(new GridBagLayout());
@@ -433,8 +441,9 @@ public class PayrollScreen extends JPanel {
 
 
         Payroll payrollLogic = new Payroll();
-        List<Employee> employees = payrollLogic.retrieveAllEmployee();
-        Object[][] data = convertToTableData(employees);
+
+        List<PayrollClass> payrollclass = payrollLogic.retrieveAllPayrolls();
+        Object[][] data = convertToTableData(payrollclass);
 
         Object[][] dest = new Object[data.length][];
 
@@ -446,8 +455,32 @@ public class PayrollScreen extends JPanel {
 
         // --- Table data ---
         String[] columnNames = {
-            "Last Name", "First Name", "Rate", "Rate Per Hour", "Days Present", "OT in Hours",
-            "Pag-Ibig", "New Deduction", "Total Deduction", "Compensation", "Total Compensation", "Net Pay"
+                "Name",
+                "Rate",
+                "Rate Per Hour",
+                "Days Present",
+                "OT In Hours",
+                "Night Differential In Hours",
+                "Special Holiday In Hours",
+                "Legal Holiday In Hours",
+                "Late In Minutes",
+                "Overtime Amount",
+                "Night Differential Amount",
+                "Special Holiday Amount",
+                "Legal Holiday Amount",
+                "Late Amount",
+                "Wage",
+                "PhilHealth Deduction",
+                "SSS Deduction",
+                "Pag-IBIG Deduction",
+                "E-Fund Deduction",
+                "Other Deduction",
+                "Salary Adjustment",
+                "Allowance Adjustment",
+                "Other Compensations",
+                "Total Deduction",
+                "Gross Pay",
+                "Net Pay"
         };
 
 
@@ -460,7 +493,7 @@ public class PayrollScreen extends JPanel {
         for (int i = 0; i < data.length; i++) {
             frozenData[i][0] = data[i][0];
             frozenData[i][1] = data[i][1];
-            System.arraycopy(data[i], 2, scrollData[i], 0, columnNames.length - 2);
+            System.arraycopy(data[i], 2, scrollData[i], 0, 6);
         }
 
         DefaultTableModel frozenModel = new DefaultTableModel(frozenData, frozenColumns) {
@@ -787,5 +820,8 @@ public class PayrollScreen extends JPanel {
                 adjustColumnWidths.run();
             }
         });
+
+
+
     }
 }
