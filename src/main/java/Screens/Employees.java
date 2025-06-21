@@ -9,6 +9,7 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import Components.TableStyler;
 import Module.E201File.E201File;
@@ -162,9 +163,17 @@ public class Employees extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Details fields
-        JLabel nameLabel = new JLabel("Name:");
-        JTextField nameField = new JTextField();
-        nameField.setEditable(false);
+        JLabel lastNameLabel = new JLabel("Last Name:");
+        JTextField lastNameField = new JTextField();
+        lastNameField.setEditable(false);
+
+        JLabel firstNameLabel = new JLabel("First Name:");
+        JTextField firstNameField = new JTextField();
+        firstNameField.setEditable(false);
+
+        JLabel middleNameLabel = new JLabel("Middle Name:");
+        JTextField middleNameField = new JTextField();
+        middleNameField.setEditable(false);
 
         JLabel idLabel = new JLabel("ID:");
         JTextField idField = new JTextField();
@@ -200,46 +209,56 @@ public class Employees extends JPanel {
 
         // Add fields to panel
         gbc.gridx = 0; gbc.gridy = 0;
-        combinedDetailsPanel.add(nameLabel, gbc);
+        combinedDetailsPanel.add(lastNameLabel, gbc);
         gbc.gridx = 1;
-        combinedDetailsPanel.add(nameField, gbc);
+        combinedDetailsPanel.add(lastNameField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
+        combinedDetailsPanel.add(firstNameLabel, gbc);
+        gbc.gridx = 1;
+        combinedDetailsPanel.add(firstNameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        combinedDetailsPanel.add(middleNameLabel, gbc);
+        gbc.gridx = 1;
+        combinedDetailsPanel.add(middleNameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3;
         combinedDetailsPanel.add(idLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(idField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 4;
         combinedDetailsPanel.add(departmentLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(departmentField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 5;
         combinedDetailsPanel.add(employmentStatusLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(employmentStatusField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 6;
         combinedDetailsPanel.add(rateLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(rateField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 7;
         combinedDetailsPanel.add(tinLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(tinField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 8;
         combinedDetailsPanel.add(pagibigLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(pagibigField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 7;
+        gbc.gridx = 0; gbc.gridy = 9;
         combinedDetailsPanel.add(sssLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(sssField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 8;
+        gbc.gridx = 0; gbc.gridy = 10;
         combinedDetailsPanel.add(philhealthLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(philhealthField, gbc);
@@ -253,15 +272,17 @@ public class Employees extends JPanel {
         add(contentPanel, BorderLayout.CENTER);
 
         // Store default border and insets for restoration and spacing
-        Border defaultBorder = nameField.getBorder();
-        Insets defaultInsets = defaultBorder.getBorderInsets(nameField);
+        Border defaultBorder = lastNameField.getBorder();
+        Insets defaultInsets = defaultBorder.getBorderInsets(lastNameField);
 
         // Helper to set all fields to "plain text" look but keep spacing
         Runnable setPlainTextLook = () -> {
             Border emptyBorder = BorderFactory.createEmptyBorder(
                 defaultInsets.top, defaultInsets.left, defaultInsets.bottom, defaultInsets.right
             );
-            nameField.setBorder(emptyBorder);
+            lastNameField.setBorder(emptyBorder);
+            middleNameField.setBorder(emptyBorder);
+            firstNameField.setBorder(emptyBorder);
             idField.setBorder(emptyBorder);
             departmentField.setBorder(emptyBorder);
             employmentStatusField.setBorder(emptyBorder);
@@ -271,7 +292,7 @@ public class Employees extends JPanel {
             sssField.setBorder(emptyBorder);
             philhealthField.setBorder(emptyBorder);
             Color bg = combinedDetailsPanel.getBackground();
-            nameField.setBackground(bg);
+            lastNameField.setBackground(bg);
             idField.setBackground(bg);
             departmentField.setBackground(bg);
             employmentStatusField.setBackground(bg);
@@ -284,7 +305,9 @@ public class Employees extends JPanel {
 
         // Helper to restore default borders
         Runnable setEditableLook = () -> {
-            nameField.setBorder(defaultBorder);
+            lastNameField.setBorder(defaultBorder);
+            middleNameField.setBorder(defaultBorder);
+            firstNameField.setBorder(defaultBorder);
             idField.setBorder(defaultBorder);
             departmentField.setBorder(defaultBorder);
             employmentStatusField.setBorder(defaultBorder);
@@ -294,7 +317,7 @@ public class Employees extends JPanel {
             sssField.setBorder(defaultBorder);
             philhealthField.setBorder(defaultBorder);
             Color bg = Color.WHITE;
-            nameField.setBackground(bg);
+            lastNameField.setBackground(bg);
             idField.setBackground(bg);
             departmentField.setBackground(bg);
             employmentStatusField.setBackground(bg);
@@ -313,30 +336,19 @@ public class Employees extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {
-                    searchField.setText("");
-
-                    nameField.setText(table.getValueAt(row, 0).toString());
-                    idField.setText(table.getValueAt(row, 1).toString());
-                    departmentField.setText(table.getValueAt(row, 2).toString());
-                    employmentStatusField.setText(table.getValueAt(row, 3).toString());
-
-                    nameField.setEditable(false);
-                    idField.setEditable(false);
-                    departmentField.setEditable(false);
-                    employmentStatusField.setEditable(false);
-                    rateField.setEditable(false);
-                    tinField.setEditable(false);
-                    pagibigField.setEditable(false);
-                    sssField.setEditable(false);
-                    philhealthField.setEditable(false);
+                    lastNameField.setText(employeeTableData[row][0].toString());
+                    firstNameField.setText(employeeTableData[row][1].toString());
+                    middleNameField.setText(employeeTableData[row][2].toString());
+                    idField.setText(employeeTableData[row][3].toString());
+                    departmentField.setText(employeeTableData[row][4].toString());
+                    employmentStatusField.setText(employeeTableData[row][5].toString());
+                    rateField.setText("₱ " + employeeTableData[row][6].toString());
+                    tinField.setText(employeeTableData[row][7].toString());
+                    pagibigField.setText(employeeTableData[row][8].toString());
+                    sssField.setText(employeeTableData[row][9].toString());
+                    philhealthField.setText(employeeTableData[row][10].toString());
 
                     setPlainTextLook.run();
-
-                    rateField.setText("₱ 610.00");
-                    tinField.setText("000 – 123 – 456 – 001");
-                    pagibigField.setText("1234 – 5678 – 9101");
-                    sssField.setText("02 – 1234567 – 9");
-                    philhealthField.setText("02 – 385929672 – 8");
 
                     searchPanel.setVisible(false);
                     CardLayout cl = (CardLayout) (contentPanel.getLayout());
@@ -357,7 +369,9 @@ public class Employees extends JPanel {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nameField.setEditable(true);
+                lastNameField.setEditable(true);
+                firstNameField.setEditable(true);
+                middleNameField.setEditable(true);
                 idField.setEditable(true);
                 departmentField.setEditable(true);
                 employmentStatusField.setEditable(true);
@@ -381,7 +395,9 @@ public class Employees extends JPanel {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nameField.setEditable(false);
+                lastNameField.setEditable(false);
+                firstNameField.setEditable(false);
+                middleNameField.setEditable(false);
                 idField.setEditable(false);
                 departmentField.setEditable(false);
                 employmentStatusField.setEditable(false);
@@ -458,9 +474,17 @@ public class Employees extends JPanel {
         });
 
         Font detailsFont = new Font("Arial", Font.PLAIN, 16);
-        nameLabel.setFont(detailsFont);
-        nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        nameField.setFont(detailsFont);
+        lastNameLabel.setFont(detailsFont);
+        lastNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        lastNameField.setFont(detailsFont);
+
+        firstNameLabel.setFont(detailsFont);
+        firstNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        firstNameField.setFont(detailsFont);
+
+        middleNameLabel.setFont(detailsFont);
+        middleNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        middleNameField.setFont(detailsFont);
 
         idLabel.setFont(detailsFont);
         idLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -494,4 +518,7 @@ public class Employees extends JPanel {
         philhealthLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         philhealthField.setFont(detailsFont);
     }
+
+
+
 }

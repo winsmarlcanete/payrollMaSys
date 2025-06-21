@@ -1,13 +1,14 @@
 package Entity;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 
 public class PayrollClass {
 
     private int payroll_id;
     private int employee_id;
-    private String period_start;
-    private String period_end;
+    private Date period_start;
+    private Date period_end;
     private double days_present;
     private double overtime_hours;
     private double nd_hours;
@@ -37,7 +38,7 @@ public class PayrollClass {
 
     // Constructor
 
-    public PayrollClass(int payroll_id, int employee_id, String period_start, String period_end, double days_present,
+    public PayrollClass(int payroll_id, int employee_id, Date period_start, Date period_end, double days_present,
                         double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, BigDecimal overtime_amount, BigDecimal nd_amount, BigDecimal sholiday_amount,
                         BigDecimal lholiday_amount, BigDecimal late_amount, BigDecimal wage, BigDecimal philhealth_deduction, BigDecimal sss_deduction, BigDecimal pagibig_deduction, BigDecimal efund_deduction, BigDecimal other_deduction,
                         BigDecimal salary_adjustment, BigDecimal allowance_adjustment, BigDecimal other_compensations, BigDecimal total_deduction, BigDecimal gross_pay, BigDecimal net_pay, BigDecimal sub_total, BigDecimal grand_total){
@@ -72,7 +73,7 @@ public class PayrollClass {
         this.grand_total = grand_total;
     }
 
-    public PayrollClass(int employee_id, String period_start, String period_end, double days_present,
+    public PayrollClass(int employee_id, Date period_start, Date period_end, double days_present,
                         double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes){
         this.employee_id = employee_id;
         this.period_start = period_start;
@@ -94,7 +95,7 @@ public class PayrollClass {
                 '}';
     }
 
-    public PayrollClass(int employee_id, String period_start, String period_end, BigDecimal pay_rate){
+    public PayrollClass(int employee_id, Date period_start, Date period_end, BigDecimal pay_rate){
         this.employee_id = employee_id;
         this.period_start = period_start;
         this.period_end = period_end;
@@ -108,11 +109,11 @@ public class PayrollClass {
 
     public int getPayroll_id(){return payroll_id;}
 
-    public String getPeriod_start() {
+    public Date getPeriod_start() {
         return period_start;
     }
 
-    public String getPeriod_end() {
+    public Date getPeriod_end() {
         return period_end;
     }
 
@@ -224,11 +225,11 @@ public class PayrollClass {
         this.payroll_id = payroll_id;
     }
 
-    public void setPeriod_start(String period_start) {
+    public void setPeriod_start(Date period_start) {
         this.period_start = period_start;
     }
 
-    public void setPeriod_end(String period_end) {
+    public void setPeriod_end(Date period_end) {
         this.period_end = period_end;
     }
 

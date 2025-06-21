@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Payroll {
     public static List<Employee> retrieveAllEmployee(){
@@ -48,7 +51,7 @@ public class Payroll {
         return employees;
     }
 
-    public static PayrollClass createPayroll(Employee emp, String period_start, String period_end){
+    public static PayrollClass createPayroll(Employee emp, Date period_start, Date period_end){
 
         Connection conn;
         try{
@@ -57,8 +60,8 @@ public class Payroll {
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1,emp.getEmployee_id());
-            stmt.setString(2, period_start);
-            stmt.setString(3, period_end);
+            stmt.setDate(2, period_start);
+            stmt.setDate(3, period_end);
 
             stmt.executeUpdate();
 
@@ -70,6 +73,108 @@ public class Payroll {
             throw new RuntimeException(e);
         }
     }
+
+    public static List<PayrollClass> retrieveAllPayrolls() {
+        List<PayrollClass> payrollList = new ArrayList<>();
+        Connection conn;
+
+        try {
+            String sql = "SELECT `employee_id`, `period_start`, `period_end`, `days_present`, " +
+                    "`overtime_hours`, `nd_hours`, `sholiday_hours`, `lholiday_hours`, `late_minutes` " +
+                    "FROM `payrollmsdb`.`payroll`";
+
+            conn = JDBC.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                PayrollClass payroll = new PayrollClass(
+                        rs.getInt("employee_id"),
+                        rs.getDate("period_start"),
+                        rs.getDate("period_end"),
+                        rs.getDouble("days_present"),
+                        rs.getDouble("overtime_hours"),
+                        rs.getDouble("nd_hours"),
+                        rs.getDouble("sholiday_hours"),
+                        rs.getDouble("lholiday_hours"),
+                        rs.getDouble("late_minutes")
+                );
+
+                payrollList.add(payroll);
+            }
+
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return payrollList;
+    }
+
+
+
+
+    public static List<PayrollClass> generatePayrollForAllEmployees( Date period_start, Date period_end) {
+        List<PayrollClass> payrolls = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = JDBC.getConnection();
+            conn.setAutoCommit(false); // Use transaction to ensure consistency
+
+            // Step 1: Retrieve all employees
+            String fetchSql = "SELECT `employee_id`, `last_name`, `first_name`, `pay_rate`, `department` FROM `payrollmsdb`.`employees`";
+            PreparedStatement fetchStmt = conn.prepareStatement(fetchSql);
+            ResultSet rs = fetchStmt.executeQuery();
+
+            // Step 2: Prepare payroll insert statement
+            String insertSql = "INSERT INTO payrollmsdb.payroll (employee_id, period_start, period_end) VALUES (?, ?, ?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertSql);
+
+            // Step 3: Iterate and insert payroll for each employee
+            while (rs.next()) {
+                int employeeId = rs.getInt("employee_id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                BigDecimal payRate = rs.getBigDecimal("pay_rate");
+                String department = rs.getString("department");
+
+                // Create and collect PayrollClass object
+                Employee emp = new Employee(employeeId, lastName, firstName, payRate, department);
+                PayrollClass payroll = new PayrollClass(employeeId, period_start, period_end, payRate);
+                payrolls.add(payroll);
+
+                // Insert into payroll table
+                insertStmt.setInt(1, employeeId);
+                insertStmt.setDate(2, period_start);
+                insertStmt.setDate(3, period_end);
+                insertStmt.addBatch(); // Batch for performance
+            }
+
+            insertStmt.executeBatch(); // Execute all insertions
+            conn.commit(); // Commit transaction
+
+            // Cleanup
+            fetchStmt.close();
+            insertStmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Roll back if anything fails
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new RuntimeException(e);
+        }
+
+        return payrolls;
+    }
+
 
     public static void updatePayroll(PayrollClass Payroll){
 
@@ -204,8 +309,8 @@ public class Payroll {
                 if (rs.next()) {
                     payroll.setPayroll_id(rs.getInt("payroll_id"));
                     payroll.setEmployee_id(rs.getInt("employee_id"));
-                    payroll.setPeriod_start(rs.getDate("period_start").toString());
-                    payroll.setPeriod_end(rs.getDate("period_end").toString());
+                    payroll.setPeriod_start(rs.getDate("period_start"));
+                    payroll.setPeriod_end(rs.getDate("period_end"));
                     payroll.setDays_present(rs.getInt("days_present"));
                     payroll.setOvertime_hours(rs.getDouble("overtime_hours"));
                     payroll.setNd_hours(rs.getDouble("nd_hours"));
@@ -280,7 +385,7 @@ public class Payroll {
         }
     }
 
-    public static Map<Integer, PayrollClass> generatePayrollMap(String period_start, String period_end) {
+    public static Map<Integer, PayrollClass> generatePayrollMap(Date period_start,  Date period_end) {
         List<Employee> emplist = retrieveAllEmployee();
         Map<Integer, PayrollClass> payrollMap = new HashMap<>();
 
@@ -291,13 +396,70 @@ public class Payroll {
 
         return payrollMap;
     }
+
+    public static void loadTimecards(Date periodStart, Date periodEnd) {
+        Connection conn;
+        try {
+            // Retrieve all employees
+            List<Employee> employees = retrieveAllEmployee();
+
+            conn = JDBC.getConnection();
+
+            for (Employee employee : employees) {
+                int employeeId = employee.getEmployee_id();
+
+                // Step 1: Retrieve total hours clocked from the timecard database
+                String timecardSql = "SELECT SUM(hours_clocked) AS total_hours " +
+                        "FROM payrollmsdb.timecard " +
+                        "WHERE employee_id = ? AND date BETWEEN ? AND ?";
+                PreparedStatement timecardStmt = conn.prepareStatement(timecardSql);
+                timecardStmt.setInt(1, employeeId);
+                timecardStmt.setDate(2, periodStart);
+                timecardStmt.setDate(3, periodEnd);
+
+                ResultSet rs = timecardStmt.executeQuery();
+                double totalHours = 0.0;
+                if (rs.next()) {
+                    totalHours = rs.getDouble("total_hours");
+                }
+
+                rs.close();
+                timecardStmt.close();
+
+                // Step 2: Compute days present using Formula.computeDaysPresent
+                double daysPresent = Formula.computeDaysPresent(totalHours);
+
+                // Step 3: Update days_present in the payroll database
+                String updateSql = "UPDATE payrollmsdb.payroll SET days_present = ? " +
+                        "WHERE employee_id = ? AND period_start = ? AND period_end = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+                updateStmt.setDouble(1, daysPresent);
+                updateStmt.setInt(2, employeeId);
+                updateStmt.setDate(3, periodStart);
+                updateStmt.setDate(4, periodEnd);
+
+                updateStmt.executeUpdate();
+                updateStmt.close();
+            }
+
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
+
     public static void main (String[] args){
         java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
-        String period_start = sqlDate.toString(); //Date picker
-        String period_end = sqlDate.toString(); // Date picker
+
 
         //Button to create payroll period
-        Map<Integer, PayrollClass> payrollMap = generatePayrollMap(period_start,period_end);
+        Map<Integer, PayrollClass> payrollMap = generatePayrollMap(sqlDate,sqlDate);
 
 
         double days_present = 20.0;
