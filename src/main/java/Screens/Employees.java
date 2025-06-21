@@ -336,17 +336,17 @@ public class Employees extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {
-                    lastNameField.setText(employeeTableData[row][0].toString());
-                    firstNameField.setText(employeeTableData[row][1].toString());
-                    middleNameField.setText(employeeTableData[row][2].toString());
-                    idField.setText(employeeTableData[row][3].toString());
-                    departmentField.setText(employeeTableData[row][4].toString());
-                    employmentStatusField.setText(employeeTableData[row][5].toString());
-                    rateField.setText("₱ " + employeeTableData[row][6].toString());
-                    tinField.setText(employeeTableData[row][7].toString());
-                    pagibigField.setText(employeeTableData[row][8].toString());
-                    sssField.setText(employeeTableData[row][9].toString());
-                    philhealthField.setText(employeeTableData[row][10].toString());
+                    lastNameField.setText(table.getValueAt(row, 0).toString());
+                    firstNameField.setText(table.getValueAt(row, 1).toString());
+                    middleNameField.setText(table.getValueAt(row, 2).toString());
+                    idField.setText(table.getValueAt(row, 3).toString());
+                    departmentField.setText(table.getValueAt(row, 4).toString());
+                    employmentStatusField.setText(table.getValueAt(row, 5).toString());
+                    rateField.setText("₱ " + table.getValueAt(row, 6).toString());
+                    tinField.setText(table.getValueAt(row, 7).toString());
+                    pagibigField.setText(table.getValueAt(row, 8).toString());
+                    sssField.setText(table.getValueAt(row, 9).toString());
+                    philhealthField.setText(table.getValueAt(row, 10).toString());
 
                     setPlainTextLook.run();
 

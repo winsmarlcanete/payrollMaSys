@@ -48,6 +48,17 @@ public class Employee {
 
     }
 
+    public Employee(int employee_id, String last_name, String first_name, String middle_name, BigDecimal pay_rate, String department, String employment_status){
+        this.employee_id = employee_id;
+        this.last_name = last_name;
+        this.first_name = first_name;
+        this.middle_name = middle_name;
+        this.pay_rate = pay_rate;
+        this.department = department;
+        this.employment_status = employment_status;
+
+    }
+
     public Employee(String first_name, String last_name, String middle_name, String department, String employment_status, BigDecimal pay_rate, String tin_number, String philhealth_number, String pagibig_number, String sss_number, Time shift_start, Time shift_end, ZkFinger.FingerprintTemplate fingerprint){
         this.first_name = first_name;
         this.last_name = last_name;

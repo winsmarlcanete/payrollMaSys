@@ -21,24 +21,22 @@ public class Payroll {
         Connection conn;
 
         try{
-            String sql = "SELECT `employees`.`employee_id`,\n" +
-                    "    `employees`.`last_name`,\n" +
-                    "    `employees`.`first_name`,\n" +
-                    "    `employees`.`pay_rate`,\n" +
-                    "    `employees`.`department`\n" +
-                    "FROM `payrollmsdb`.`employees`;";
+            String sql = "SELECT `employee_id`, `last_name`, `first_name`, `middle_name`, `pay_rate`, `department`, `employment_status` " +
+                    "FROM `payrollmsdb`.`employees`";
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 int employeeId = rs.getInt("employee_id");
-                String firstName = rs.getString("first_name");
                 String lastName = rs.getString("last_name");
+                String firstName = rs.getString("first_name");
+                String middleName = rs.getString("middle_name");
                 BigDecimal payRate = rs.getBigDecimal("pay_rate");
                 String department = rs.getString("department");
+                String employmentStatus = rs.getString("employment_status");
 
-                Employee emp = new Employee(employeeId, lastName, firstName, payRate, department);
+                Employee emp = new Employee(employeeId, lastName, firstName, middleName, payRate, department, employmentStatus);
                 employees.add(emp);
             }
 
