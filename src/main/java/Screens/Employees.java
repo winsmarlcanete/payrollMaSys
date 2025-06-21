@@ -18,13 +18,30 @@ import org.payroll.MainWindow;
 public class Employees extends JPanel {
 
     private static DefaultTableModel employeeTableModel;
-    private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
+
+
+    private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
+    private static String[] detailsViewHeaders = { "Last Name", "First Name", "Middle Name", "Department", "Employment Status", "Rate / Hour", "TIN No.", "Pag-Ibig No.", "SSS No.", "PhilHealth No." };
+    private static Object[][] tableViewData;
+    private static Object[][] detailsViewData;
     private JTable table;
     private JTextField searchField;
 
     public static void loadEmployeeTabledata() {
-        Object[][] data = E201File.getEmployeeTableData(); // query your source
-        employeeTableModel.setDataVector(data, columnHeaders);
+        Object[][] rawData = E201File.getEmployeeTableData(); // Query your source
+
+        // Map data for table view
+        tableViewData = new Object[rawData.length][tableViewHeaders.length];
+        for (int i = 0; i < rawData.length; i++) {
+            tableViewData[i][0] = rawData[i][0] + ", " + rawData[i][1]; // Combine last name and first name
+            tableViewData[i][1] = rawData[i][3]; // ID
+            tableViewData[i][2] = rawData[i][4]; // Department
+            tableViewData[i][3] = rawData[i][5]; // Employment Status
+        }
+
+        // Map data for details view
+        detailsViewData = rawData; // Use rawData directly for details view
+        employeeTableModel.setDataVector(tableViewData, tableViewHeaders);
     }
 
 
@@ -51,9 +68,7 @@ public class Employees extends JPanel {
 
         // Table data
         Object[][] data = employeeTableData;
-
-
-        employeeTableModel = new DefaultTableModel(data, columnHeaders) {
+        employeeTableModel = new DefaultTableModel(tableViewData, tableViewHeaders) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -336,17 +351,17 @@ public class Employees extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {
-                    lastNameField.setText(table.getValueAt(row, 0).toString());
-                    firstNameField.setText(table.getValueAt(row, 1).toString());
-                    middleNameField.setText(table.getValueAt(row, 2).toString());
-                    idField.setText(table.getValueAt(row, 3).toString());
-                    departmentField.setText(table.getValueAt(row, 4).toString());
-                    employmentStatusField.setText(table.getValueAt(row, 5).toString());
-                    rateField.setText("₱ " + table.getValueAt(row, 6).toString());
-                    tinField.setText(table.getValueAt(row, 7).toString());
-                    pagibigField.setText(table.getValueAt(row, 8).toString());
-                    sssField.setText(table.getValueAt(row, 9).toString());
-                    philhealthField.setText(table.getValueAt(row, 10).toString());
+                    lastNameField.setText(detailsViewData[row][0].toString());
+                    firstNameField.setText(detailsViewData[row][1].toString());
+                    middleNameField.setText(detailsViewData[row][2].toString());
+                    idField.setText(detailsViewData[row][3].toString());
+                    departmentField.setText(detailsViewData[row][4].toString());
+                    employmentStatusField.setText(detailsViewData[row][5].toString());
+                    rateField.setText("₱ " + detailsViewData[row][6].toString());
+                    tinField.setText(detailsViewData[row][7].toString());
+                    pagibigField.setText(detailsViewData[row][8].toString());
+                    sssField.setText(detailsViewData[row][9].toString());
+                    philhealthField.setText(detailsViewData[row][10].toString());
 
                     setPlainTextLook.run();
 

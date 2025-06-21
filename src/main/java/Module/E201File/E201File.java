@@ -93,10 +93,8 @@ public class E201File {
                 String sssNumber = rs.getString("sss_number");
                 String philhealthNumber = rs.getString("philhealth_number");
 
-                String fullName = lastName + ", " + firstName + " " + middleName;
-
                 Object[] row = {
-                        fullName, id, department, employmentStatus,
+                        lastName, firstName, middleName, id, department, employmentStatus,
                         payRate, tinNumber, pagibigNumber, sssNumber, philhealthNumber
                 };
                 dataList.add(row);
