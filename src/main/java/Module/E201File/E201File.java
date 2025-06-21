@@ -71,35 +71,31 @@ public class E201File {
         List<Object[]> dataList = new ArrayList<>();
 
         String query = """
-        SELECT employee_id, last_name, first_name, middle_name,
-               department, employment_status, shift_start, shift_end,
-               pay_rate, tin_number, pagibig_number, sss_number, philhealth_number
-        FROM employees""";
+    SELECT employee_id, last_name, first_name, middle_name,
+           department, employment_status, shift_start, shift_end,
+           pay_rate, tin_number, pagibig_number, sss_number, philhealth_number
+    FROM employees""";
 
         try (Connection conn = JDBC.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                int id = rs.getInt("employee_id");
                 String lastName = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
                 String middleName = rs.getString("middle_name");
+                int id = rs.getInt("employee_id");
                 String department = rs.getString("department");
                 String employmentStatus = rs.getString("employment_status");
-                Time shiftStart = rs.getTime("shift_start");
-                Time shiftEnd = rs.getTime("shift_end");
                 double payRate = rs.getDouble("pay_rate");
                 String tinNumber = rs.getString("tin_number");
                 String pagibigNumber = rs.getString("pagibig_number");
                 String sssNumber = rs.getString("sss_number");
                 String philhealthNumber = rs.getString("philhealth_number");
 
-                String fullName = String.format("%s, %s %s", lastName, firstName, middleName != null ? middleName : "");
-
                 Object[] row = {
-                        fullName.trim(), id, department, employmentStatus,
-                        shiftStart, shiftEnd, payRate, tinNumber, pagibigNumber, sssNumber, philhealthNumber
+                        lastName, firstName, middleName, id, department, employmentStatus,
+                        payRate, tinNumber, pagibigNumber, sssNumber, philhealthNumber
                 };
                 dataList.add(row);
             }
