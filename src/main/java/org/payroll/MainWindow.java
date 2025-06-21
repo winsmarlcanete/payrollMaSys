@@ -12,6 +12,7 @@ import Module.E201File.E201File;
 import Screens.*;
 
 public class MainWindow extends JFrame {
+    public static Color activeColor = new Color(0, 128, 0);
 
     private Object[][] employeeTableData;
     public MainWindow() {
@@ -34,14 +35,14 @@ public class MainWindow extends JFrame {
             }
         });
 
-
+//        try {
+//            UIManager.setLookAndFeel(new FlatLightLaf());
+//        } catch (Exception ex) {
+//            System.err.println("Failed to initialize FlatLaf");
+//        }
 
         // Set the look and feel to FlatLaf (optional)
-        // try {
-        //     UIManager.setLookAndFeel(new FlatLightLaf());
-        // } catch (Exception ex) {
-        //     System.err.println("Failed to initialize FlatLaf");
-        // }
+
 
         // Use CardLayout for switching panels
         CardLayout cardLayout = new CardLayout();
@@ -79,7 +80,7 @@ public class MainWindow extends JFrame {
                 buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
                 buttonPanel.setBackground(Color.WHITE);
 
-                Color activeColor = new Color(0, 153, 0);
+                Color activeColor = new Color(0, 158, 0);
                 Color defaultColor = UIManager.getColor("Button.background");
 
                 // Store buttons for color management
@@ -87,7 +88,12 @@ public class MainWindow extends JFrame {
 
                 for (String name : panelMap.keySet()) {
                     JButton btn = new JButton(name);
+                    btn.setFont(new Font("Arial", Font.PLAIN, 16));
                     btn.setFocusPainted(false);
+//                    btn.setPreferredSize(new Dimension(btn.getPreferredSize().width, 35));
+//                    btn.setMaximumSize(new Dimension(btn.getPreferredSize().width, 35));
+                    btn.setPreferredSize(new Dimension(0, 45));
+                    btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
                     btn.setBackground(defaultColor);
                     btn.setBorderPainted(false); // Hide border, keep padding
                     buttonPanel.add(btn);
@@ -100,9 +106,11 @@ public class MainWindow extends JFrame {
                             if (entry.getKey().equals(name)) {
                                 entry.getValue().setBackground(activeColor);
                                 entry.getValue().setForeground(Color.WHITE);
+                                entry.getValue().setFont(new Font("Arial", Font.BOLD, 16));
                             } else {
                                 entry.getValue().setBackground(defaultColor);
                                 entry.getValue().setForeground(Color.BLACK);
+                                entry.getValue().setFont(new Font("Arial", Font.PLAIN, 16));
                             }
                         }
                         // Clear Employees search field when switching to Employees panel
@@ -122,24 +130,38 @@ public class MainWindow extends JFrame {
                     });
                 }
 
+        ImageIcon userIcon = new ImageIcon(
+                new ImageIcon(getClass().getClassLoader().getResource("User.png"))
+                        .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+        );
+
+        JButton currentUser = new JButton("Human Resources");
+        currentUser.setFont(new Font("Arial", Font.PLAIN, 16));
+        currentUser.setFocusPainted(false);
+        currentUser.setBackground(Color.BLACK);
+        currentUser.setForeground(Color.WHITE);
+        currentUser.setIconTextGap(10);
+        currentUser.setBorderPainted(false);
+        currentUser.setIcon(userIcon);
+        currentUser.setPreferredSize(new Dimension(200, 45));
+        currentUser.setMaximumSize(new Dimension(200, 45));
+
+        buttonPanel.add(currentUser);
+
+
         // Set the first button as active
         if (!buttonMap.isEmpty()) {
             JButton firstBtn = buttonMap.values().iterator().next();
             firstBtn.setBackground(activeColor);
             firstBtn.setForeground(Color.WHITE);
+            firstBtn.setFont(new Font("Arial", Font.BOLD, 16));
         }
-
-        // Add a green separator panel below the buttons
-        JPanel greenSeparator = new JPanel();
-        greenSeparator.setBackground(activeColor);
-        greenSeparator.setPreferredSize(new Dimension(0, 6)); // 6px tall
 
         // Layout
         setLayout(new BorderLayout());
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
         topPanel.add(buttonPanel, BorderLayout.NORTH);
-        topPanel.add(greenSeparator, BorderLayout.SOUTH);
 
         add(topPanel, BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);

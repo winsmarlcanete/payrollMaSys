@@ -2,6 +2,7 @@ package Screens;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -11,6 +12,7 @@ import java.awt.event.ActionListener;
 
 import Components.TableStyler;
 import Module.E201File.E201File;
+import org.payroll.MainWindow;
 
 public class Employees extends JPanel {
 
@@ -37,11 +39,14 @@ public class Employees extends JPanel {
         // Search bar
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout());
+        searchPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        searchPanel.setOpaque(false);
+
         searchField = new JTextField();
         JButton searchButton = new JButton("Search");
         searchField.setPreferredSize(null);
         searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.EAST);
+        searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Table data
         Object[][] data = employeeTableData;
@@ -117,9 +122,12 @@ public class Employees extends JPanel {
 
         // CardLayout for switching views
         JPanel contentPanel = new JPanel(new CardLayout());
+        contentPanel.setBackground(Color.RED);
 
         // Table view panel
         JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(MainWindow.activeColor);
+        tablePanel.setBorder(new EmptyBorder(0, 10, 10, 10));
         tablePanel.add(searchPanel, BorderLayout.NORTH);
         tablePanel.add(tableScrollPane, BorderLayout.CENTER);
 
