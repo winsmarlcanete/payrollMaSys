@@ -215,42 +215,42 @@ public class Employees extends JPanel {
         gbc.gridx = 1;
         combinedDetailsPanel.add(middleNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 3;
         combinedDetailsPanel.add(idLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(idField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 4;
         combinedDetailsPanel.add(departmentLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(departmentField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 5;
         combinedDetailsPanel.add(employmentStatusLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(employmentStatusField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 6;
         combinedDetailsPanel.add(rateLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(rateField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 7;
         combinedDetailsPanel.add(tinLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(tinField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 8;
         combinedDetailsPanel.add(pagibigLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(pagibigField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 7;
+        gbc.gridx = 0; gbc.gridy = 9;
         combinedDetailsPanel.add(sssLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(sssField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 8;
+        gbc.gridx = 0; gbc.gridy = 10;
         combinedDetailsPanel.add(philhealthLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(philhealthField, gbc);
@@ -273,6 +273,8 @@ public class Employees extends JPanel {
                 defaultInsets.top, defaultInsets.left, defaultInsets.bottom, defaultInsets.right
             );
             lastNameField.setBorder(emptyBorder);
+            middleNameField.setBorder(emptyBorder);
+            firstNameField.setBorder(emptyBorder);
             idField.setBorder(emptyBorder);
             departmentField.setBorder(emptyBorder);
             employmentStatusField.setBorder(emptyBorder);
@@ -296,6 +298,8 @@ public class Employees extends JPanel {
         // Helper to restore default borders
         Runnable setEditableLook = () -> {
             lastNameField.setBorder(defaultBorder);
+            middleNameField.setBorder(defaultBorder);
+            firstNameField.setBorder(defaultBorder);
             idField.setBorder(defaultBorder);
             departmentField.setBorder(defaultBorder);
             employmentStatusField.setBorder(defaultBorder);
