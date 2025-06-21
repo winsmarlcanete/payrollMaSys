@@ -360,6 +360,10 @@ public class Employees extends JPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Reload employee table data
+                loadEmployeeTabledata();
+
+                // Switch back to the table view
                 CardLayout cl = (CardLayout) (contentPanel.getLayout());
                 cl.show(contentPanel, "TableView");
                 searchPanel.setVisible(true);
@@ -372,7 +376,7 @@ public class Employees extends JPanel {
                 lastNameField.setEditable(true);
                 firstNameField.setEditable(true);
                 middleNameField.setEditable(true);
-                idField.setEditable(true);
+                //idField.setEditable(true);
                 departmentField.setEditable(true);
                 employmentStatusField.setEditable(true);
                 rateField.setEditable(true);
@@ -395,6 +399,23 @@ public class Employees extends JPanel {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int employeeId = Integer.parseInt(idField.getText());
+                String lastName = lastNameField.getText();
+                String firstName = firstNameField.getText();
+                String middleName = middleNameField.getText();
+                String department = departmentField.getText();
+                String employmentStatus = employmentStatusField.getText();
+                double payRate = Double.parseDouble(rateField.getText().replace("₱ ", ""));
+                String tinNumber = tinField.getText();
+                String pagibigNumber = pagibigField.getText();
+                String sssNumber = sssField.getText();
+                String philhealthNumber = philhealthField.getText();
+
+                E201File.updateEmployeeData( lastName, firstName, middleName, department,
+                        employmentStatus, payRate, tinNumber, pagibigNumber,
+                        sssNumber, philhealthNumber,employeeId);
+
+                // Reset fields to non-editable
                 lastNameField.setEditable(false);
                 firstNameField.setEditable(false);
                 middleNameField.setEditable(false);

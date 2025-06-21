@@ -7,6 +7,7 @@ public class PayrollClass {
 
     private int payroll_id;
     private int employee_id;
+    private String employee_name;
     private Date period_start;
     private Date period_end;
     private double days_present;
@@ -21,6 +22,7 @@ public class PayrollClass {
     private BigDecimal lholiday_amount;
     private BigDecimal late_amount;
     private BigDecimal pay_rate;
+    private BigDecimal pay_rate_per_hour;
     private BigDecimal wage;
     private BigDecimal philhealth_deduction;
     private BigDecimal sss_deduction;
@@ -74,7 +76,7 @@ public class PayrollClass {
     }
 
     public PayrollClass(int employee_id, Date period_start, Date period_end, double days_present,
-                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes){
+                        double overtime_hours, double nd_hours, double sholiday_hours, double lholiday_hours, double late_minutes, BigDecimal pay_rate, String employee_name){
         this.employee_id = employee_id;
         this.period_start = period_start;
         this.period_end = period_end;
@@ -84,6 +86,9 @@ public class PayrollClass {
         this.sholiday_hours = sholiday_hours;
         this.lholiday_hours = lholiday_hours;
         this.late_minutes = late_minutes;
+        this.pay_rate = pay_rate;
+        this.employee_name = employee_name;
+        this.pay_rate_per_hour = pay_rate.divide(new BigDecimal("8"), 2, BigDecimal.ROUND_HALF_UP);
     }
 
     @Override
@@ -95,11 +100,13 @@ public class PayrollClass {
                 '}';
     }
 
-    public PayrollClass(int employee_id, Date period_start, Date period_end, BigDecimal pay_rate){
+    public PayrollClass(int employee_id, Date period_start, Date period_end, BigDecimal pay_rate, String employee_name){
         this.employee_id = employee_id;
         this.period_start = period_start;
         this.period_end = period_end;
         this.pay_rate = pay_rate;
+        pay_rate_per_hour = pay_rate.divide(new BigDecimal("8"), 2, BigDecimal.ROUND_HALF_UP);
+        this.employee_name = employee_name;
     }
 
     //Getters
@@ -162,6 +169,11 @@ public class PayrollClass {
     }
 
     public BigDecimal getPayrate() {return pay_rate;}
+
+    public BigDecimal getPay_rate_per_hour() {
+        return pay_rate_per_hour;
+    }
+
     public BigDecimal getWage() {return wage;}
 
     public BigDecimal getPhilhealth_deduction() {
@@ -215,6 +227,12 @@ public class PayrollClass {
     public BigDecimal getGrand_total() {
         return grand_total;
     }
+
+    public String getEmployee_name() {
+        return employee_name;
+    }
+
+
 
     //Setters
     public void setEmployee_id(int employee_id) {
