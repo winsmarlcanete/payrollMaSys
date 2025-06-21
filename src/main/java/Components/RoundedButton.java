@@ -27,7 +27,7 @@ public class RoundedButton extends JButton {
         int height = getHeight();
 
         // Clear entire area (in case something leaks behind)
-        g2.setComposite(AlphaComposite.Clear);
+        g2.setColor(new Color(0, 0, 0, 0));
         g2.fillRect(0, 0, width, height);
         g2.setComposite(AlphaComposite.SrcOver);
 
