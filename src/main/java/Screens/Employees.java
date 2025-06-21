@@ -8,6 +8,7 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import Components.TableStyler;
 import Module.E201File.E201File;
@@ -307,10 +308,16 @@ public class Employees extends JPanel {
                 if (row != -1) {
                     searchField.setText("");
 
-                    nameField.setText(table.getValueAt(row, 0).toString());
-                    idField.setText(table.getValueAt(row, 1).toString());
-                    departmentField.setText(table.getValueAt(row, 2).toString());
-                    employmentStatusField.setText(table.getValueAt(row, 3).toString());
+                    // Dynamically populate fields based on selected row
+                    nameField.setText(employeeTableData[row][0].toString());
+                    idField.setText(employeeTableData[row][1].toString());
+                    departmentField.setText(employeeTableData[row][2].toString());
+                    employmentStatusField.setText(employeeTableData[row][3].toString());
+                    rateField.setText("₱ " + employeeTableData[row][6].toString());
+                    tinField.setText(employeeTableData[row][7].toString());
+                    pagibigField.setText(employeeTableData[row][8].toString());
+                    sssField.setText(employeeTableData[row][9].toString());
+                    philhealthField.setText(employeeTableData[row][10].toString());
 
                     nameField.setEditable(false);
                     idField.setEditable(false);
@@ -323,12 +330,6 @@ public class Employees extends JPanel {
                     philhealthField.setEditable(false);
 
                     setPlainTextLook.run();
-
-                    rateField.setText("₱ 610.00");
-                    tinField.setText("000 – 123 – 456 – 001");
-                    pagibigField.setText("1234 – 5678 – 9101");
-                    sssField.setText("02 – 1234567 – 9");
-                    philhealthField.setText("02 – 385929672 – 8");
 
                     searchPanel.setVisible(false);
                     CardLayout cl = (CardLayout) (contentPanel.getLayout());
@@ -486,4 +487,7 @@ public class Employees extends JPanel {
         philhealthLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         philhealthField.setFont(detailsFont);
     }
+
+
+
 }

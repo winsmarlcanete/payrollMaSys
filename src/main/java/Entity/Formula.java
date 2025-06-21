@@ -6,7 +6,9 @@ import java.math.RoundingMode;
 public class Formula {
 
 
-
+    public static Double computeDaysPresent(Double hours_clocked){
+        return hours_clocked/8;
+    }
     public static BigDecimal computeLateAmount(BigDecimal pay_rate, double late_minutes) {
 
         if (pay_rate == null) pay_rate = BigDecimal.ZERO;
