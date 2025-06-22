@@ -4,6 +4,10 @@ import Algorithms.sha256;
 import Module.Registration.UserRegistration.UserRegistration;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.border.EmptyBorder;
+import java.awt.image.BufferedImage;
 
 import org.payroll.MainWindow;
 
@@ -11,29 +15,54 @@ import java.awt.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Objects;
+
+// Make sure to correctly import your custom Rounded components based on their actual location:
+import Components.RoundedTextField;
+import Components.RoundedPasswordField;
+import Components.RoundedButton;
+
 
 import static Module.Registration.UserRegistration.UserRegistration.checkUserEmail;
 
 public class Login extends JFrame {
+
+    // Declare error message label at class level so action listeners can access it
+    private JLabel errorMessageLabel;
+    private RoundedTextField emailField;
+    private RoundedPasswordField passwordField;
+
+
     public Login() {
         setTitle("SynergyGrafixCorp. Payroll Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Set the background color for the entire frame's content pane
+        getContentPane().setBackground(Color.LIGHT_GRAY);
+        setLayout(new GridBagLayout()); // Use GridBagLayout for the frame to center the main panel
         initComponents();
     }
 
     private void initComponents() {
-        // Panel to center the content
+        // Main Panel for Content (this will be the white background card)
         JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(Color.LIGHT_GRAY);
-        centerPanel.setPreferredSize(new Dimension(400, 350));
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.setPreferredSize(new Dimension(550, 500));
+        centerPanel.setMaximumSize(new Dimension(550, 500));
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         // Logo
-        ImageIcon rawLogo = new ImageIcon("C:/Users/PC1/Desktop/SynRepo/payrollMaSys/src/main/java/Screens/logo.png");
-        Image scaledLogo = rawLogo.getImage().getScaledInstance(300, 70, Image.SCALE_SMOOTH); // Fixed size
+        int targetLogoHeight = 40;
+        ImageIcon rawLogo = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png")); // Assuming whole_logo.png is the logo you want
+        if (rawLogo.getImageLoadStatus() != MediaTracker.COMPLETE) {
+            System.err.println("Warning: Logo image 'whole_logo.png' not found or could not be loaded.");
+            rawLogo = new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)); // Transparent 1x1 image
+        }
+        Image scaledLogo = rawLogo.getImage().getScaledInstance(
+                (int) ((double) rawLogo.getIconWidth() / rawLogo.getIconHeight() * targetLogoHeight),
+                targetLogoHeight,
+                Image.SCALE_SMOOTH
+        );
         JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -43,78 +72,82 @@ public class Login extends JFrame {
         systemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Email field
-        JTextField emailField = new JTextField(20);
-        emailField.setMaximumSize(new Dimension(250, 30));
+        emailField = new RoundedTextField(20);
+        emailField.setMaximumSize(new Dimension(350, 30));
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        emailField.setBorder(BorderFactory.createTitledBorder("Email"));
 
         // =============== Password field ===============
-        // Create the password panel with titled border
         JPanel passwordPanel = new JPanel();
         passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.X_AXIS));
-        passwordPanel.setMaximumSize(new Dimension(250, 50));
+        passwordPanel.setMaximumSize(new Dimension(350, 50));
         passwordPanel.setBorder(BorderFactory.createTitledBorder("Password"));
+        passwordPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passwordPanel.setBackground(Color.WHITE);
 
         // Password field
-        JPasswordField passwordField = new JPasswordField(20);
-        passwordField.setMaximumSize(new Dimension(250, 30));
+        passwordField = new RoundedPasswordField(20);
+        passwordField.setMaximumSize(new Dimension(300, 30));
         passwordField.setEchoChar('•');
+        passwordField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        passwordField.setOpaque(false);
 
         // Eye button
-        JButton toggleButton = new JButton("👁"); // You can also use an icon
+        JButton toggleButton = new JButton("👁");
         toggleButton.setFocusable(false);
         toggleButton.setMargin(new Insets(0, 5, 0, 5));
         toggleButton.setPreferredSize(new Dimension(40, 30));
+        toggleButton.setBackground(new Color(220, 220, 220));
+        toggleButton.setBorderPainted(false);
+        toggleButton.setOpaque(false);
 
         // Toggle password visibility
         toggleButton.addActionListener(e -> {
             if (passwordField.getEchoChar() == 0) {
-                passwordField.setEchoChar('•'); // Hide
+                passwordField.setEchoChar('•');
+                toggleButton.setText("👁");
             } else {
-                passwordField.setEchoChar((char) 0); // Show
+                passwordField.setEchoChar((char) 0);
+                toggleButton.setText("✖");
             }
         });
 
-        passwordPanel.add(Box.createHorizontalStrut(5)); // spacing from left
+        passwordPanel.add(Box.createHorizontalStrut(5));
         passwordPanel.add(passwordField);
         passwordPanel.add(Box.createHorizontalStrut(5));
         passwordPanel.add(toggleButton);
-        passwordPanel.setAlignmentX(Component.CENTER_ALIGNMENT); // Ensure password panel is centered
+        passwordPanel.add(Box.createHorizontalStrut(5));
+
+        // Error Message Label (Initially hidden)
+        errorMessageLabel = new JLabel("Incorrect email or password");
+        errorMessageLabel.setForeground(Color.RED);
+        errorMessageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        errorMessageLabel.setVisible(false);
+
+        // Add DocumentListeners to hide error message on input
+        DocumentListener hideErrorMessageListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { hideError(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { hideError(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { hideError(); }
+
+            private void hideError() {
+                if (errorMessageLabel.isVisible()) {
+                    errorMessageLabel.setVisible(false);
+                }
+            }
+        };
+        emailField.getDocument().addDocumentListener(hideErrorMessageListener);
+        passwordField.getDocument().addDocumentListener(hideErrorMessageListener);
+
 
         // Buttons
-        JButton loginButton = new JButton("Log In");
-        JButton createAccountButton = new JButton("Create Account");
-        JButton forgotPasswordButton = new JButton("Forgot Password");
+        RoundedButton loginButton = new RoundedButton("Log In", 20);
+        RoundedButton createAccountButton = new RoundedButton("Create Account", 20);
+        RoundedButton forgotPasswordButton = new RoundedButton("Forgot Password", 20);
 
-
-        //Action Listener
-        loginButton.addActionListener(e -> {
-            String input_email = emailField.getText();
-            if(emailExists(input_email)) {
-                System.out.print("Email found");
-                String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
-                char[] passwordChars = passwordField.getPassword();
-                String passwordInput = sha256.stringToSHA256(new String(passwordChars));
-                if (Objects.equals(passwordFromDB, passwordInput)){
-                    System.out.println(" and password matched!");
-
-                    MainWindow mainWindow = new MainWindow();
-                    mainWindow.setVisible(true);
-                    mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                    dispose();
-
-
-                } else {
-                    System.out.println(" but password incorrect!");
-                }
-            } else {
-                System.out.println("Couldn't find account");
-            }
-        });
-
-
-
-        Dimension buttonSize = new Dimension(200, 30);
+        Dimension buttonSize = new Dimension(350, 30);
         loginButton.setMaximumSize(buttonSize);
         createAccountButton.setMaximumSize(buttonSize);
         forgotPasswordButton.setMaximumSize(buttonSize);
@@ -123,21 +156,71 @@ public class Login extends JFrame {
         createAccountButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         forgotPasswordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        loginButton.setBackground(new Color(0, 153, 0));
-        createAccountButton.setBackground(new Color(0, 204, 0));
-        forgotPasswordButton.setBackground(new Color(0, 204, 0));
+        loginButton.setBackground(new Color(46, 204, 113));
+        createAccountButton.setBackground(new Color(46, 204, 113));
+        forgotPasswordButton.setBackground(new Color(46, 204, 113));
 
         loginButton.setForeground(Color.WHITE);
         createAccountButton.setForeground(Color.WHITE);
         forgotPasswordButton.setForeground(Color.WHITE);
 
+        //Action Listener
+        loginButton.addActionListener(e -> {
+            String input_email = emailField.getText().trim(); // Trim whitespace
+            char[] passwordChars = passwordField.getPassword();
+
+            // --- Input Validation for Empty Fields ---
+            if (input_email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Email field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
+                errorMessageLabel.setVisible(false); // Ensure error label is hidden for this type of warning
+                return; // Stop further processing
+            }
+
+            if (passwordChars.length == 0) {
+                JOptionPane.showMessageDialog(this, "Password field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
+                errorMessageLabel.setVisible(false); // Ensure error label is hidden for this type of warning
+                return; // Stop further processing
+            }
+            // --- End Input Validation ---
+
+            String passwordInput = sha256.stringToSHA256(new String(passwordChars));
+
+            // Clear password array immediately after use for security
+            Arrays.fill(passwordChars, ' ');
+
+            if(emailExists(input_email)) {
+                String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
+                if (Objects.equals(passwordFromDB, passwordInput)){
+                    // Login Successful
+                    errorMessageLabel.setVisible(false); // Hide any previous error
+                    System.out.println("Email found and password matched!");
+
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.setVisible(true);
+                    mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    dispose(); // Close login window
+
+                } else {
+                    // Password incorrect
+                    errorMessageLabel.setText("Incorrect email or password");
+                    errorMessageLabel.setVisible(true); // Show error message
+                    System.out.println("Email found but password incorrect!");
+                }
+            } else {
+                // Email not found
+                errorMessageLabel.setText("Incorrect email or password");
+                errorMessageLabel.setVisible(true); // Show error message
+                System.out.println("Couldn't find account");
+            }
+        });
+
+
         // Create Account Button ActionListener
         createAccountButton.addActionListener(e -> {
-            // Open the registration screen
             Register registerScreen = new Register();
             registerScreen.setVisible(true);
-            registerScreen.setExtendedState(JFrame.MAXIMIZED_BOTH); // Ensure maximized mode
-            dispose(); // Close the login screen
+            registerScreen.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            dispose();
         });
 
         // Forgot Password Button will redirect to ResetPassword.java
@@ -149,42 +232,47 @@ public class Login extends JFrame {
         // Add components to the panel
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(logoLabel);
-        centerPanel.add(systemLabel); // Now systemLabel is declared before being added
+        centerPanel.add(systemLabel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(emailField);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(passwordPanel);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        centerPanel.add(errorMessageLabel);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         centerPanel.add(loginButton);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(createAccountButton);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(forgotPasswordButton);
+        centerPanel.add(Box.createVerticalGlue());
 
-        // Wrapper panel to center everything on the screen
-        JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setBackground(Color.WHITE);
-        wrapper.add(centerPanel);
+        // Add the main panel to the frame using GridBagLayout to center it
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(centerPanel, gbc);
 
-        add(wrapper);
-        pack(); // Call pack() after adding components
+        pack();
+        setLocationRelativeTo(null);
     }
 
     public static boolean emailExists(String targetEmail) {
-        List<String> emails = checkUserEmail();
+        List<String> emails = UserRegistration.checkUserEmail();
         for (String email : emails) {
             if (email.equalsIgnoreCase(targetEmail)) {
-                return true; // Found a match
+                return true;
             }
         }
-        return false; // No match found
+        return false;
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Login homeScreen = new Login();
-            homeScreen.setVisible(true);
-            homeScreen.setExtendedState(JFrame.MAXIMIZED_BOTH); // Ensure maximized mode
+            Login loginScreen = new Login();
+            loginScreen.setVisible(true);
+            loginScreen.setExtendedState(JFrame.MAXIMIZED_BOTH);
         });
     }
 }
