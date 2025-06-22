@@ -78,18 +78,36 @@ public class Payroll {
 
         try {
             // Fetch the latest payroll record for each employee
-            String sql = "SELECT p.employee_id, p.period_start, p.period_end, " +
-                    "MAX(p.days_present) AS days_present, " +
+            String sql = "SELECT " +
+                    "p.employee_id, " +
+                    "p.period_start, " +
+                    "p.period_end, " +
+                    "COALESCE(SUM(tc.hours_clocked), 0) AS days_present, " + // ← renamed result as days_present
                     "MAX(p.overtime_hours) AS overtime_hours, " +
                     "MAX(p.nd_hours) AS nd_hours, " +
                     "MAX(p.sholiday_hours) AS sholiday_hours, " +
                     "MAX(p.lholiday_hours) AS lholiday_hours, " +
                     "MAX(p.late_minutes) AS late_minutes, " +
-                    "e.first_name, e.last_name, e.pay_rate " +
+                    "e.first_name, " +
+                    "e.last_name, " +
+                    "e.pay_rate " +
                     "FROM payrollmsdb.payroll p " +
                     "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
-                    "WHERE p.period_start = (SELECT MAX(period_start) FROM payrollmsdb.payroll WHERE employee_id = p.employee_id) " +
-                    "GROUP BY p.employee_id, p.period_start, p.period_end, e.first_name, e.last_name, e.pay_rate";
+                    "LEFT JOIN payrollmsdb.timecards tc ON tc.employee_id = p.employee_id " +
+                    "AND tc.date BETWEEN p.period_start AND p.period_end " +
+                    "WHERE p.period_start = ( " +
+                    "   SELECT MAX(period_start) " +
+                    "   FROM payrollmsdb.payroll " +
+                    "   WHERE employee_id = p.employee_id " +
+                    ") " +
+                    "GROUP BY " +
+                    "p.employee_id, " +
+                    "p.period_start, " +
+                    "p.period_end, " +
+                    "e.first_name, " +
+                    "e.last_name, " +
+                    "e.pay_rate;";
+
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
