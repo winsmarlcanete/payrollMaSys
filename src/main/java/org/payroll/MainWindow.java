@@ -128,7 +128,8 @@ public class MainWindow extends JFrame {
                         // Clear Leave Management search field when switching to Leave Management panel
                         if (name.equals("Leave Management")) {
                             leavemanagement.clearSearchField();
-                            leavemanagement.loadEmployeeTabledata();
+                            leavemanagement.loadEmployeeTabledata(); // 👈 this refreshes the table
+
                         }
 
                         if (name.equals("PayrollScreen")) {

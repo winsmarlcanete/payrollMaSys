@@ -19,13 +19,28 @@ public class Attendance extends JPanel {
     private JPanel mainContainer;
 
     private static DefaultTableModel employeeTableModel;
+    private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
+    private static Object[][] tableViewData;
+    private static Object[][] detailsViewData;
     private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
     private JTable table;
     private TableRowSorter<DefaultTableModel> rowSorter;
 
     public static void loadEmployeeTabledata() {
-        Object[][] data = E201File.getEmployeeTableData();
-        employeeTableModel.setDataVector(data, columnHeaders);
+        Object[][] rawData = E201File.getEmployeeTableData(); // Query your source
+
+        // Map data for table view
+        tableViewData = new Object[rawData.length][tableViewHeaders.length];
+        for (int i = 0; i < rawData.length; i++) {
+            tableViewData[i][0] = rawData[i][0] + ", " + rawData[i][1]; // Combine last name and first name
+            tableViewData[i][1] = rawData[i][3]; // ID
+            tableViewData[i][2] = rawData[i][4]; // Department
+            tableViewData[i][3] = rawData[i][5]; // Employment Status
+        }
+
+        // Map data for details view
+        detailsViewData = rawData; // Use rawData directly for details view
+        employeeTableModel.setDataVector(tableViewData, tableViewHeaders);
     }
 
     public Attendance() {
@@ -120,13 +135,12 @@ public class Attendance extends JPanel {
         topPanel.add(rightPanel, BorderLayout.EAST);
 
         Object[][] data = E201File.getEmployeeTableData();
-        employeeTableModel = new DefaultTableModel(data, columnHeaders) {
+        employeeTableModel = new DefaultTableModel(tableViewData, tableViewHeaders) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
         table = new JTable(employeeTableModel);
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
