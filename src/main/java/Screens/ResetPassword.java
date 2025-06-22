@@ -248,11 +248,18 @@ class EnterCodeScreen {
             if (enteredCode.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter the code.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                // TODO: Implement actual OTP verification logic here
-                JOptionPane.showMessageDialog(frame, "Code entered: " + enteredCode + " for email: " + ResetPassword.userEmail, "Verification Status (TODO)", JOptionPane.INFORMATION_MESSAGE);
-                // If verification is successful:
-                // frame.dispose();
-                // NewPasswordScreen.showNewPasswordScreen(); // A new screen for setting new password
+
+                if (ForgotPassword.verifyOtp(ResetPassword.userEmail, enteredCode)) {
+                    // If verification is successful
+                    JOptionPane.showMessageDialog(frame, "Code verified successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispose(); // Close current frame
+                    //NewPasswordScreen.showNewPasswordScreen(); // Open the new New Password screen
+                } else {
+                    // If verification fails
+                    JOptionPane.showMessageDialog(frame, "Invalid code. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                frame.dispose();
+                // NewPasswordScreen.showNewPasswordScreen();
             }
         });
         panel.add(verifyButton);
