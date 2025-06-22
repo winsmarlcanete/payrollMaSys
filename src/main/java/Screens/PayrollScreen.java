@@ -1,6 +1,7 @@
 package Screens;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -24,6 +25,7 @@ import Components.RoundedComboBox;
 import Entity.Employee;
 import Entity.PayrollClass;
 import Module.Payroll.Payroll;
+import org.payroll.MainWindow;
 
 public class PayrollScreen extends JPanel {
     private JTextField searchField;
@@ -73,38 +75,28 @@ public class PayrollScreen extends JPanel {
         // --- Search bar (same as Employees.java) ---
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchPanel.setOpaque(false);
+        searchPanel.setLayout(new BorderLayout(10, 0));
+        searchPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+//        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Add left/right padding
+
         searchField = new JTextField();
-        JButton searchButton = new JButton("Search");
         searchField.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchField.setPreferredSize(null);
+        searchField.setBorder(null);
+
+        JButton searchButton = new JButton("Search");
         searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        searchField.setPreferredSize(new Dimension(180, 36));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Add left/right padding
+        searchButton.setPreferredSize(new Dimension(150, 70));
+        searchButton.setBackground(Color.WHITE);
+        searchButton.setBorder(null);
+        searchButton.setFocusable(false);
+
         searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.EAST);
-
-        // --- Top group: logo (left), dropdown + button (right) ---
-        JPanel topGroupPanel = new JPanel();
-        topGroupPanel.setOpaque(false);
-        topGroupPanel.setLayout(new BorderLayout());
-        topGroupPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-        // Logo (leftmost)
-        int targetHeight = 30;
-        // Load and scale the logo image
-        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
-        int origWidth = logoIcon.getIconWidth();
-        int origHeight = logoIcon.getIconHeight();
-        int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
-        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-
-        // Create a rounded JLabel for the logo
-        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
-        logoLabel.setPreferredSize(new Dimension(targetWidth + 40, targetHeight)); // Add 20px left/right padding
-        logoLabel.setOpaque(true);
+        searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Dropdown
         RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
-            "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
+                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
         }) {
             @Override
             protected void paintBorder(Graphics g) {
@@ -113,7 +105,6 @@ public class PayrollScreen extends JPanel {
         };
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
         sortCombo.setPreferredSize(new Dimension(250, 36));
-        sortCombo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // right padding 10
         sortCombo.setBackground(Color.WHITE);
         sortCombo.setFocusable(false);
         sortCombo.setMaximumRowCount(12);
@@ -195,6 +186,30 @@ public class PayrollScreen extends JPanel {
         comboPanel.setOpaque(true);
         comboPanel.setBackground(Color.WHITE);
 
+        searchPanel.add(comboPanel, BorderLayout.EAST);
+        searchPanel.setPreferredSize(new Dimension(0, 60));
+        searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+        // --- Top group: logo (left), dropdown + button (right) ---
+        JPanel logoAndButtonPanel = new JPanel();
+        logoAndButtonPanel.setOpaque(false);
+        logoAndButtonPanel.setLayout(new BorderLayout());
+        logoAndButtonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        // Logo (leftmost)
+        int targetHeight = 30;
+        // Load and scale the logo image
+        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+
+        // Create a rounded JLabel for the logo
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        logoLabel.setPreferredSize(new Dimension(targetWidth + 40, targetHeight)); // Add 20px left/right padding
+        logoLabel.setOpaque(true);
+
         // Button
         JButton createPeriodBtn = new JButton("Create new payroll period");
         createPeriodBtn.setFont(new Font("Arial", Font.BOLD, 16));
@@ -263,12 +278,12 @@ public class PayrollScreen extends JPanel {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(0, 0, 0, 0);
-        rightPanel.add(comboPanel, gbc);
+//        rightPanel.add(comboPanel, gbc);
 
         gbc.gridx = 1;
         rightPanel.add(btnPanel, gbc);
 
-        // Make rightPanel match the height of topGroupPanel
+        // Make rightPanel match the height of logoAndButtonPanel
         int topGroupHeight = Math.max(targetHeight, Math.max(sortCombo.getPreferredSize().height, createPeriodBtn.getPreferredSize().height)) + 8;
         comboPanel.setPreferredSize(new Dimension(comboPanel.getPreferredSize().width, topGroupHeight));
         comboPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, topGroupHeight));
@@ -280,14 +295,21 @@ public class PayrollScreen extends JPanel {
         rightPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, topGroupHeight));
         rightPanel.setMinimumSize(new Dimension(0, topGroupHeight));
 
+        JPanel topGroupPanel = new JPanel();
+        topGroupPanel.setLayout(new BoxLayout(topGroupPanel, BoxLayout.Y_AXIS));
+        topGroupPanel.setOpaque(false);
+
         // Add logo to the left, rightPanel to the right
-        topGroupPanel.add(logoLabel, BorderLayout.WEST);
-        topGroupPanel.add(rightPanel, BorderLayout.EAST);
+        logoAndButtonPanel.add(logoLabel, BorderLayout.WEST);
+        logoAndButtonPanel.add(rightPanel, BorderLayout.EAST);
+
+        topGroupPanel.add(searchPanel);
+        topGroupPanel.add(logoAndButtonPanel);
 
         // Set minimum and maximum height to preferred height to prevent stretching
         int prefHeight = Math.max(targetHeight, Math.max(sortCombo.getPreferredSize().height, createPeriodBtn.getPreferredSize().height));
-        topGroupPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, prefHeight + 8));
-        topGroupPanel.setPreferredSize(new Dimension(topGroupPanel.getPreferredSize().width, prefHeight + 8));
+        logoAndButtonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, prefHeight + 8));
+        logoAndButtonPanel.setPreferredSize(new Dimension(logoAndButtonPanel.getPreferredSize().width, prefHeight + 8));
 
         // --- Period info ---
         JPanel periodPanel = new JPanel();
@@ -561,11 +583,7 @@ public class PayrollScreen extends JPanel {
 
         // Set table header background to green and foreground to white
         JTableHeader frozenHeader = frozenTable.getTableHeader();
-        frozenHeader.setBackground(new Color(0, 128, 0));
-        frozenHeader.setForeground(Color.WHITE);
         JTableHeader scrollHeader = scrollTable.getTableHeader();
-        scrollHeader.setBackground(new Color(0, 128, 0));
-        scrollHeader.setForeground(Color.WHITE);
 
         // Scroll panes for both tables
         JScrollPane frozenScroll = new JScrollPane(frozenTable);
@@ -717,8 +735,10 @@ public class PayrollScreen extends JPanel {
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.add(whitePanel);
 
-        add(searchPanel, BorderLayout.NORTH);
+//        add(searchPanel, BorderLayout.NORTH);
+//        add(logoAndButtonPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
+        setBackground(MainWindow.activeColor);
 
         // --- Responsive column resizing ---
         // Helper method for column resizing

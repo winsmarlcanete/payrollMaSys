@@ -59,10 +59,23 @@ public class Employees extends JPanel {
         searchPanel.setLayout(new BorderLayout(10, 0));
         searchPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         searchPanel.setOpaque(false);
+        searchPanel.setPreferredSize(new Dimension(0, 70));
+        searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+
+        Font font = new Font("Arial", Font.PLAIN, 16);
 
         searchField = new JTextField();
-        JButton searchButton = new JButton("Search");
+        searchField.setFont(font);
+        searchField.setBorder(null);
         searchField.setPreferredSize(null);
+
+        JButton searchButton = new JButton("Search");
+        searchButton.setFont(font);
+        searchButton.setPreferredSize(new Dimension(150, 70));
+        searchButton.setBackground(Color.WHITE);
+        searchButton.setBorder(null);
+        searchButton.setFocusable(false);
+
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.WEST);
 
@@ -159,8 +172,6 @@ public class Employees extends JPanel {
         comboPanel.setBackground(Color.WHITE);
 
         searchPanel.add(comboPanel, BorderLayout.EAST);
-        searchPanel.setPreferredSize(new Dimension(0, 70));
-        searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
         // Table data
         Object[][] data = employeeTableData;
@@ -171,6 +182,12 @@ public class Employees extends JPanel {
             }
         };
         table = new JTable(employeeTableModel);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
@@ -227,19 +244,13 @@ public class Employees extends JPanel {
         });
 
         // Font
-        Font font = new Font("Arial", Font.PLAIN, 16);
+
         table.setFont(font);
         table.setRowHeight(40);
         table.getTableHeader().setFont(font);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-        searchField.setFont(font);
-        searchButton.setFont(font);
-        searchButton.setPreferredSize(new Dimension(150, 70));
-        searchButton.setBackground(Color.WHITE);
-        searchField.setBorder(null);
-        searchButton.setBorder(null);
-        searchButton.setFocusable(false);
+
 
 
         // CardLayout for switching views
