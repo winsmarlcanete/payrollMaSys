@@ -52,7 +52,9 @@ public class MainWindow extends JFrame {
 
         // Create panels for each section
         employeeTableData = E201File.getEmployeeTableData();
+
         Employees employees = new Employees(this, employeeTableData);
+        employees.loadEmployeeTabledata();
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
         LeaveManagement leavemanagement = new LeaveManagement();
