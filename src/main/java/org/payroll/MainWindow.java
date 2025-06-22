@@ -15,6 +15,7 @@ import Screens.*;
 
 public class MainWindow extends JFrame {
     public static Color activeColor = new Color(0, 128, 0);
+    public static Color grayColor = new Color(217, 217, 217);
 
     private Object[][] employeeTableData;
     public MainWindow() {
@@ -98,9 +99,10 @@ public class MainWindow extends JFrame {
 //                    btn.setMaximumSize(new Dimension(btn.getPreferredSize().width, 35));
                     btn.setPreferredSize(new Dimension(0, 45));
                     btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-                    btn.setBackground(defaultColor);
+                    btn.setBackground(new Color(217, 217, 217));
                     btn.setBorderPainted(false); // Hide border, keep padding
                     buttonPanel.add(btn);
+                    buttonPanel.add(Box.createRigidArea(new Dimension(1, 0)));
                     buttonMap.put(name, btn);
 
                     btn.addActionListener(e -> {
@@ -112,7 +114,7 @@ public class MainWindow extends JFrame {
                                 entry.getValue().setForeground(Color.WHITE);
                                 entry.getValue().setFont(new Font("Arial", Font.BOLD, 16));
                             } else {
-                                entry.getValue().setBackground(defaultColor);
+                                entry.getValue().setBackground(new Color(217, 217, 217));
                                 entry.getValue().setForeground(Color.BLACK);
                                 entry.getValue().setFont(new Font("Arial", Font.PLAIN, 16));
                             }
