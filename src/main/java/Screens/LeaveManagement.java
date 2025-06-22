@@ -1,24 +1,9 @@
 package Screens;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
+import java.util.Objects;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import Components.RoundedButton;
@@ -131,11 +116,194 @@ public class LeaveManagement extends JPanel {
         leavesUsedField.setHorizontalAlignment(JTextField.CENTER);
         RoundedTextField remainingSILField = new RoundedTextField(10);
         remainingSILField.setHorizontalAlignment(JTextField.CENTER);
-        RoundedTextField dateField1 = new RoundedTextField(10);
-        RoundedTextField dateField2 = new RoundedTextField(10);
-        RoundedTextField dateField3 = new RoundedTextField(10);
-        RoundedTextField dateField4 = new RoundedTextField(10);
-        RoundedTextField dateField5 = new RoundedTextField(10);
+        RoundedButton dateField1 = new RoundedButton ("Input Date", 20);
+        RoundedButton dateField2 = new RoundedButton ("Input Date", 20);
+        RoundedButton dateField3 = new RoundedButton ("Input Date", 20);
+        RoundedButton dateField4 = new RoundedButton ("Input Date", 20);
+        RoundedButton dateField5 = new RoundedButton ("Input Date", 20);
+
+        ImageIcon calendarIcon = new ImageIcon(
+                new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("Black Calendar.png")))
+                        .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+        );
+
+        dateField1.setIcon(calendarIcon);
+        dateField1.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        dateField1.setIconTextGap(12);
+
+        dateField2.setIcon(calendarIcon);
+        dateField2.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        dateField2.setIconTextGap(12);
+
+        dateField3.setIcon(calendarIcon);
+        dateField3.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        dateField3.setIconTextGap(12);
+
+        dateField4.setIcon(calendarIcon);
+        dateField4.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        dateField4.setIconTextGap(12);
+
+        dateField5.setIcon(calendarIcon);
+        dateField5.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        dateField5.setIconTextGap(12);
+
+        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy");
+        final java.util.Date[] field1Date = {null};
+        final java.util.Date[] field2Date = {null};
+        final java.util.Date[] field3Date = {null};
+        final java.util.Date[] field4Date = {null};
+        final java.util.Date[] field5Date = {null};
+
+        dateField1.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    field1Date[0] = selectedDate;
+                    dateField1.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+        dateField2.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    field2Date[0] = selectedDate;
+                    dateField2.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+        dateField3.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    field3Date[0] = selectedDate;
+                    dateField3.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+        dateField4.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    field4Date[0] = selectedDate;
+                    dateField4.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+        dateField5.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    field5Date[0] = selectedDate;
+                    dateField5.setText(sdf.format(selectedDate));
+                }
+            }
+        });
 
         RoundedComboBox<String> typeOfLeave1 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
         RoundedComboBox<String> typeOfLeave2 = new RoundedComboBox<>(new String[]{"", "Sick Leave", "Maternity Leave", "Paternity Leave", "Bereavement Leave"});
@@ -242,7 +410,7 @@ public class LeaveManagement extends JPanel {
         typeOfLeave4.setEnabled(false);
         typeOfLeave5.setEnabled(false);
 
-        dateField1.setEnabled(true);
+        dateField1.setEnabled(false);
         dateField2.setEnabled(false);
         dateField3.setEnabled(false);
         dateField4.setEnabled(false);
@@ -252,6 +420,24 @@ public class LeaveManagement extends JPanel {
         typeOfLeave1.addActionListener(e -> {
             boolean filled = typeOfLeave1.getSelectedIndex() > 0;
             typeOfLeave2.setEnabled(filled);
+            dateField1.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave1.setSelectedIndex(0);
+                typeOfLeave2.setEnabled(false); typeOfLeave2.setSelectedIndex(0);
+                typeOfLeave3.setEnabled(false); typeOfLeave3.setSelectedIndex(0);
+                typeOfLeave4.setEnabled(false); typeOfLeave4.setSelectedIndex(0);
+                typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
+
+                dateField1.setEnabled(false);
+                dateField2.setEnabled(false);
+                dateField3.setEnabled(false);
+                dateField4.setEnabled(false);
+                dateField5.setEnabled(false);
+            }
+        });
+        typeOfLeave2.addActionListener(e -> {
+            boolean filled = typeOfLeave2.getSelectedIndex() > 0;
+            typeOfLeave3.setEnabled(filled);
             dateField2.setEnabled(filled);
             if (!filled) {
                 typeOfLeave2.setSelectedIndex(0);
@@ -259,45 +445,43 @@ public class LeaveManagement extends JPanel {
                 typeOfLeave4.setEnabled(false); typeOfLeave4.setSelectedIndex(0);
                 typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
 
-                dateField2.setText(""); dateField2.setEnabled(false);
-                dateField3.setText(""); dateField3.setEnabled(false);
-                dateField4.setText(""); dateField4.setEnabled(false);
-                dateField5.setText(""); dateField5.setEnabled(false);
+                dateField2.setEnabled(false);
+                dateField3.setEnabled(false);
+                dateField4.setEnabled(false);
+                dateField5.setEnabled(false);
             }
         });
-        typeOfLeave2.addActionListener(e -> {
-            boolean filled = typeOfLeave2.getSelectedIndex() > 0;
-            typeOfLeave3.setEnabled(filled);
+        typeOfLeave3.addActionListener(e -> {
+            boolean filled = typeOfLeave3.getSelectedIndex() > 0;
+            typeOfLeave4.setEnabled(filled);
             dateField3.setEnabled(filled);
             if (!filled) {
                 typeOfLeave3.setSelectedIndex(0);
                 typeOfLeave4.setEnabled(false); typeOfLeave4.setSelectedIndex(0);
                 typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
 
-                dateField3.setText(""); dateField3.setEnabled(false);
-                dateField4.setText(""); dateField4.setEnabled(false);
-                dateField5.setText(""); dateField5.setEnabled(false);
-            }
-        });
-        typeOfLeave3.addActionListener(e -> {
-            boolean filled = typeOfLeave3.getSelectedIndex() > 0;
-            typeOfLeave4.setEnabled(filled);
-            dateField4.setEnabled(filled);
-            if (!filled) {
-                typeOfLeave4.setSelectedIndex(0);
-                typeOfLeave5.setEnabled(false); typeOfLeave5.setSelectedIndex(0);
-
-                dateField4.setText(""); dateField4.setEnabled(false);
-                dateField5.setText(""); dateField5.setEnabled(false);
+                dateField3.setEnabled(false);
+                dateField4.setEnabled(false);
+                dateField5.setEnabled(false);
             }
         });
         typeOfLeave4.addActionListener(e -> {
             boolean filled = typeOfLeave4.getSelectedIndex() > 0;
             typeOfLeave5.setEnabled(filled);
+            dateField4.setEnabled(filled);
+            if (!filled) {
+                typeOfLeave4.setSelectedIndex(0);
+                dateField4.setEnabled(false);
+                dateField5.setEnabled(false);
+            }
+        });
+        typeOfLeave5.addActionListener(e -> {
+            boolean filled = typeOfLeave4.getSelectedIndex() > 0;
+            typeOfLeave5.setEnabled(filled);
             dateField5.setEnabled(filled);
             if (!filled) {
                 typeOfLeave5.setSelectedIndex(0);
-                dateField5.setText(""); dateField5.setEnabled(false);
+                dateField5.setEnabled(false);
             }
         });
         groupPanel.add(typeOfLeave1); groupPanel.add(typeOfLeave2);
@@ -341,6 +525,18 @@ public class LeaveManagement extends JPanel {
         dateField3.setFont(detailsFont); dateField4.setFont(detailsFont); dateField5.setFont(detailsFont);
         groupPanel.add(dateField1); groupPanel.add(dateField2);
         groupPanel.add(dateField3); groupPanel.add(dateField4); groupPanel.add(dateField5);
+
+        dateField1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dateField2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dateField3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dateField4.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dateField5.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        dateField1.setPreferredSize(new Dimension(120, 35));
+        dateField2.setPreferredSize(new Dimension(120, 35));
+        dateField3.setPreferredSize(new Dimension(120, 35));
+        dateField4.setPreferredSize(new Dimension(120, 35));
+        dateField5.setPreferredSize(new Dimension(120, 35));
 
         // Set preferred size for the group panel to match its content, not too wide
         groupPanel.setPreferredSize(new java.awt.Dimension(990, 400)); // Adjust width as needed
@@ -470,11 +666,6 @@ public class LeaveManagement extends JPanel {
                     typeOfLeave3.setSelectedIndex(0);
                     typeOfLeave4.setSelectedIndex(0);
                     typeOfLeave5.setSelectedIndex(0);
-                    dateField1.setText("");
-                    dateField2.setText("");
-                    dateField3.setText("");
-                    dateField4.setText("");
-                    dateField5.setText("");
                     cardLayout.show(contentPanel, "DetailsView");
                     nameField.setFocusable(false);
                     idField.setFocusable(false);
@@ -490,14 +681,30 @@ public class LeaveManagement extends JPanel {
         saveButton.addActionListener(e -> {
             int used = 0;
             JComboBox<?>[] leaveBoxes = {typeOfLeave1, typeOfLeave2, typeOfLeave3, typeOfLeave4, typeOfLeave5};
-            JTextField[] dateFields = {dateField1, dateField2, dateField3, dateField4, dateField5};
+            JButton[] dateButtons = {dateField1, dateField2, dateField3, dateField4, dateField5};
+            boolean valid = true;
+
             for (int i = 0; i < 5; i++) {
-                if (leaveBoxes[i].getSelectedIndex() > 0 && !dateFields[i].getText().trim().isEmpty()) {
-                    used++;
+                if (leaveBoxes[i].getSelectedIndex() > 0) {
+                    String dateText = dateButtons[i].getText().trim();
+
+                    if (dateText.equals("Input Date")) {
+                        JOptionPane.showMessageDialog(null,
+                                "Please input date for leave #" + (i + 1),
+                                "Missing Date",
+                                JOptionPane.WARNING_MESSAGE);
+                        valid = false;
+                        break;  // stop checking further, since saving shouldn't proceed
+                    } else {
+                        used++;
+                    }
                 }
             }
-            leavesUsedField.setText(String.valueOf(used));
-            remainingSILField.setText((5 - used) + " / 5");
+
+            if (valid) {
+                leavesUsedField.setText(String.valueOf(used));
+                remainingSILField.setText((5 - used) + " / 5");
+            }
         });
 
         // --- Back button event ---

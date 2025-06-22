@@ -26,15 +26,14 @@ public class RoundedButton extends JButton {
         int width = getWidth();
         int height = getHeight();
 
-        // Clear entire area (in case something leaks behind)
+        // Transparent background
         g2.setColor(new Color(0, 0, 0, 0));
         g2.fillRect(0, 0, width, height);
-        g2.setComposite(AlphaComposite.SrcOver);
 
-        // Create rounded shape
+        // Rounded rectangle shape
         Shape roundedRect = new RoundRectangle2D.Float(0, 0, width, height, arc, arc);
 
-        // Set color based on state
+        // State-dependent background color
         Color bg = getBackground();
         if (getModel().isPressed()) {
             bg = bg.darker();
@@ -45,15 +44,8 @@ public class RoundedButton extends JButton {
         g2.setColor(bg);
         g2.fill(roundedRect);
 
-        // Draw text
-        g2.setFont(getFont());
-        FontMetrics fm = g2.getFontMetrics();
-        Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
-        int textX = (width - stringBounds.width) / 2;
-        int textY = (height - stringBounds.height) / 2 + fm.getAscent();
-
-        g2.setColor(getForeground());
-        g2.drawString(getText(), textX, textY);
+        // ✅ Let JButton draw the label (text/icon)
+        super.paintComponent(g2);
 
         g2.dispose();
     }

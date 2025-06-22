@@ -185,7 +185,7 @@ public class PayrollScreen extends JPanel {
         gbcCombo.gridx = 0;
         gbcCombo.gridy = 0;
         gbcCombo.anchor = GridBagConstraints.CENTER;
-        JLabel sortLabel = new JLabel("Sort By Department: ");
+        JLabel sortLabel = new JLabel("Sort by Department: ");
         sortLabel.setFont(new Font("Arial", Font.BOLD, 16));
         sortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
         comboPanel.add(sortLabel, gbcCombo);
@@ -196,7 +196,7 @@ public class PayrollScreen extends JPanel {
         comboPanel.setBackground(Color.WHITE);
 
         // Button
-        JButton createPeriodBtn = new JButton("Create New Payroll Period");
+        JButton createPeriodBtn = new JButton("Create new payroll period");
         createPeriodBtn.setFont(new Font("Arial", Font.BOLD, 16));
         createPeriodBtn.setPreferredSize(new Dimension(250, 36));
         createPeriodBtn.setBackground(Color.WHITE);

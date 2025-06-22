@@ -3,16 +3,16 @@ package Screens;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import javax.swing.plaf.basic.ComboPopup;
+import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.Random;
 
+import Components.RoundedComboBox;
 import Components.TableStyler;
 import Module.E201File.E201File;
+import jdk.swing.interop.DispatcherWrapper;
 import org.payroll.MainWindow;
 
 public class Employees extends JPanel {
@@ -56,7 +56,7 @@ public class Employees extends JPanel {
 
         // Search bar
         JPanel searchPanel = new JPanel();
-        searchPanel.setLayout(new BorderLayout());
+        searchPanel.setLayout(new BorderLayout(10, 0));
         searchPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         searchPanel.setOpaque(false);
 
@@ -65,6 +65,102 @@ public class Employees extends JPanel {
         searchField.setPreferredSize(null);
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.WEST);
+
+        // Dropdown
+        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
+                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
+        }) {
+            @Override
+            protected void paintBorder(Graphics g) {
+                // Do nothing: no border for this instance
+            }
+        };
+        sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
+        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setBackground(Color.WHITE);
+        sortCombo.setFocusable(false);
+        sortCombo.setMaximumRowCount(12);
+        ((JLabel)sortCombo.getRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
+
+        // Custom renderer for hover effect in dropdown list
+        sortCombo.setRenderer(new DefaultListCellRenderer() {
+            private int hoveredIndex = -1;
+            {
+                // Add mouse motion listener to popup list for hover effect
+                sortCombo.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+                        JList<?> list = getPopupList();
+                        if (list != null) {
+                            list.addMouseMotionListener(new MouseMotionAdapter() {
+                                @Override
+                                public void mouseMoved(MouseEvent e) {
+                                    hoveredIndex = list.locationToIndex(e.getPoint());
+                                    list.repaint();
+                                }
+                            });
+                            list.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mouseExited(MouseEvent e) {
+                                    hoveredIndex = -1;
+                                    list.repaint();
+                                }
+                            });
+                        }
+                    }
+                    @Override public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {}
+                    @Override public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {}
+                    private JList<?> getPopupList() {
+                        ComboPopup popup = (ComboPopup) sortCombo.getUI().getAccessibleChild(sortCombo, 0);
+                        return popup != null ? popup.getList() : null;
+                    }
+                });
+            }
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (index >= 0 && index == hoveredIndex && !isSelected) {
+                    c.setBackground(new Color(230, 255, 230)); // light greenish
+                }
+                return c;
+            }
+        });
+
+        // Add hover effect (like LeaveManagement)
+        Color comboDefaultBg = Color.WHITE;
+        Color comboHoverBg = new Color(230, 255, 230); // light greenish
+        sortCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (sortCombo.isEnabled()) {
+                    sortCombo.setBackground(comboHoverBg);
+                }
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                sortCombo.setBackground(comboDefaultBg);
+            }
+        });
+
+        // Use GridBagLayout for vertical centering
+        JPanel comboPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcCombo = new GridBagConstraints();
+        gbcCombo.gridx = 0;
+        gbcCombo.gridy = 0;
+        gbcCombo.anchor = GridBagConstraints.CENTER;
+        JLabel sortLabel = new JLabel("Sort by Department: ");
+        sortLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        sortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
+        comboPanel.add(sortLabel, gbcCombo);
+
+        gbcCombo.gridx = 1;
+        comboPanel.add(sortCombo, gbcCombo);
+        comboPanel.setOpaque(true);
+        comboPanel.setBackground(Color.WHITE);
+
+        searchPanel.add(comboPanel, BorderLayout.EAST);
+        searchPanel.setPreferredSize(new Dimension(0, 70));
+        searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
         // Table data
         Object[][] data = employeeTableData;
@@ -82,8 +178,10 @@ public class Employees extends JPanel {
 
         // Set table header background to green and foreground to white
         JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(0, 128, 0)); // green
-        header.setForeground(Color.WHITE);
+        header.setBackground(MainWindow.grayColor);
+        header.setForeground(Color.BLACK);
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 40));
+        header.setResizingAllowed(false);
 
         // Remove the up/down arrow buttons from the vertical scrollbar
         tableScrollPane.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
@@ -131,14 +229,24 @@ public class Employees extends JPanel {
         // Font
         Font font = new Font("Arial", Font.PLAIN, 16);
         table.setFont(font);
-        table.setRowHeight(20);
+        table.setRowHeight(40);
         table.getTableHeader().setFont(font);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
         searchField.setFont(font);
         searchButton.setFont(font);
+        searchButton.setPreferredSize(new Dimension(150, 70));
+        searchButton.setBackground(Color.WHITE);
+        searchField.setBorder(null);
+        searchButton.setBorder(null);
+        searchButton.setFocusable(false);
+
 
         // CardLayout for switching views
         JPanel contentPanel = new JPanel(new CardLayout());
         contentPanel.setBackground(Color.RED);
+
+
 
         // Table view panel
         JPanel tablePanel = new JPanel(new BorderLayout());
