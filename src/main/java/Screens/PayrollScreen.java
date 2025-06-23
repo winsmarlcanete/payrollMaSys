@@ -836,7 +836,7 @@ public class PayrollScreen extends JPanel {
 
         JPanel periodEndPanel = new JPanel();
         periodEndPanel.setLayout(new BoxLayout(periodEndPanel, BoxLayout.Y_AXIS));
-        JLabel periodEndLabel = new JLabel("Period Start:");
+        JLabel periodEndLabel = new JLabel("Period End:");
         periodEndLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         periodEndLabel.setBorder(new EmptyBorder(0, 0, 5, 0));
         periodEndLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -923,45 +923,6 @@ public class PayrollScreen extends JPanel {
             org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
             org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
 
-            java.util.Date today = new java.util.Date();
-            java.util.Date minDate = periodStartDate[0];
-            if (minDate == null) {
-                JOptionPane.showMessageDialog(null, "Please select a period start first.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Set picker to minDate by default
-            model.setValue(minDate);
-
-            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
-                if (selectedDate != null) {
-                    if (selectedDate.before(minDate)) {
-                        JOptionPane.showMessageDialog(null, "End period cannot be before the start period.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Period start cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    periodStartDate[0] = selectedDate;
-                    periodStartButton.setText(sdf.format(selectedDate));
-                    // If toDate is before new fromDate, reset toDate
-                    if (periodEndDate[0] != null && periodEndDate[0].before(periodStartDate[0])) {
-                        periodEndDate[0] = null;
-                        periodEndButton.setText("Select End Period");
-                    }
-                }
-            }
-        });
-
-        periodEndButton.addActionListener(e -> {
-            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
-            java.util.Properties p = new java.util.Properties();
-            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
-            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
-
             // Set max selectable date to today using Calendar
             java.util.Calendar cal = java.util.Calendar.getInstance();
             int year = cal.get(java.util.Calendar.YEAR);
@@ -978,7 +939,46 @@ public class PayrollScreen extends JPanel {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
                     if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "End period cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Start period cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    periodStartDate[0] = selectedDate;
+                    periodStartButton.setText(sdf.format(selectedDate));
+                    // If toDate is before new periodStartDate, reset toDate
+                    if (periodEndDate[0] != null && periodEndDate[0].before(periodStartDate[0])) {
+                        periodEndDate[0] = null;
+                        periodEndButton.setText("Select End Period");
+                    }
+                }
+            }
+        });
+
+        periodEndButton.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            java.util.Date today = new java.util.Date();
+            java.util.Date minDate = periodStartDate[0];
+            if (minDate == null) {
+                JOptionPane.showMessageDialog(null, "Please select a start date first.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Set picker to minDate by default
+            model.setValue(minDate);
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.before(minDate)) {
+                        JOptionPane.showMessageDialog(null, "End date cannot be before start date.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "End date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
                         return;
                     }
                     periodEndDate[0] = selectedDate;
@@ -1087,7 +1087,7 @@ public class PayrollScreen extends JPanel {
 
                 // Center popup (example size 300x200)
                 int popupWidth = 800;
-                int popupHeight = 400;
+                int popupHeight = 300;
                 int x = (size.width - popupWidth) / 2;
                 int y = (size.height - popupHeight) / 2;
                 createPeriodPopup.setBounds(x, y, popupWidth, popupHeight);
