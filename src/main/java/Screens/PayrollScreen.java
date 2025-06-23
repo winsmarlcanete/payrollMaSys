@@ -1133,7 +1133,7 @@ public class PayrollScreen extends JPanel {
 
             // Helper method to calculate the ideal width of a column based on its content
             java.util.function.BiFunction<JTable, Integer, Integer> getPreferredWidth = (table, colIndex) -> {
-                int maxWidth = 50; // A minimum width
+                int maxWidth = 50; // Minimum width
                 TableCellRenderer headerRenderer = table.getColumnModel().getColumn(colIndex).getHeaderRenderer();
                 if (headerRenderer == null) {
                     headerRenderer = table.getTableHeader().getDefaultRenderer();
@@ -1146,54 +1146,18 @@ public class PayrollScreen extends JPanel {
                     Component cellComp = cellRenderer.getTableCellRendererComponent(table, table.getValueAt(row, colIndex), false, false, row, colIndex);
                     maxWidth = Math.max(cellComp.getPreferredSize().width, maxWidth);
                 }
-                return maxWidth + 20; // Add 20px for padding
+                return maxWidth + 10; // Add padding
             };
 
-            // --- Step 1: Calculate and set the ideal width for the frozen columns AND their container ---
-            int frozenCols = frozenTable.getColumnCount();
-            int totalFrozenNaturalWidth = 0;
-            for (int col = 0; col < frozenCols; col++) {
-                int naturalWidth = getPreferredWidth.apply(frozenTable, col);
-                frozenTable.getColumnModel().getColumn(col).setPreferredWidth(naturalWidth);
-                totalFrozenNaturalWidth += naturalWidth;
-            }
+            // Adjust frozen columns with fixed widths
+            frozenTable.getColumnModel().getColumn(0).setPreferredWidth(50); // Set width for "Name" column
+            frozenTable.getColumnModel().getColumn(1).setPreferredWidth(50); // Set width for "Rate" column
 
-            // *** CORRECTED CODE TO FIX THE CONTAINER HEIGHT ***
-            // Set the preferred width.
-            frozenScroll.setPreferredSize(new Dimension(totalFrozenNaturalWidth, 0));
-            // Crucially, only constrain the MAXIMUM WIDTH. Allow the height to be flexible (Integer.MAX_VALUE).
-            frozenScroll.setMaximumSize(new Dimension(totalFrozenNaturalWidth, Integer.MAX_VALUE));
-            // *************************************************
-
-            // --- Step 2: Calculate the ideal width for the scrollable columns ---
+            // Adjust scrollable columns dynamically
             int scrollCols = scrollTable.getColumnCount();
-            int totalScrollNaturalWidth = 0;
-            int[] scrollNaturalWidths = new int[scrollCols];
             for (int col = 0; col < scrollCols; col++) {
                 int naturalWidth = getPreferredWidth.apply(scrollTable, col);
-                scrollNaturalWidths[col] = naturalWidth;
-                totalScrollNaturalWidth += naturalWidth;
-            }
-
-            // --- Step 3: Distribute remaining space when maximized ---
-            boolean maximized = (window instanceof JFrame) && ((((JFrame) window).getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0);
-            int availableWidth = tablePanel.getWidth();
-            int totalNaturalWidth = frozenScroll.getWidth() + totalScrollNaturalWidth;
-
-
-            if (maximized && availableWidth > totalNaturalWidth) {
-                int extraSpace = availableWidth - totalNaturalWidth;
-                if (totalScrollNaturalWidth > 0) { 
-                    for (int col = 0; col < scrollCols; col++) {
-                        double proportion = (double) scrollNaturalWidths[col] / totalScrollNaturalWidth;
-                        int additionalWidth = (int) (extraSpace * proportion);
-                        scrollTable.getColumnModel().getColumn(col).setPreferredWidth(scrollNaturalWidths[col] + additionalWidth);
-                    }
-                }
-            } else {
-                for (int col = 0; col < scrollCols; col++) {
-                    scrollTable.getColumnModel().getColumn(col).setPreferredWidth(scrollNaturalWidths[col]);
-                }
+                scrollTable.getColumnModel().getColumn(col).setPreferredWidth(naturalWidth);
             }
         };
 
