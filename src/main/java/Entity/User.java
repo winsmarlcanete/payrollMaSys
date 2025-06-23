@@ -1,49 +1,75 @@
 package Entity;
 
+// This is a placeholder User class.
+// You might need to add more fields and methods based on your application's requirements.
 public class User {
-    private int user_id;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
     private String email;
-    private String password;
-    private int access_level;
-    private String creation_date;
-    private int account_status;
-    private String user_name;
-    private int otp;
+    private String passwordHash;
+    private int accessLevel;
+    private int accountStatus;
+    private String userName;
+    private String securityQuestion;
+    private String securityAnswerHash;
 
-    private String security_question;
-    private String security_answer;
-
-    //Constructor
-    public User(String first_name,String last_name, String email, String password, int access_level,int account_status, String user_name ){
-    this.first_name = first_name;
-    this.last_name = last_name;
-    this.email = email;
-    this.password = password;
-    this.access_level = access_level;
-    this.account_status = account_status;
-    this.user_name = user_name;
-
+    // Constructor
+    public User(String firstName, String lastName, String email, String passwordHash,
+                int accessLevel, int accountStatus, String userName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.accessLevel = accessLevel;
+        this.accountStatus = accountStatus;
+        this.userName = userName;
     }
 
-    //Getters and Setters
-    public int getUser_id(){return user_id;}
-    public String getFirst_name(){return first_name;}
-    public String getLast_name(){return last_name;}
-    public String getEmail(){return email;}
-    public String getPassword(){return password;}
-    public int getAccess_level(){return access_level;}
-    public String getCreation_date(){return creation_date;}
-    public int getAccount_status(){return account_status;}
-    public String getUser_name(){return user_name;}
-    public int getOtp(){return otp;}
-
-    public String getSecurity_question() {
-        return security_question;
+    // Getter methods
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getSecurity_answer() {
-        return security_answer;
+    public String getLastName() {
+        return lastName;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public int getAccessLevel() {
+        return accessLevel;
+    }
+
+    public int getAccountStatus() {
+        return accountStatus;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getSecurityQuestion() {
+        return securityQuestion;
+    }
+
+    public String getSecurityAnswerHash() {
+        return securityAnswerHash;
+    }
+
+    // Setter methods for security question and answer
+    public void setSecurityQuestion(String securityQuestion) {
+        this.securityQuestion = securityQuestion;
+    }
+
+    public void setSecurityAnswerHash(String securityAnswerHash) {
+        this.securityAnswerHash = securityAnswerHash;
+    }
+
+    // You can add more setter methods if needed for other fields
 }
