@@ -1,6 +1,7 @@
 package Screens;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -16,10 +17,12 @@ import java.util.Arrays;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import Components.RoundedButton;
 import Components.TableStyler;
 import Components.RoundedComboBox;
 import Entity.Employee;
@@ -252,7 +255,6 @@ public class PayrollScreen extends JPanel {
             }
             }
         });
-
 
 
         // Use GridBagLayout for vertical centering
@@ -732,12 +734,224 @@ public class PayrollScreen extends JPanel {
         whitePanel.add(headerPanel);
         whitePanel.add(tablePanel);
 
+        JLayeredPane layeredPane = new JLayeredPane();
+
+        JPanel createPeriodPopup = new JPanel();
+        createPeriodPopup.setLayout(new GridBagLayout());
+        createPeriodPopup.setBackground(new Color(0, 0, 0)); // Semi-transparent overlay
+        createPeriodPopup.setVisible(false);
+
+        JPanel dateSelector = new JPanel();
+        dateSelector.setLayout(new BoxLayout(dateSelector, BoxLayout.X_AXIS));
+
+        RoundedButton periodStart = new RoundedButton ("Input Date", 20);
+        RoundedButton periodEnd = new RoundedButton ("Input Date", 20);
+
+        ImageIcon blackCalendarIcon = new ImageIcon(
+                new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("Black Calendar.png")))
+                        .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+        );
+
+        periodStart.setIcon(blackCalendarIcon);
+        periodStart.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        periodStart.setIconTextGap(12);
+        periodStart.setFont(new Font("Arial", Font.BOLD, 18));
+        periodStart.setBackground(Color.WHITE);
+        periodStart.setForeground(Color.BLACK);
+        periodStart.setFocusPainted(false);
+        periodStart.setIcon(calendarIcon);
+        periodStart.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        periodStart.setIconTextGap(12); // Space between text and icon
+
+        // Add hover effect and hand cursor
+        periodStart.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//        periodStart.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+        periodStart.addMouseListener(new MouseAdapter() {
+            Color normalBg = Color.WHITE;
+            Color hoverBg = new Color(34, 177, 76);
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                periodStart.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                periodStart.setBackground(normalBg);
+            }
+        });
+
+        periodEnd.setIcon(blackCalendarIcon);
+        periodEnd.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        periodEnd.setIconTextGap(12);
+        periodEnd.setFont(new Font("Arial", Font.BOLD, 18));
+        periodEnd.setBackground(Color.WHITE);
+        periodEnd.setForeground(Color.BLACK);
+        periodEnd.setFocusPainted(false);
+        periodEnd.setIcon(calendarIcon);
+        periodEnd.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
+        periodEnd.setIconTextGap(12); // Space between text and icon
+
+        // Add hover effect and hand cursor
+        periodEnd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//        periodEnd.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+        periodEnd.addMouseListener(new MouseAdapter() {
+            Color normalBg = Color.WHITE;
+            Color hoverBg = new Color(34, 177, 76);
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                periodEnd.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                periodEnd.setBackground(normalBg);
+            }
+        });
+
+        final java.util.Date[] periodStartDate = {null};
+        final java.util.Date[] periodEndDate = {null};
+
+        periodStart.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    periodStartDate[0] = selectedDate;
+                    periodStart.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+
+        periodEnd.addActionListener(e -> {
+            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
+            java.util.Properties p = new java.util.Properties();
+            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
+            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
+
+            // Set max selectable date to today using Calendar
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int year = cal.get(java.util.Calendar.YEAR);
+            int month = cal.get(java.util.Calendar.MONTH);
+            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            datePanel.getModel().setSelected(true);
+            datePanel.getModel().setDate(year, month, day);
+            datePanel.getModel().setSelected(false);
+
+            java.util.Date today = cal.getTime();
+
+            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
+                if (selectedDate != null) {
+                    if (selectedDate.after(today)) {
+                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    periodEndDate[0] = selectedDate;
+                    periodEnd.setText(sdf.format(selectedDate));
+                }
+            }
+        });
+
+        Font font = new Font("Arial", Font.BOLD, 18);
+
+        JPanel middleSpace = new JPanel();
+        middleSpace.setSize(new Dimension(300, 0));
+        JLabel dash = new JLabel("-");
+        dash.setFont(font);
+        middleSpace.add(dash);
+
+        dateSelector.add(periodStart);
+        dateSelector.add(Box.createRigidArea(new Dimension(10, 0)));
+        dateSelector.add(middleSpace);
+        dateSelector.add(Box.createRigidArea(new Dimension(10, 0)));
+        dateSelector.add(periodEnd);
+        createPeriodPopup.add(dateSelector);
+        createPeriodPopup.add(Box.createRigidArea(new Dimension(0, 10)));
+        createPeriodBtn.addActionListener(e -> createPeriodPopup.setVisible(true));
+
+        JPanel saveAndCancel = new JPanel();
+        saveAndCancel.setLayout(new BoxLayout(saveAndCancel, BoxLayout.X_AXIS));
+
+        RoundedButton saveBtn = new RoundedButton("Save", 5);
+        saveBtn.setFont(font);
+        saveBtn.setPreferredSize(new Dimension(300, 35));
+        saveBtn.setBackground(Color.WHITE);
+        saveBtn.setForeground(new Color(0, 153, 0));
+        saveBtn.setFocusPainted(false);
+        saveBtn.setBorder(BorderFactory.createEmptyBorder());
+        saveBtn.setContentAreaFilled(false);
+        saveBtn.setOpaque(false);
+        saveBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        RoundedButton cancelBtn = new RoundedButton("Cancel", 5);
+        cancelBtn.setFont(font);
+        cancelBtn.setPreferredSize(new Dimension(300, 35));
+        cancelBtn.setBackground(Color.WHITE);
+        cancelBtn.setForeground(new Color(0, 153, 0));
+        cancelBtn.setFocusPainted(false);
+        cancelBtn.setBorder(BorderFactory.createEmptyBorder());
+        cancelBtn.setContentAreaFilled(false);
+        cancelBtn.setOpaque(false);
+        cancelBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        saveAndCancel.add(saveBtn);
+        saveAndCancel.add(Box.createRigidArea(new Dimension(10, 0)));
+        saveAndCancel.add(cancelBtn);
+
+        JPanel popGroup = new JPanel();
+        popGroup.setLayout(new BoxLayout(popGroup, BoxLayout.Y_AXIS));
+        popGroup.add(dateSelector);
+        popGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+        popGroup.add(saveAndCancel);
+
+        createPeriodPopup.add(popGroup);
+
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.add(whitePanel);
 
+        layeredPane.add(contentPanel, Integer.valueOf(0));
+        layeredPane.add(createPeriodPopup, Integer.valueOf(1));
+
+        layeredPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension size = layeredPane.getSize();
+                contentPanel.setBounds(0, 0, size.width, size.height);
+
+                // Center popup (example size 300x200)
+                int popupWidth = 700;
+                int popupHeight = 300;
+                int x = (size.width - popupWidth) / 2;
+                int y = (size.height - popupHeight) / 2;
+                createPeriodPopup.setBounds(x, y, popupWidth, popupHeight);
+            }
+        });
+
+        // Add layered pane to this tab panel
+        add(layeredPane, BorderLayout.CENTER);
+
 //        add(searchPanel, BorderLayout.NORTH);
 //        add(logoAndButtonPanel, BorderLayout.NORTH);
-        add(contentPanel, BorderLayout.CENTER);
+//        add(contentPanel, BorderLayout.CENTER);
         setBackground(MainWindow.activeColor);
 
         // --- Responsive column resizing ---
