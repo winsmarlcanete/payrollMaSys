@@ -79,7 +79,7 @@ public class Payroll {
         Connection conn;
 
         try {
-            // Fetch payroll records filtered by the given period_start and period_end
+            // Updated SQL query to include additional fields
             String sql = "SELECT " +
                     "p.employee_id, " +
                     "p.period_start, " +
@@ -90,28 +90,29 @@ public class Payroll {
                     "p.sholiday_hours, " +
                     "p.lholiday_hours, " +
                     "p.late_minutes, " +
-                    "SUM(tc.hours_clocked) AS total_hours_clocked, " +  // summed over grouped timecard entries
+                    "p.overtime_amount, " +
+                    "p.nd_amount, " +
+                    "p.sholiday_amount, " +
+                    "p.lholiday_amount, " +
+                    "p.late_amount, " +
+                    "p.wage, " +
+                    "p.philhealth_deduction, " +
+                    "p.sss_deduction, " +
+                    "p.pagibig_deduction, " +
+                    "p.efund_deduction, " +
+                    "p.other_deduction, " +
+                    "p.salary_adjustment, " +
+                    "p.allowance_adjustment, " +
+                    "p.other_compensations, " +
+                    "p.total_deduction, " +
+                    "p.gross_pay, " +
+                    "p.net_pay, " +
                     "e.first_name, " +
                     "e.last_name, " +
                     "e.pay_rate " +
                     "FROM payrollmsdb.payroll p " +
                     "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
-                    "LEFT JOIN payrollmsdb.timecards tc ON tc.employee_id = p.employee_id " +
-                    "AND tc.date BETWEEN p.period_start AND p.period_end " +
-                    "WHERE p.period_start >= ? AND p.period_end <= ? " +
-                    "GROUP BY " +
-                    "p.employee_id, " +
-                    "p.period_start, " +
-                    "p.period_end, " +
-                    "p.days_present, " +
-                    "p.overtime_hours, " +
-                    "p.nd_hours, " +
-                    "p.sholiday_hours, " +
-                    "p.lholiday_hours, " +
-                    "p.late_minutes, " +
-                    "e.first_name, " +
-                    "e.last_name, " +
-                    "e.pay_rate;";
+                    "WHERE p.period_start >= ? AND p.period_end <= ?";
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -137,7 +138,25 @@ public class Payroll {
                         employeeName
                 );
 
-                System.out.println("Adding payroll: " + payroll.getEmployee_id() + ", " + payroll.getPeriod_start() + ", " + payroll.getPeriod_end());
+                // Set additional fields
+                payroll.setOvertime_amount(rs.getBigDecimal("overtime_amount"));
+                payroll.setNd_amount(rs.getBigDecimal("nd_amount"));
+                payroll.setSholiday_amount(rs.getBigDecimal("sholiday_amount"));
+                payroll.setLholiday_amount(rs.getBigDecimal("lholiday_amount"));
+                payroll.setLate_amount(rs.getBigDecimal("late_amount"));
+                payroll.setWage(rs.getBigDecimal("wage"));
+                payroll.setPhilhealth_deduction(rs.getBigDecimal("philhealth_deduction"));
+                payroll.setSss_deduction(rs.getBigDecimal("sss_deduction"));
+                payroll.setPagibig_deduction(rs.getBigDecimal("pagibig_deduction"));
+                payroll.setEfund_deduction(rs.getBigDecimal("efund_deduction"));
+                payroll.setOther_deduction(rs.getBigDecimal("other_deduction"));
+                payroll.setSalary_adjustment(rs.getBigDecimal("salary_adjustment"));
+                payroll.setAllowance_adjustment(rs.getBigDecimal("allowance_adjustment"));
+                payroll.setOther_compensations(rs.getBigDecimal("other_compensations"));
+                payroll.setTotal_deduction(rs.getBigDecimal("total_deduction"));
+                payroll.setGross_pay(rs.getBigDecimal("gross_pay"));
+                payroll.setNet_pay(rs.getBigDecimal("net_pay"));
+
                 payrollList.add(payroll);
             }
 
