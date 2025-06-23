@@ -2,13 +2,50 @@ package Entity;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Date;
 
 public class Formula {
 
 
-    public static Double computeDaysPresent(Double hours_clocked){
-        return hours_clocked/8;
+    public static Double computeDaysPresent(Double hoursClocked){
+        return hoursClocked/8;
     }
+    public static double computeOvertimeHours(double hoursClocked) {
+        return Math.max(0, hoursClocked - 8);
+    }
+
+    public static double computeNightDifferentialHours(LocalTime startTime, LocalTime endTime, double hoursClocked) {
+        double ndHours = 0;
+        LocalTime nightStart = LocalTime.of(22, 0); // 10 PM
+        LocalTime nightEnd = LocalTime.of(6, 0);   // 6 AM
+
+        if (startTime.isBefore(nightEnd)) {
+            ndHours += Math.min(Duration.between(startTime, nightEnd).toHours(), hoursClocked);
+        }
+        if (endTime.isAfter(nightStart)) {
+            ndHours += Math.min(Duration.between(nightStart, endTime).toHours(), hoursClocked);
+        }
+
+        return ndHours;
+    }
+
+    public static double computeSpecialHolidayHours(Date date, double hoursClocked, boolean isSpecialHoliday) {
+        return isSpecialHoliday ? hoursClocked : 0;
+    }
+
+    public static double computeLegalHolidayHours(Date date, double hoursClocked, boolean isLegalHoliday) {
+        return isLegalHoliday ? hoursClocked : 0;
+    }
+
+    public static double computeLateMinutes(LocalTime expectedStart, LocalTime actualStart) {
+        if (actualStart.isAfter(expectedStart)) {
+            return Duration.between(expectedStart, actualStart).toMinutes();
+        }
+        return 0;
+    }
+
     public static BigDecimal computeLateAmount(BigDecimal pay_rate, double late_minutes) {
 
         if (pay_rate == null) pay_rate = BigDecimal.ZERO;

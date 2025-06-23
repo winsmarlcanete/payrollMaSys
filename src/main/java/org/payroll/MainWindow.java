@@ -12,10 +12,13 @@ import java.util.Map;
 import Module.E201File.E201File;
 import Module.Payroll.Payroll;
 import Screens.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainWindow extends JFrame {
     public static Color activeColor = new Color(0, 128, 0);
     public static Color grayColor = new Color(217, 217, 217);
+    private JPanel overlayPanel;
 
     private Object[][] employeeTableData;
     public MainWindow() {
@@ -136,11 +139,43 @@ public class MainWindow extends JFrame {
 
                         }
 
-                        if (name.equals("PayrollScreen")) {
-                            Payroll.retrieveAllPayrolls();
-                            java.sql.Date periodStart = java.sql.Date.valueOf("2024-10-21"); // Set to 2024-10-21
-                            java.sql.Date periodEnd = java.sql.Date.valueOf("2024-11-05");   // Set to 2024-11-05
-                            Payroll.loadTimecards(periodStart, periodEnd);
+                        if (name.equals("Payroll")) {
+
+                            System.out.println("Loading Payroll screen...");
+
+                            // Create a JOptionPane with a message and progress bar
+                            JOptionPane optionPane = new JOptionPane(
+                                    "Payroll is being updated...",
+                                    JOptionPane.INFORMATION_MESSAGE,
+                                    JOptionPane.DEFAULT_OPTION,
+                                    null,
+                                    new Object[]{}, // No buttons
+                                    null
+                            );
+
+                            JDialog dialog = optionPane.createDialog(payroll, "Updating Payroll");
+                            dialog.setModal(true);
+
+                            // Run updatePayrollDetails in the background
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            executorService.submit(() -> {
+                                System.out.println("Running updatePayrollDetails in the background...");
+                                java.sql.Date periodStart = java.sql.Date.valueOf("2024-10-21");
+                                java.sql.Date periodEnd = java.sql.Date.valueOf("2024-11-05");
+                                Payroll.retrieveAllTimecards(periodStart, periodEnd);
+                                System.out.println("updatePayrollDetails completed.");
+
+                                SwingUtilities.invokeLater(() -> {
+                                    System.out.println("Refreshing Payroll UI...");
+                                    Payroll.retrieveAllPayrolls();
+
+                                    dialog.dispose(); // Close the dialog
+                                    payroll.repaint();
+                                });
+                            });
+
+                            executorService.shutdown();
+                            dialog.setVisible(true);
                         }
                     });
                 }

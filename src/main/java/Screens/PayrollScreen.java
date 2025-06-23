@@ -33,6 +33,40 @@ import org.payroll.MainWindow;
 public class PayrollScreen extends JPanel {
     private JTextField searchField;
 
+    private DefaultTableModel frozenModel;
+    private DefaultTableModel scrollModel;
+    private JTable frozenTable;
+    private JTable scrollTable;
+
+    public void refreshPayrollData(List<PayrollClass> updatedPayrollList) {
+        Object[][] tableData = convertToTableData(updatedPayrollList);
+
+        // Update frozen table data
+        DefaultTableModel frozenModel = getFrozenModel();
+        frozenModel.setDataVector(
+                Arrays.stream(tableData).map(row -> Arrays.copyOf(row, 2)).toArray(Object[][]::new),
+                new String[] {"Name", "Rate"} // Replace with frozenColumns
+        );
+
+        // Update scrollable table data
+        DefaultTableModel scrollModel = getScrollModel();
+        scrollModel.setDataVector(
+                Arrays.stream(tableData).map(row -> Arrays.copyOfRange(row, 2, row.length)).toArray(Object[][]::new),
+                new String[] {
+                        "Rate Per Hour", "Days Present", "OT In Hours", "Night Differential In Hours",
+                        "Special Holiday In Hours", "Legal Holiday In Hours", "Late In Minutes",
+                        "Overtime Amount", "Night Differential Amount", "Special Holiday Amount",
+                        "Legal Holiday Amount", "Late Amount", "Wage", "PhilHealth Deduction",
+                        "SSS Deduction", "Pag-IBIG Deduction", "E-Fund Deduction", "Other Deduction",
+                        "Salary Adjustment", "Allowance Adjustment", "Other Compensations",
+                        "Total Deduction", "Gross Pay", "Net Pay"
+                } // Replace with scrollColumns
+        );
+
+        // Repaint tables
+        getFrozenTable().repaint();
+        getScrollTable().repaint();
+    }
     private Object[][] convertToTableData(List<PayrollClass> payrollList) {
         Object[][] data = new Object[payrollList.size()][26]; // Adjust size to match the number of columns
 
@@ -74,6 +108,41 @@ public class PayrollScreen extends JPanel {
     public PayrollScreen() {
         setLayout(new BorderLayout());
         setBackground(new Color(34, 177, 76)); // green
+
+
+        frozenModel = new DefaultTableModel(new Object[][]{}, new String[]{"Name", "Rate"}) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        // Initialize frozenTable
+        frozenTable = new JTable(frozenModel);
+        TableStyler.styleTable(frozenTable);
+
+        // Initialize scrollModel and scrollTable (if not already done)
+        scrollModel = new DefaultTableModel(new Object[][]{}, new String[]{
+                "Rate Per Hour", "Days Present", "OT In Hours", "Night Differential In Hours",
+                "Special Holiday In Hours", "Legal Holiday In Hours", "Late In Minutes",
+                "Overtime Amount", "Night Differential Amount", "Special Holiday Amount",
+                "Legal Holiday Amount", "Late Amount", "Wage", "PhilHealth Deduction",
+                "SSS Deduction", "Pag-IBIG Deduction", "E-Fund Deduction", "Other Deduction",
+                "Salary Adjustment", "Allowance Adjustment", "Other Compensations",
+                "Total Deduction", "Gross Pay", "Net Pay"
+        }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        scrollTable = new JTable(scrollModel);
+        TableStyler.styleTable(scrollTable);
+
+        List<PayrollClass> updatedPayrollList = Payroll.retrieveAllPayrolls();
+        refreshPayrollData(updatedPayrollList);
+
 
         // --- Search bar (same as Employees.java) ---
         JPanel searchPanel = new JPanel(new BorderLayout());
@@ -541,19 +610,18 @@ public class PayrollScreen extends JPanel {
             System.arraycopy(data[i], 2, scrollData[i], 0, columnNames.length - 2);
         }
 
-        DefaultTableModel frozenModel = new DefaultTableModel(frozenData, frozenColumns) {
+        frozenModel = new DefaultTableModel(frozenData, frozenColumns) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
-        DefaultTableModel scrollModel = new DefaultTableModel(scrollData, scrollColumns) {
+        scrollModel = new DefaultTableModel(scrollData, scrollColumns) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
 
-        JTable frozenTable = new JTable(frozenModel);
-        JTable scrollTable = new JTable(scrollModel);
+
+
         scrollTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        TableStyler.styleTable(frozenTable);
-        TableStyler.styleTable(scrollTable);
+
 
         // Synchronize row selection
         ListSelectionModel selectionModel = frozenTable.getSelectionModel();
@@ -1078,5 +1146,24 @@ public class PayrollScreen extends JPanel {
 
 
 
+
+
+    }
+
+
+    public DefaultTableModel getFrozenModel() {
+        return frozenModel;
+    }
+
+    public DefaultTableModel getScrollModel() {
+        return scrollModel;
+    }
+
+    public JTable getFrozenTable() {
+        return frozenTable;
+    }
+
+    public JTable getScrollTable() {
+        return scrollTable;
     }
 }

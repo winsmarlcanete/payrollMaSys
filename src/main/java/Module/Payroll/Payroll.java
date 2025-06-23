@@ -6,7 +6,9 @@ import Entity.PayrollClass;
 import Entity.Formula;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,12 +84,13 @@ public class Payroll {
                     "p.employee_id, " +
                     "p.period_start, " +
                     "p.period_end, " +
-                    "COALESCE(SUM(tc.hours_clocked), 0) AS days_present, " + // ← renamed result as days_present
-                    "MAX(p.overtime_hours) AS overtime_hours, " +
-                    "MAX(p.nd_hours) AS nd_hours, " +
-                    "MAX(p.sholiday_hours) AS sholiday_hours, " +
-                    "MAX(p.lholiday_hours) AS lholiday_hours, " +
-                    "MAX(p.late_minutes) AS late_minutes, " +
+                    "p.days_present, " +
+                    "p.overtime_hours, " +
+                    "p.nd_hours, " +
+                    "p.sholiday_hours, " +
+                    "p.lholiday_hours, " +
+                    "p.late_minutes, " +
+                    "SUM(tc.hours_clocked) AS total_hours_clocked, " +  // summed over grouped timecard entries
                     "e.first_name, " +
                     "e.last_name, " +
                     "e.pay_rate " +
@@ -96,14 +99,20 @@ public class Payroll {
                     "LEFT JOIN payrollmsdb.timecards tc ON tc.employee_id = p.employee_id " +
                     "AND tc.date BETWEEN p.period_start AND p.period_end " +
                     "WHERE p.period_start = ( " +
-                    "   SELECT MAX(period_start) " +
-                    "   FROM payrollmsdb.payroll " +
-                    "   WHERE employee_id = p.employee_id " +
+                    "    SELECT MAX(period_start) " +
+                    "    FROM payrollmsdb.payroll " +
+                    "    WHERE employee_id = p.employee_id " +
                     ") " +
                     "GROUP BY " +
                     "p.employee_id, " +
                     "p.period_start, " +
                     "p.period_end, " +
+                    "p.days_present, " +
+                    "p.overtime_hours, " +
+                    "p.nd_hours, " +
+                    "p.sholiday_hours, " +
+                    "p.lholiday_hours, " +
+                    "p.late_minutes, " +
                     "e.first_name, " +
                     "e.last_name, " +
                     "e.pay_rate;";
@@ -299,6 +308,215 @@ public class Payroll {
         }
     }
 
+    public static void retrieveAllTimecards(Date periodStart, Date periodEnd) {
+        Connection conn;
+        try {
+            conn = JDBC.getConnection();
+
+            // Step 1: Retrieve all employees
+            List<Employee> employees = retrieveAllEmployee();
+
+            for (Employee employee : employees) {
+                int employeeId = employee.getEmployee_id();
+
+                // Step 2: Retrieve total hours clocked from the timecard database
+                String timecardSql = "SELECT SUM(hours_clocked) AS total_hours " +
+                        "FROM payrollmsdb.timecards " +
+                        "WHERE employee_id = ? AND date BETWEEN ? AND ?";
+                PreparedStatement timecardStmt = conn.prepareStatement(timecardSql);
+                timecardStmt.setInt(1, employeeId);
+                timecardStmt.setDate(2, periodStart);
+                timecardStmt.setDate(3, periodEnd);
+
+                System.out.println("Retrieving timecard for employeeId: " + employeeId +
+                        ", periodStart: " + periodStart +
+                        ", periodEnd: " + periodEnd);
+                ResultSet rs = timecardStmt.executeQuery();
+                double totalHours = 0.0;
+                if (rs.next()) {
+                    totalHours = rs.getDouble("total_hours");
+                }
+
+                rs.close();
+                timecardStmt.close();
+
+                // Step 3: Compute days present using Formula.computeDaysPresent
+                double daysPresent = Formula.computeDaysPresent(totalHours);
+
+                // Debugging: Print values before updating
+                System.out.println("Updating payroll for employeeId: " + employeeId +
+                        ", periodStart: " + periodStart +
+                        ", periodEnd: " + periodEnd +
+                        ", daysPresent: " + daysPresent);
+
+                // Step 4: Update days_present in the payroll database
+                String updateSql = "UPDATE payrollmsdb.payroll SET days_present = ? " +
+                        "WHERE employee_id = ? AND period_start = ? AND period_end = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+                updateStmt.setDouble(1, daysPresent);
+                updateStmt.setInt(2, employeeId);
+                updateStmt.setDate(3, periodStart);
+                updateStmt.setDate(4, periodEnd);
+
+                int rowsUpdated = updateStmt.executeUpdate();
+                System.out.println("Rows updated: " + rowsUpdated); // Debugging: Check rows affected
+                updateStmt.close();
+
+                updatePayrollDetails(periodStart, periodEnd); // Update payroll details after updating payroll
+            }
+
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    public static void updatePayrollDetails(Date periodStart, Date periodEnd) {
+        Connection conn;
+        try {
+            conn = JDBC.getConnection();
+
+            // Step 1: Preload holiday lists
+            List<LocalDate> specialHolidays = List.of(
+                    LocalDate.of(2023, 2, 25), LocalDate.of(2023, 4, 8), LocalDate.of(2023, 8, 21),
+                    LocalDate.of(2023, 11, 1), LocalDate.of(2023, 12, 8), LocalDate.of(2023, 12, 31)
+            );
+            List<LocalDate> legalHolidays = List.of(
+                    LocalDate.of(2023, 1, 1), LocalDate.of(2023, 4, 6), LocalDate.of(2023, 4, 7),
+                    LocalDate.of(2023, 5, 1), LocalDate.of(2023, 6, 12), LocalDate.of(2023, 8, 28),
+                    LocalDate.of(2023, 11, 30), LocalDate.of(2023, 12, 25), LocalDate.of(2023, 12, 30)
+            );
+
+            // Step 2: Retrieve all employees
+            List<Employee> employees = retrieveAllEmployee();
+
+            // Step 3: Prepare batch update statement
+            String updateSql = "UPDATE payrollmsdb.payroll SET " +
+                    "overtime_hours = ?, nd_hours = ?, sholiday_hours = ?, " +
+                    "lholiday_hours = ?, late_minutes = ? " +
+                    "WHERE employee_id = ? AND period_start = ? AND period_end = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+
+            for (Employee employee : employees) {
+                int employeeId = employee.getEmployee_id();
+
+                // Step 4: Retrieve timecard data for the employee
+                String timecardSql = "SELECT tc.date, tc.hours_clocked, e.shift_start, e.shift_end, " +
+                        "p.overtime_hours, p.nd_hours, p.sholiday_hours, p.lholiday_hours, p.late_minutes " +
+                        "FROM payrollmsdb.timecards tc " +
+                        "JOIN payrollmsdb.employees e ON tc.employee_id = e.employee_id " +
+                        "JOIN payrollmsdb.payroll p ON p.employee_id = tc.employee_id " +
+                        "AND p.period_start = ? AND p.period_end = ? " +
+                        "WHERE tc.employee_id = ? AND tc.date BETWEEN ? AND ?";
+                PreparedStatement timecardStmt = conn.prepareStatement(timecardSql);
+                timecardStmt.setDate(1, periodStart);
+                timecardStmt.setDate(2, periodEnd);
+                timecardStmt.setInt(3, employeeId);
+                timecardStmt.setDate(4, periodStart);
+                timecardStmt.setDate(5, periodEnd);
+
+                ResultSet rs = timecardStmt.executeQuery();
+
+                while (rs.next()) {
+                    Date date = rs.getDate("date");
+                    double hoursClocked = rs.getDouble("hours_clocked");
+                    Time startTime = rs.getTime("shift_start");
+                    Time endTime = rs.getTime("shift_end");
+
+                    double overtimeHours = Formula.computeOvertimeHours(hoursClocked);
+                    double ndHours = 0;
+                    if (startTime != null && endTime != null) {
+                        LocalTime start = startTime.toLocalTime();
+                        LocalTime end = endTime.toLocalTime();
+                        ndHours = Formula.computeNightDifferentialHours(start, end, hoursClocked);
+                    }
+
+                    double sholidayHours = specialHolidays.contains(date.toLocalDate()) ? hoursClocked : 0;
+                    double lholidayHours = legalHolidays.contains(date.toLocalDate()) ? hoursClocked : 0;
+
+                    double lateMinutes = 0;
+                    if (startTime != null) {
+                        LocalTime expectedStart = LocalTime.of(9, 0); // 9 AM
+                        LocalTime actualStart = startTime.toLocalTime();
+                        lateMinutes = Formula.computeLateMinutes(expectedStart, actualStart);
+                    }
+
+                    // Check if update is needed
+                    if (overtimeHours == rs.getDouble("overtime_hours") &&
+                            ndHours == rs.getDouble("nd_hours") &&
+                            sholidayHours == rs.getDouble("sholiday_hours") &&
+                            lholidayHours == rs.getDouble("lholiday_hours") &&
+                            lateMinutes == rs.getDouble("late_minutes")) {
+                        continue; // Skip update if values match
+                    }
+
+                    // Add to batch
+                    updateStmt.setDouble(1, overtimeHours);
+                    updateStmt.setDouble(2, ndHours);
+                    updateStmt.setDouble(3, sholidayHours);
+                    updateStmt.setDouble(4, lholidayHours);
+                    updateStmt.setDouble(5, lateMinutes);
+                    updateStmt.setInt(6, employeeId);
+                    updateStmt.setDate(7, periodStart);
+                    updateStmt.setDate(8, periodEnd);
+                    updateStmt.addBatch();
+                }
+
+                rs.close();
+                timecardStmt.close();
+            }
+
+            // Execute batch updates
+            int[] rowsUpdated = updateStmt.executeBatch();
+            System.out.println("Batch update completed. Rows updated: " + rowsUpdated.length);
+
+            updateStmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Helper method to check if a date is a special holiday
+    public static boolean checkSpecialHoliday(Date date) {
+        List<LocalDate> specialHolidays = List.of(
+                LocalDate.of(2023, 2, 25),  // EDSA Revolution Anniversary
+                LocalDate.of(2023, 4, 8),   // Black Saturday
+                LocalDate.of(2023, 8, 21),  // Ninoy Aquino Day
+                LocalDate.of(2023, 11, 1),  // All Saints' Day
+                LocalDate.of(2023, 12, 8),  // Feast of the Immaculate Conception
+                LocalDate.of(2023, 12, 31)  // New Year's Eve
+        );
+
+        LocalDate localDate = date.toLocalDate();
+        return specialHolidays.contains(localDate);
+    }
+
+    // Helper method to check if a date is a legal holiday
+    public static boolean checkLegalHoliday(Date date) {
+        List<LocalDate> legalHolidays = List.of(
+                LocalDate.of(2023, 1, 1),   // New Year's Day
+                LocalDate.of(2023, 4, 6),   // Maundy Thursday
+                LocalDate.of(2023, 4, 7),   // Good Friday
+                LocalDate.of(2023, 5, 1),   // Labor Day
+                LocalDate.of(2023, 6, 12),  // Independence Day
+                LocalDate.of(2023, 8, 28),  // National Heroes Day (last Monday of August, variable)
+                LocalDate.of(2023, 11, 30), // Bonifacio Day
+                LocalDate.of(2023, 12, 25), // Christmas Day
+                LocalDate.of(2023, 12, 30)  // Rizal Day
+        );
+
+        LocalDate localDate = date.toLocalDate();
+        return legalHolidays.contains(localDate);
+    }
+
+
+
+
     public static void viewPayroll(PayrollClass payroll) {
         String sql = "SELECT `payroll`.`payroll_id`,\n" +
                 "    `payroll`.`employee_id`,\n" +
@@ -429,57 +647,7 @@ public class Payroll {
         return payrollMap;
     }
 
-    public static void loadTimecards(Date periodStart, Date periodEnd) {
-        Connection conn;
-        try {
-            // Retrieve all employees
-            List<Employee> employees = retrieveAllEmployee();
 
-            conn = JDBC.getConnection();
-
-            for (Employee employee : employees) {
-                int employeeId = employee.getEmployee_id();
-
-                // Step 1: Retrieve total hours clocked from the timecard database
-                String timecardSql = "SELECT SUM(hours_clocked) AS total_hours " +
-                        "FROM payrollmsdb.timecard " +
-                        "WHERE employee_id = ? AND date BETWEEN ? AND ?";
-                PreparedStatement timecardStmt = conn.prepareStatement(timecardSql);
-                timecardStmt.setInt(1, employeeId);
-                timecardStmt.setDate(2, periodStart);
-                timecardStmt.setDate(3, periodEnd);
-
-                ResultSet rs = timecardStmt.executeQuery();
-                double totalHours = 0.0;
-                if (rs.next()) {
-                    totalHours = rs.getDouble("total_hours");
-                }
-
-                rs.close();
-                timecardStmt.close();
-
-                // Step 2: Compute days present using Formula.computeDaysPresent
-                double daysPresent = Formula.computeDaysPresent(totalHours);
-
-                // Step 3: Update days_present in the payroll database
-                String updateSql = "UPDATE payrollmsdb.payroll SET days_present = ? " +
-                        "WHERE employee_id = ? AND period_start = ? AND period_end = ?";
-                PreparedStatement updateStmt = conn.prepareStatement(updateSql);
-                updateStmt.setDouble(1, daysPresent);
-                updateStmt.setInt(2, employeeId);
-                updateStmt.setDate(3, periodStart);
-                updateStmt.setDate(4, periodEnd);
-
-                updateStmt.executeUpdate();
-                updateStmt.close();
-            }
-
-            conn.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
 
