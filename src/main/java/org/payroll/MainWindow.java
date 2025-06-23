@@ -5,6 +5,7 @@ import javax.swing.*;
 // import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,6 +15,8 @@ import Module.Payroll.Payroll;
 import Screens.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainWindow extends JFrame {
     public static Color activeColor = new Color(0, 128, 0);
@@ -139,45 +142,45 @@ public class MainWindow extends JFrame {
 
                         }
 
-                        if (name.equals("Payroll")) {
-
-                            System.out.println("Loading Payroll screen...");
-
-                            // Create a JOptionPane with a message and progress bar
-                            JOptionPane optionPane = new JOptionPane(
-                                    "Payroll is being updated...",
-                                    JOptionPane.INFORMATION_MESSAGE,
-                                    JOptionPane.DEFAULT_OPTION,
-                                    null,
-                                    new Object[]{}, // No buttons
-                                    null
-                            );
-
-                            JDialog dialog = optionPane.createDialog(payroll, "Updating Payroll");
-                            dialog.setModal(true);
-                            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Disable X button
-
-                            // Run updatePayrollDetails in the background
-                            ExecutorService executorService = Executors.newSingleThreadExecutor();
-                            executorService.submit(() -> {
-                                System.out.println("Running updatePayrollDetails in the background...");
-                                java.sql.Date periodStart = java.sql.Date.valueOf("2024-10-21");
-                                java.sql.Date periodEnd = java.sql.Date.valueOf("2024-11-05");
-                                Payroll.retrieveAllTimecards(periodStart, periodEnd);
-                                System.out.println("updatePayrollDetails completed.");
-
-                                SwingUtilities.invokeLater(() -> {
-                                    System.out.println("Refreshing Payroll UI...");
-                                    Payroll.retrieveAllPayrolls(periodStart,periodEnd);
-
-                                    dialog.dispose(); // Close the dialog
-                                    payroll.repaint();
-                                });
-                            });
-
-                            executorService.shutdown();
-                            dialog.setVisible(true);
-                        }
+//                        if (name.equals("Payroll")) {
+//
+//                            System.out.println("Loading Payroll screen...");
+//
+//                            // Create a JOptionPane with a message and progress bar
+//                            JOptionPane optionPane = new JOptionPane(
+//                                    "Payroll is being updated...",
+//                                    JOptionPane.INFORMATION_MESSAGE,
+//                                    JOptionPane.DEFAULT_OPTION,
+//                                    null,
+//                                    new Object[]{}, // No buttons
+//                                    null
+//                            );
+//
+//                            JDialog dialog = optionPane.createDialog(payroll, "Updating Payroll");
+//                            dialog.setModal(true);
+//                            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Disable X button
+//
+//                            // Run updatePayrollDetails in the background
+//                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+//                            executorService.submit(() -> {
+//                                System.out.println("Running updatePayrollDetails in the background...");
+//                                java.sql.Date periodStart = java.sql.Date.valueOf("2024-10-21");
+//                                java.sql.Date periodEnd = java.sql.Date.valueOf("2024-11-05");
+//                                Payroll.retrieveAllTimecards(periodStart, periodEnd);
+//                                System.out.println("updatePayrollDetails completed.");
+//
+//                                SwingUtilities.invokeLater(() -> {
+//                                    System.out.println("Refreshing Payroll UI...");
+//                                    Payroll.retrieveAllPayrolls(periodStart,periodEnd);
+//
+//                                    dialog.dispose(); // Close the dialog
+//                                    payroll.repaint();
+//                                });
+//                            });
+//
+//                            executorService.shutdown();
+//                            dialog.setVisible(true);
+//                        }
                     });
                 }
 
@@ -221,7 +224,51 @@ public class MainWindow extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new MainWindow().setVisible(true);
+            MainWindow frame = new MainWindow();
+            frame.setVisible(true);
+
+            PayrollScreen payroll = new PayrollScreen();
+
+            // Create a modeless dialog to indicate updating
+            JDialog updatingDialog = new JDialog(frame, "Please wait", false);
+            updatingDialog.setLayout(new BorderLayout());
+            updatingDialog.add(new JLabel("Updating payroll, please wait...", SwingConstants.CENTER), BorderLayout.CENTER);
+            updatingDialog.setSize(300, 100);
+            updatingDialog.setLocationRelativeTo(frame);
+
+            // Show the dialog
+            updatingDialog.setVisible(false);
+
+            // Scheduler to run update every 10 seconds
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() -> {
+                System.out.println("Running updatePayrollDetails in the background...");
+                Date periodStart = Date.valueOf("2024-10-21");
+                Date periodEnd = Date.valueOf("2024-11-05");
+
+                Payroll.retrieveAllTimecards(periodStart, periodEnd);
+                System.out.println("updatePayrollDetails completed.");
+
+                SwingUtilities.invokeLater(() -> {
+                    System.out.println("Refreshing Payroll UI...");
+                    Payroll.retrieveAllPayrolls(periodStart, periodEnd);
+                    payroll.repaint();
+                    payroll.revalidate();
+
+                    if (!updatingDialog.isVisible()) {
+                        updatingDialog.setVisible(false);
+                    }
+                });
+            }, 0, 10, TimeUnit.SECONDS);
+
+            // Shutdown the scheduler when window closes
+            frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    scheduler.shutdown();
+                    updatingDialog.dispose();
+                }
+            });
         });
     }
 }
