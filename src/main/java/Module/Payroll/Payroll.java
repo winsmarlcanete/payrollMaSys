@@ -74,12 +74,12 @@ public class Payroll {
         }
     }
 
-    public static List<PayrollClass> retrieveAllPayrolls() {
+    public static List<PayrollClass> retrieveAllPayrolls(Date period_start, Date period_end) {
         List<PayrollClass> payrollList = new ArrayList<>();
         Connection conn;
 
         try {
-            // Fetch the latest payroll record for each employee
+            // Fetch payroll records filtered by the given period_start and period_end
             String sql = "SELECT " +
                     "p.employee_id, " +
                     "p.period_start, " +
@@ -98,11 +98,7 @@ public class Payroll {
                     "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
                     "LEFT JOIN payrollmsdb.timecards tc ON tc.employee_id = p.employee_id " +
                     "AND tc.date BETWEEN p.period_start AND p.period_end " +
-                    "WHERE p.period_start = ( " +
-                    "    SELECT MAX(period_start) " +
-                    "    FROM payrollmsdb.payroll " +
-                    "    WHERE employee_id = p.employee_id " +
-                    ") " +
+                    "WHERE p.period_start >= ? AND p.period_end <= ? " +
                     "GROUP BY " +
                     "p.employee_id, " +
                     "p.period_start, " +
@@ -117,9 +113,10 @@ public class Payroll {
                     "e.last_name, " +
                     "e.pay_rate;";
 
-
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setDate(1, period_start);
+            stmt.setDate(2, period_end);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -434,8 +431,8 @@ public class Payroll {
                         ndHours = Formula.computeNightDifferentialHours(start, end, hoursClocked);
                     }
 
-                    double sholidayHours = specialHolidays.contains(date.toLocalDate()) ? hoursClocked : 0;
-                    double lholidayHours = legalHolidays.contains(date.toLocalDate()) ? hoursClocked : 0;
+                    double sholidayHours = Formula.checkSpecialHoliday(date) ? hoursClocked : 0;
+                    double lholidayHours = Formula.checkLegalHoliday(date) ? hoursClocked : 0;
 
                     double lateMinutes = 0;
                     if (startTime != null) {
@@ -463,6 +460,8 @@ public class Payroll {
                     updateStmt.setDate(7, periodStart);
                     updateStmt.setDate(8, periodEnd);
                     updateStmt.addBatch();
+
+
                 }
 
                 rs.close();
@@ -476,43 +475,14 @@ public class Payroll {
             updateStmt.close();
             conn.close();
 
+            calculatePayroll();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // Helper method to check if a date is a special holiday
-    public static boolean checkSpecialHoliday(Date date) {
-        List<LocalDate> specialHolidays = List.of(
-                LocalDate.of(2023, 2, 25),  // EDSA Revolution Anniversary
-                LocalDate.of(2023, 4, 8),   // Black Saturday
-                LocalDate.of(2023, 8, 21),  // Ninoy Aquino Day
-                LocalDate.of(2023, 11, 1),  // All Saints' Day
-                LocalDate.of(2023, 12, 8),  // Feast of the Immaculate Conception
-                LocalDate.of(2023, 12, 31)  // New Year's Eve
-        );
 
-        LocalDate localDate = date.toLocalDate();
-        return specialHolidays.contains(localDate);
-    }
-
-    // Helper method to check if a date is a legal holiday
-    public static boolean checkLegalHoliday(Date date) {
-        List<LocalDate> legalHolidays = List.of(
-                LocalDate.of(2023, 1, 1),   // New Year's Day
-                LocalDate.of(2023, 4, 6),   // Maundy Thursday
-                LocalDate.of(2023, 4, 7),   // Good Friday
-                LocalDate.of(2023, 5, 1),   // Labor Day
-                LocalDate.of(2023, 6, 12),  // Independence Day
-                LocalDate.of(2023, 8, 28),  // National Heroes Day (last Monday of August, variable)
-                LocalDate.of(2023, 11, 30), // Bonifacio Day
-                LocalDate.of(2023, 12, 25), // Christmas Day
-                LocalDate.of(2023, 12, 30)  // Rizal Day
-        );
-
-        LocalDate localDate = date.toLocalDate();
-        return legalHolidays.contains(localDate);
-    }
 
 
 
@@ -647,7 +617,107 @@ public class Payroll {
         return payrollMap;
     }
 
+    public static void calculatePayroll() {
+        Connection conn;
 
+        try {
+            conn = JDBC.getConnection();
+
+            // Step 1: Retrieve all employees
+            List<Employee> employees = retrieveAllEmployee();
+
+            for (Employee employee : employees) {
+                int employeeId = employee.getEmployee_id();
+
+                // Step 2: Retrieve payroll data for the employee
+                String sql = "SELECT days_present, overtime_hours, nd_hours, sholiday_hours, lholiday_hours, late_minutes, " +
+                        "e.pay_rate " +
+                        "FROM payrollmsdb.payroll p " +
+                        "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
+                        "WHERE p.employee_id = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, employeeId);
+
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    BigDecimal payRate = rs.getBigDecimal("pay_rate");
+                    double daysPresent = rs.getDouble("days_present");
+                    double overtimeHours = rs.getDouble("overtime_hours");
+                    double ndHours = rs.getDouble("nd_hours");
+                    double sholidayHours = rs.getDouble("sholiday_hours");
+                    double lholidayHours = rs.getDouble("lholiday_hours");
+                    double lateMinutes = rs.getDouble("late_minutes");
+
+                    // Step 3: Calculate payroll details using formulas
+                    BigDecimal overtimeAmount = Formula.computeOvertimeAmount(payRate, overtimeHours);
+                    BigDecimal ndAmount = Formula.computeNightDifferentialAmount(payRate, ndHours);
+                    BigDecimal sholidayAmount = Formula.computeSpecialHolidayAmount(payRate, sholidayHours);
+                    BigDecimal lholidayAmount = Formula.computeLegalHolidayAmount(payRate, lholidayHours);
+                    BigDecimal lateAmount = Formula.computeLateAmount(payRate, lateMinutes);
+                    BigDecimal wage = Formula.computeWage(payRate, lateAmount, daysPresent);
+
+                    // Deductions
+                    BigDecimal philhealthDeduction = new BigDecimal("0");
+                    BigDecimal sssDeduction = new BigDecimal("0");
+                    BigDecimal pagibigDeduction = new BigDecimal("0");
+                    BigDecimal efundDeduction = new BigDecimal("0");
+                    BigDecimal otherDeduction = new BigDecimal("0");
+
+                    // Compensations
+                    BigDecimal salaryAdjustment = new BigDecimal("0");
+                    BigDecimal allowanceAdjustment = new BigDecimal("0");
+                    BigDecimal otherCompensations = new BigDecimal("0");
+
+                    BigDecimal totalDeduction = Formula.computeTotalDeductionAmount(philhealthDeduction, sssDeduction, pagibigDeduction, efundDeduction, otherDeduction);
+                    BigDecimal grossPay = Formula.computeTotalGrossAmount(wage, overtimeAmount, ndAmount, sholidayAmount, lholidayAmount);
+                    BigDecimal netPay = Formula.computeNetPay(grossPay, totalDeduction, salaryAdjustment, allowanceAdjustment, otherCompensations);
+
+                    // Step 4: Update payroll data in the database
+                    String updateSql = "UPDATE payrollmsdb.payroll SET " +
+                            "overtime_amount = ?, nd_amount = ?, sholiday_amount = ?, lholiday_amount = ?, late_amount = ?, " +
+                            "wage = ?, philhealth_deduction = ?, sss_deduction = ?, pagibig_deduction = ?, efund_deduction = ?, " +
+                            "other_deduction = ?, salary_adjustment = ?, allowance_adjustment = ?, other_compensations = ?, " +
+                            "total_deduction = ?, gross_pay = ?, net_pay = ? " +
+                            "WHERE employee_id = ?";
+                    PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+                    updateStmt.setBigDecimal(1, overtimeAmount);
+                    updateStmt.setBigDecimal(2, ndAmount);
+                    updateStmt.setBigDecimal(3, sholidayAmount);
+                    updateStmt.setBigDecimal(4, lholidayAmount);
+                    updateStmt.setBigDecimal(5, lateAmount);
+                    updateStmt.setBigDecimal(6, wage);
+                    updateStmt.setBigDecimal(7, philhealthDeduction);
+                    updateStmt.setBigDecimal(8, sssDeduction);
+                    updateStmt.setBigDecimal(9, pagibigDeduction);
+                    updateStmt.setBigDecimal(10, efundDeduction);
+                    updateStmt.setBigDecimal(11, otherDeduction);
+                    updateStmt.setBigDecimal(12, salaryAdjustment);
+                    updateStmt.setBigDecimal(13, allowanceAdjustment);
+                    updateStmt.setBigDecimal(14, otherCompensations);
+                    updateStmt.setBigDecimal(15, totalDeduction);
+                    updateStmt.setBigDecimal(16, grossPay);
+                    updateStmt.setBigDecimal(17, netPay);
+                    updateStmt.setInt(18, employeeId);
+
+                    int rowsUpdated = updateStmt.executeUpdate();
+                    System.out.println("Payroll updated for employeeId: " + employeeId + ". Rows affected: " + rowsUpdated);
+
+                    updateStmt.close();
+                } else {
+                    System.out.println("No payroll record found for employeeId: " + employeeId);
+                }
+
+                rs.close();
+                stmt.close();
+            }
+
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 
@@ -655,34 +725,7 @@ public class Payroll {
 
 
     public static void main (String[] args){
-        java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
 
-
-        //Button to create payroll period
-        Map<Integer, PayrollClass> payrollMap = generatePayrollMap(sqlDate,sqlDate);
-
-
-        double days_present = 20.0;
-        double overtime_hours = 10.5;
-        double nd_hours = 6.0;
-        double sholiday_hours = 2.5;
-        double lholiday_hours = 1.0;
-        double late_minutes = 15.0;
-        BigDecimal pay_rate = new BigDecimal("2000");
-
-        payrollMap.get(182).setPayrate(pay_rate);
-        payrollMap.get(182).setLate_minutes(15.0);
-        payrollMap.get(182).setDays_present(days_present);
-        payrollMap.get(182).setOvertime_hours(overtime_hours);
-        payrollMap.get(182).setNd_hours(nd_hours);
-        payrollMap.get(182).setSholiday_hours(sholiday_hours);
-        payrollMap.get(182).setLholiday_hours(lholiday_hours);
-        payrollMap.get(182).setLate_minutes(late_minutes);
-
-
-        updatePayroll(payrollMap.get(182));
-
-        viewPayroll(payrollMap.get(182));
 
 
 

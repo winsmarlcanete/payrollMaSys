@@ -3,8 +3,10 @@ package Entity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 public class Formula {
 
@@ -149,6 +151,39 @@ public class Formula {
                 .add(allowance_adjustment)
                 .add(salary_adjustment)
                 .add(other_compensations);
+    }
+
+    // Helper method to check if a date is a special holiday
+    public static boolean checkSpecialHoliday(java.sql.Date date) {
+        List<LocalDate> specialHolidays = List.of(
+                LocalDate.of(2023, 2, 25),  // EDSA Revolution Anniversary
+                LocalDate.of(2023, 4, 8),   // Black Saturday
+                LocalDate.of(2023, 8, 21),  // Ninoy Aquino Day
+                LocalDate.of(2023, 11, 1),  // All Saints' Day
+                LocalDate.of(2023, 12, 8),  // Feast of the Immaculate Conception
+                LocalDate.of(2023, 12, 31)  // New Year's Eve
+        );
+
+        LocalDate localDate = date.toLocalDate();
+        return specialHolidays.contains(localDate);
+    }
+
+    // Helper method to check if a date is a legal holiday
+    public static boolean checkLegalHoliday(java.sql.Date date) {
+        List<LocalDate> legalHolidays = List.of(
+                LocalDate.of(2023, 1, 1),   // New Year's Day
+                LocalDate.of(2023, 4, 6),   // Maundy Thursday
+                LocalDate.of(2023, 4, 7),   // Good Friday
+                LocalDate.of(2023, 5, 1),   // Labor Day
+                LocalDate.of(2023, 6, 12),  // Independence Day
+                LocalDate.of(2023, 8, 28),  // National Heroes Day (last Monday of August, variable)
+                LocalDate.of(2023, 11, 30), // Bonifacio Day
+                LocalDate.of(2023, 12, 25), // Christmas Day
+                LocalDate.of(2023, 12, 30)  // Rizal Day
+        );
+
+        LocalDate localDate = date.toLocalDate();
+        return legalHolidays.contains(localDate);
     }
 
 }

@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.util.Arrays;
 
 
@@ -39,18 +40,31 @@ public class PayrollScreen extends JPanel {
     private JTable frozenTable;
     private JTable scrollTable;
 
-    public void refreshPayrollData(List<PayrollClass> updatedPayrollList) {
-        Object[][] tableData = convertToTableData(updatedPayrollList);
+    private Object[][] frozenData;
+    private Object[][] scrollData;
+    private String[] frozenColumns;
+    private String[] scrollColumns;
 
-        // Update frozen table data
-        DefaultTableModel frozenModel = getFrozenModel();
+    public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate) {
+        // Retrieve all payrolls using the retrieveAllPayrolls function
+        List<PayrollClass> allPayrolls = Payroll.retrieveAllPayrolls(startDate, endDate);
+
+        for (PayrollClass payroll : allPayrolls) {
+            System.out.println(payroll);
+        }
+
+        Object[][] tableData = convertToTableData(allPayrolls);
+        System.out.println("Table Data:");
+        for (Object[] row : tableData) {
+            System.out.println(Arrays.toString(row));
+        }
+
         frozenModel.setDataVector(
                 Arrays.stream(tableData).map(row -> Arrays.copyOf(row, 2)).toArray(Object[][]::new),
-                new String[] {"Name", "Rate"} // Replace with frozenColumns
+                new String[] {"Name", "Rate"}
         );
 
-        // Update scrollable table data
-        DefaultTableModel scrollModel = getScrollModel();
+        // Set the scrollModel with the remaining columns
         scrollModel.setDataVector(
                 Arrays.stream(tableData).map(row -> Arrays.copyOfRange(row, 2, row.length)).toArray(Object[][]::new),
                 new String[] {
@@ -61,12 +75,14 @@ public class PayrollScreen extends JPanel {
                         "SSS Deduction", "Pag-IBIG Deduction", "E-Fund Deduction", "Other Deduction",
                         "Salary Adjustment", "Allowance Adjustment", "Other Compensations",
                         "Total Deduction", "Gross Pay", "Net Pay"
-                } // Replace with scrollColumns
+                }
         );
 
-        // Repaint tables
-        getFrozenTable().repaint();
-        getScrollTable().repaint();
+        // Repaint and revalidate the tables to reflect the updated data
+        frozenTable.repaint();
+        frozenTable.revalidate();
+        scrollTable.repaint();
+        scrollTable.revalidate();
     }
     private Object[][] convertToTableData(List<PayrollClass> payrollList) {
         Object[][] data = new Object[payrollList.size()][26]; // Adjust size to match the number of columns
@@ -110,39 +126,6 @@ public class PayrollScreen extends JPanel {
         setLayout(new BorderLayout());
         setBackground(new Color(34, 177, 76)); // green
 
-
-        frozenModel = new DefaultTableModel(new Object[][]{}, new String[]{"Name", "Rate"}) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        // Initialize frozenTable
-        frozenTable = new JTable(frozenModel);
-        TableStyler.styleTable(frozenTable);
-
-        // Initialize scrollModel and scrollTable (if not already done)
-        scrollModel = new DefaultTableModel(new Object[][]{}, new String[]{
-                "Rate Per Hour", "Days Present", "OT In Hours", "Night Differential In Hours",
-                "Special Holiday In Hours", "Legal Holiday In Hours", "Late In Minutes",
-                "Overtime Amount", "Night Differential Amount", "Special Holiday Amount",
-                "Legal Holiday Amount", "Late Amount", "Wage", "PhilHealth Deduction",
-                "SSS Deduction", "Pag-IBIG Deduction", "E-Fund Deduction", "Other Deduction",
-                "Salary Adjustment", "Allowance Adjustment", "Other Compensations",
-                "Total Deduction", "Gross Pay", "Net Pay"
-        }) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        scrollTable = new JTable(scrollModel);
-        TableStyler.styleTable(scrollTable);
-
-        List<PayrollClass> updatedPayrollList = Payroll.retrieveAllPayrolls();
-        refreshPayrollData(updatedPayrollList);
 
 
         // --- Search bar (same as Employees.java) ---
@@ -312,7 +295,7 @@ public class PayrollScreen extends JPanel {
             if (createPeriodBtn.isEnabled()) {
                 createPeriodBtn.setBackground(btnPressedBg);
 
-                List<PayrollClass> payrolls = Payroll.generatePayrollForAllEmployees(java.sql.Date.valueOf("2024-10-21"), java.sql.Date.valueOf("2024-11-5"));
+
 
             }
             }
@@ -403,8 +386,8 @@ public class PayrollScreen extends JPanel {
         );
 
         // Replace JTextField with JButton for date selection
-        JButton fromDateBtn = new JButton("Oct 21, 2024");
-        JButton toDateBtn = new JButton("Nov 5,2024"); // Declare toDateBtn before using it
+        JButton fromDateBtn = new JButton("");
+        JButton toDateBtn = new JButton(""); // Declare toDateBtn before using it
         fromDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
         fromDateBtn.setBackground(Color.BLACK);
         fromDateBtn.setForeground(Color.WHITE);
@@ -412,6 +395,8 @@ public class PayrollScreen extends JPanel {
         fromDateBtn.setIcon(calendarIcon);
         fromDateBtn.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
         fromDateBtn.setIconTextGap(12); // Space between text and icon
+
+
 
         // Add hover effect and hand cursor
         fromDateBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -492,6 +477,11 @@ public class PayrollScreen extends JPanel {
                     }
                 }
             }
+            if (fromDate[0] != null && toDate[0] != null) {
+                java.sql.Date sqlFromDate = new java.sql.Date(fromDate[0].getTime());
+                java.sql.Date sqlToDate = new java.sql.Date(toDate[0].getTime());
+                refreshPayrollData(sqlFromDate, sqlToDate);
+            }
         });
 
         JLabel dashLabel = new JLabel(" - ");
@@ -531,6 +521,12 @@ public class PayrollScreen extends JPanel {
                 toDateBtn.setText(sdf.format(selectedDate));
             }
             }
+
+            if (fromDate[0] != null && toDate[0] != null) {
+                java.sql.Date sqlFromDate = new java.sql.Date(fromDate[0].getTime());
+                java.sql.Date sqlToDate = new java.sql.Date(toDate[0].getTime());
+                refreshPayrollData(sqlFromDate, sqlToDate);
+            }
         });
 
         JLabel adminLabel = new JLabel((String) sortCombo.getSelectedItem());
@@ -553,7 +549,7 @@ public class PayrollScreen extends JPanel {
 
         Payroll payrollLogic = new Payroll();
 
-        List<PayrollClass> payrollclass = payrollLogic.retrieveAllPayrolls();
+        List<PayrollClass> payrollclass = payrollLogic.retrieveAllPayrolls(Date.valueOf("2024-10-21"),Date.valueOf("2024-11-05"));
         Object[][] data = convertToTableData(payrollclass);
 
         Object[][] dest = new Object[data.length][];
@@ -597,14 +593,14 @@ public class PayrollScreen extends JPanel {
 
         for (Object[] row : data) {
             System.out.println(Arrays.toString(row));
+
         }
 
-        // --- Frozen columns setup ---
-        String[] frozenColumns = Arrays.copyOfRange(columnNames, 0, 2);
-        String[] scrollColumns = Arrays.copyOfRange(columnNames, 2, columnNames.length);
+        frozenColumns = Arrays.copyOfRange(columnNames, 0, 2);
+         scrollColumns = Arrays.copyOfRange(columnNames, 2, columnNames.length);
 
-        Object[][] frozenData = new Object[data.length][2];
-        Object[][] scrollData = new Object[data.length][columnNames.length - 2];
+        frozenData = new Object[data.length][2];
+        scrollData = new Object[data.length][columnNames.length - 2];
         for (int i = 0; i < data.length; i++) {
             frozenData[i][0] = data[i][0];
             frozenData[i][1] = data[i][1];
@@ -618,6 +614,13 @@ public class PayrollScreen extends JPanel {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
 
+
+        frozenTable = new JTable(frozenModel);
+        TableStyler.styleTable(frozenTable);
+
+
+        scrollTable = new JTable(scrollModel);
+        TableStyler.styleTable(scrollTable);
 
 
         scrollTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -1017,6 +1020,26 @@ public class PayrollScreen extends JPanel {
         saveBtn.setContentAreaFilled(false);
         saveBtn.setOpaque(false);
         saveBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
+        saveBtn.addActionListener(e -> {
+            if (periodStartDate[0] == null || periodEndDate[0] == null) {
+                JOptionPane.showMessageDialog(null, "Please select both start and end dates.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Convert java.util.Date to java.sql.Date
+            java.sql.Date sqlPeriodStart = new java.sql.Date(periodStartDate[0].getTime());
+            java.sql.Date sqlPeriodEnd = new java.sql.Date(periodEndDate[0].getTime());
+
+            // Call generatePayrollForAllEmployees
+            Payroll.generatePayrollForAllEmployees(sqlPeriodStart, sqlPeriodEnd);
+
+            // Optionally close the popup
+            createPeriodPopup.setVisible(false);
+
+            JOptionPane.showMessageDialog(null, "Payroll generated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        });
 
         RoundedButton cancelBtn = new RoundedButton("Cancel", 30);
         cancelBtn.setFont(font);

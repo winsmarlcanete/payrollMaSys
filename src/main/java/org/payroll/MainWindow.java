@@ -155,6 +155,7 @@ public class MainWindow extends JFrame {
 
                             JDialog dialog = optionPane.createDialog(payroll, "Updating Payroll");
                             dialog.setModal(true);
+                            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Disable X button
 
                             // Run updatePayrollDetails in the background
                             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -167,7 +168,7 @@ public class MainWindow extends JFrame {
 
                                 SwingUtilities.invokeLater(() -> {
                                     System.out.println("Refreshing Payroll UI...");
-                                    Payroll.retrieveAllPayrolls();
+                                    Payroll.retrieveAllPayrolls(periodStart,periodEnd);
 
                                     dialog.dispose(); // Close the dialog
                                     payroll.repaint();
