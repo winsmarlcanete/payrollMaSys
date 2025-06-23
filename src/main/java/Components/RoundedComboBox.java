@@ -75,7 +75,8 @@ public class RoundedComboBox<E> extends JComboBox<E> {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     // Transparent background
-                    g2.setComposite(AlphaComposite.Clear);
+//                    g2.setComposite(AlphaComposite.Clear);
+                    g2.setColor(new Color(0, 0, 0, 0));
                     g2.fillRect(0, 0, getWidth(), getHeight());
                     g2.setComposite(AlphaComposite.SrcOver);
 
