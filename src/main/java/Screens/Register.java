@@ -52,7 +52,7 @@ public class Register extends JFrame {
 
         // Center form (2 columns)
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0)); // 2 columns with horizontal gap
-        centerPanel.setMaximumSize(new Dimension(600, 300)); // Adjusted maximum size for new fields
+        centerPanel.setMaximumSize(new Dimension(650, 300)); // Adjusted maximum width for new fields and longer dropdown
         centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         centerPanel.setBackground(Color.LIGHT_GRAY);
 
@@ -197,13 +197,13 @@ public class Register extends JFrame {
         String[] securityQuestions = {
                 "Select a question", // Placeholder
                 "What is the name of your favorite pet?",
-                "Who's your best friend?",
-                "What year was your mother born?",
-                "What city were you born in?",
-                "Who's your daddy?"
+                "What is the name of the town where you were born?",
+                "What was your childhood nickname?",
+                "What was the name of your first school?",
+                "What is your dream vacation destination?"
         };
         securityQuestionComboBox = new JComboBox<>(securityQuestions);
-        securityQuestionComboBox.setMaximumSize(new Dimension(250, 40));
+        securityQuestionComboBox.setMaximumSize(new Dimension(400, 40)); // Increased width for full visibility
         securityQuestionComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         securityQuestionComboBox.setBorder(BorderFactory.createTitledBorder("Security Question"));
         ((JLabel)securityQuestionComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER); // Center text in combobox
