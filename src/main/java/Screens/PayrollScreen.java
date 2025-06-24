@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import Components.BlackRoundedComboBox;
 import Components.RoundedButton;
 import Components.TableStyler;
 import Components.RoundedComboBox;
@@ -369,46 +370,157 @@ public class PayrollScreen extends JPanel {
         logoAndButtonPanel.setPreferredSize(new Dimension(logoAndButtonPanel.getPreferredSize().width, prefHeight + 8));
 
         // --- Period info ---
-        JPanel periodPanel = new JPanel();
+        // LEFT: periodPanel
+        JPanel periodPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         periodPanel.setOpaque(false);
-        periodPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         periodPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
-        // Set periodPanel height to fit its components
-        periodPanel.setPreferredSize(null);
-        periodPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, periodPanel.getPreferredSize().height));
 
         JLabel periodLabel = new JLabel("Period:");
         periodLabel.setFont(new Font("Arial", Font.BOLD, 22));
         periodLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
-        String samplePeriodStart1 = "Oct 21, 2024";
-        String samplePeriodEnd1 = "Nov 5, 2024";
-        String samplePeriodStart2 = "Nov 21, 2024";
-        String samplePeriodEnd2 = "Dec 5, 2024";
-        String samplePeriodStart3 = "Jan 21, 2024";
-        String samplePeriodEnd3 = "Feb 5, 2024";
-        RoundedComboBox<String> payrollPeriod = new RoundedComboBox<>(new String[]{samplePeriodStart1 + " — " + samplePeriodEnd1, samplePeriodStart2 + " — " + samplePeriodEnd2, samplePeriodStart3 + " — " + samplePeriodEnd3});
+        BlackRoundedComboBox<String> payrollPeriod = new BlackRoundedComboBox<>(new String[]{
+                "Oct 21, 2024 - Nov 5, 2024",
+                "Nov 21, 2024 - Dec 5, 2024",
+                "Jan 21, 2024 - Feb 5, 2024"
+        });
+        payrollPeriod.setName("payrollPeriod");
         payrollPeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        payrollPeriod.setSize(new Dimension(100, 75));
+        payrollPeriod.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        payrollPeriod.setPreferredSize(new Dimension(290, 34));
+        payrollPeriod.setBackground(Color.BLACK); // Background of the combobox itself
+        payrollPeriod.setForeground(Color.WHITE); // Initial selected item text
+        payrollPeriod.setFont(new Font("Arial", Font.PLAIN, 18));
+        payrollPeriod.setOpaque(false);
+        payrollPeriod.setEditable(false);
 
-        JLabel adminLabel = new JLabel((String) sortCombo.getSelectedItem());
-        // Update adminLabel text when sortCombo selection changes
-        sortCombo.addActionListener(e -> adminLabel.setText((String) sortCombo.getSelectedItem()));
+// ✅ Force white foreground after selection manually
+        payrollPeriod.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                Component comp = payrollPeriod.getEditor().getEditorComponent();
+                if (comp instanceof JTextField) {
+                    ((JTextField) comp).setForeground(Color.WHITE);
+                }
+            }
+        });
+
+// ✅ Override the renderer
+        payrollPeriod.setRenderer(new ListCellRenderer<Object>() {
+            private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(payrollPeriod.getFont());
+                label.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+
+                if (index == -1) {
+                    // Selected item shown in combo box
+                    label.setForeground(Color.WHITE);
+                    label.setBackground(Color.BLACK);
+                    label.setOpaque(true);
+                } else {
+                    // Dropdown items
+                    label.setForeground(Color.BLACK);
+                    label.setBackground(isSelected ? new Color(220, 220, 220) : Color.WHITE);
+                    label.setOpaque(true);
+                }
+                label.repaint();
+                return label;
+
+            }
+        });
+
+
+
+        JLabel adminLabel = new JLabel("All Departments");
         adminLabel.setFont(new Font("Arial", Font.BOLD, 18));
         adminLabel.setOpaque(true);
         adminLabel.setBackground(Color.BLACK);
         adminLabel.setForeground(Color.WHITE);
         adminLabel.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
 
+        sortCombo.addActionListener(e -> {
+            String selected = (String) sortCombo.getSelectedItem();
+            adminLabel.setText(selected);
+        });
+
         periodPanel.add(periodLabel);
         periodPanel.add(payrollPeriod);
-//        periodPanel.add(fromDateBtn);
-//        periodPanel.add(dashLabel);
-//        periodPanel.add(toDateBtn);
         periodPanel.add(Box.createHorizontalStrut(10));
         periodPanel.add(adminLabel);
 
+// RIGHT: rightButtons
+        JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
+        rightButtons.setOpaque(false);
 
+        RoundedButton edit = new RoundedButton("Edit", 10);
+        edit.setFont(new Font("Arial", Font.BOLD, 18));
+        edit.setPreferredSize(new Dimension(100, 35));
+        edit.setBackground(Color.BLACK);
+        edit.setForeground(Color.WHITE);
+        edit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        edit.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                edit.setBackground(new Color(40, 40, 40)); // Slightly lighter black
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                edit.setBackground(Color.BLACK);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                edit.setBackground(new Color(100, 100, 100)); // Even lighter on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                edit.setBackground(edit.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+            }
+        });
+
+        ImageIcon plusIcon = new ImageIcon(
+                new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("plus.png")))
+                        .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+        );
+
+        RoundedButton addDeduction = new RoundedButton("Add Deduction", 10);
+        addDeduction.setFont(new Font("Arial", Font.BOLD, 18));
+        addDeduction.setPreferredSize(new Dimension(200, 35));
+        addDeduction.setIcon(plusIcon);
+        addDeduction.setIconTextGap(10);
+        addDeduction.setBackground(Color.BLACK);
+        addDeduction.setForeground(Color.WHITE);
+        addDeduction.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        addDeduction.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                addDeduction.setBackground(new Color(40, 40, 40)); // Slightly lighter black
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                addDeduction.setBackground(Color.BLACK);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                addDeduction.setBackground(new Color(100, 100, 100)); // Even lighter on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                addDeduction.setBackground(addDeduction.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+            }
+        });
+
+        rightButtons.add(edit);
+        rightButtons.add(addDeduction);
+
+// PERIOD GROUP: manual size management
+        JPanel periodGroup = new JPanel();
+        periodGroup.setLayout(new BoxLayout(periodGroup, BoxLayout.X_AXIS));
+        periodGroup.add(periodPanel);
+        periodGroup.add(Box.createHorizontalGlue());  // pushes rightButtons to the right
+        periodGroup.add(rightButtons);
+        periodGroup.setOpaque(false);
 
         Payroll payrollLogic = new Payroll();
 
@@ -527,7 +639,7 @@ public class PayrollScreen extends JPanel {
         JScrollPane frozenScroll = new JScrollPane(frozenTable);
         frozenScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         frozenScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-//        frozenScroll.setPreferredSize(new Dimension(80, frozenTable.getPreferredSize().height));
+        frozenScroll.setPreferredSize(new Dimension(300, frozenTable.getPreferredSize().height));
 //        frozenScroll.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
 //        frozenScroll.setOpaque(false);
         frozenScroll.setBorder(BorderFactory.createEmptyBorder(2, 2, 17, 0));
@@ -671,7 +783,7 @@ public class PayrollScreen extends JPanel {
         whitePanel.setBackground(Color.WHITE);
         whitePanel.setOpaque(true);
         whitePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        whitePanel.add(periodPanel);
+        whitePanel.add(periodGroup);
         whitePanel.add(Box.createVerticalStrut(10));
         whitePanel.add(headerPanel);
         whitePanel.add(tablePanel);
