@@ -8,9 +8,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage; // Added this import just in case for logo fallback
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import Algorithms.OTPGenerator;
 import Config.EmailService;
+import Config.JDBC;
 import Module.Security.ForgotPassword;
 import Module.Security.UserAuthenticator;
 
@@ -287,12 +293,11 @@ class SecurityQuestionScreen {
         frame.setLayout(new GridBagLayout());
 
         JPanel panel = new JPanel();
-        panel.setBackground(Color.WHITE); // Changed to White to match image's inner panel background
+        panel.setBackground(Color.WHITE);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setPreferredSize(new Dimension(550, 500));
         panel.setMaximumSize(new Dimension(550, 500));
-
 
         // Back Button
         JPanel headerPanel = new JPanel();
@@ -312,46 +317,50 @@ class SecurityQuestionScreen {
         panel.add(headerPanel);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Logo - Dynamically scaled from classpath
-        int targetHeight = 30;
-        ImageIcon logoIcon;
-        java.net.URL logoImageUrl = SecurityQuestionScreen.class.getClassLoader().getResource("whole_logo.png");
-        if (logoImageUrl != null) {
-            logoIcon = new ImageIcon(logoImageUrl);
-            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
-            }
-        } else {
-            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
-        }
-
-        int origWidth = logoIcon.getIconWidth();
-        int origHeight = logoIcon.getIconHeight();
-        int targetWidth = (origHeight > 0) ? (int) ((double) origWidth / origHeight * targetHeight) : targetHeight;
-        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(logoLabel);
-
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JLabel title = new JLabel("Payroll Management System");
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(title);
-
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // Security Question Label (TODO: This should be dynamically loaded based on userEmail)
-        JLabel questionLabel = new JLabel("What is the name of your favorite pet?");
+        // Dropdown for Security Questions
+        JLabel questionLabel = new JLabel("Select Security Question:");
         questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        questionLabel.setFont(new Font("Arial", Font.PLAIN, 16)); // Slightly larger font for question
+        questionLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         panel.add(questionLabel);
 
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Answer Field
-        RoundedTextField answerField = new RoundedTextField(20);
+        JComboBox<String> securityQuestionDropdown = new JComboBox<>();
+        securityQuestionDropdown.setMaximumSize(new Dimension(350, 30));
+        securityQuestionDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Populate dropdown with questions from the database
+        try (Connection conn = JDBC.getConnection()) {
+            String query = "SELECT DISTINCT security_question FROM users WHERE security_question IS NOT NULL";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            ArrayList<String> questions = new ArrayList<>();
+            while (rs.next()) {
+                questions.add(rs.getString("security_question"));
+            }
+
+            for (String question : questions) {
+                securityQuestionDropdown.addItem(question);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Failed to load security questions.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        panel.add(securityQuestionDropdown);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Text field for entering the answer
+        JLabel answerLabel = new JLabel("Enter Your Answer:");
+        answerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        answerLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        panel.add(answerLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JTextField answerField = new JTextField();
         answerField.setMaximumSize(new Dimension(350, 30));
         answerField.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(answerField);
@@ -359,23 +368,24 @@ class SecurityQuestionScreen {
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         RoundedButton submitAnswerButton = new RoundedButton("Submit Answer", 20);
-        submitAnswerButton.setBackground(new Color(46, 204, 113)); // Matched green color
+        submitAnswerButton.setBackground(new Color(46, 204, 113));
         submitAnswerButton.setForeground(Color.WHITE);
         submitAnswerButton.setMaximumSize(new Dimension(350, 30));
         submitAnswerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitAnswerButton.addActionListener(e -> {
+            String selectedQuestion = (String) securityQuestionDropdown.getSelectedItem();
             String enteredAnswer = answerField.getText();
-            if (enteredAnswer.isEmpty()) {
+
+            if (enteredAnswer == null || enteredAnswer.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter your answer.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                // TODO: Implement actual security question answer verification logic here
-                // For demonstration, let's assume "test" is the correct answer
-                if (enteredAnswer.equalsIgnoreCase("test")) { // Placeholder verification
-                    JOptionPane.showMessageDialog(frame, "Security question verified successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                boolean isAnswerCorrect = ForgotPassword.verifySecurityAnswer(ResetPassword.userEmail, enteredAnswer);
+                if (isAnswerCorrect) {
+                    JOptionPane.showMessageDialog(frame, "Answer submitted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                     frame.dispose();
-                    NewPasswordScreen.showNewPasswordScreen(); // A new screen for setting new password
+                    NewPasswordScreen.showNewPasswordScreen();
                 } else {
-                    frame.dispose(); // Close current frame if invalid
+                    JOptionPane.showMessageDialog(frame, "Incorrect answer. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -388,6 +398,7 @@ class SecurityQuestionScreen {
         frame.add(panel, gbc);
         frame.setVisible(true);
     }
+
 }
 
 // ----------- NewPasswordScreen Class ------------

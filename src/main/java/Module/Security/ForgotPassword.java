@@ -49,4 +49,31 @@ public class ForgotPassword {
 
         return false;
     }
+
+    public static boolean verifySecurityAnswer(String email, String providedAnswer) {
+        // Hash the provided answer using SHA-256
+        String hashedProvidedAnswer = sha256.stringToSHA256(providedAnswer);
+
+        try (Connection conn = JDBC.getConnection()) {
+            // SQL query to retrieve the hashed security answer for the given email
+            String query = "SELECT security_answer FROM users WHERE email = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, email);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String storedHashedAnswer = rs.getString("security_answer");
+                // Compare the hashed provided answer with the stored hashed answer
+                return hashedProvidedAnswer.equals(storedHashedAnswer);
+            } else {
+                System.out.println("No user found with the email: " + email);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print the stack trace for debugging
+        }
+
+        return false; // Return false if verification fails
+    }
+
+
 }
