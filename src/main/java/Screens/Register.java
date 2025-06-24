@@ -196,12 +196,15 @@ public class Register extends JFrame {
         // =============== Security Question Dropdown ===============
         String[] securityQuestions = {
                 "Select a question", // Placeholder
-                "What is the name of your favorite pet?",
-                "What is the name of the town where you were born?",
-                "What was your childhood nickname?",
-                "What was the name of your first school?",
-                "What is your dream vacation destination?"
+                "What is the name of your first pet?",
+                "What is your favorite color?",
+                "What city were you born in?",
+                "What is your mother’s maiden name?",
+                "What was the name of your first school?"
         };
+
+
+
         securityQuestionComboBox = new JComboBox<>(securityQuestions);
         securityQuestionComboBox.setMaximumSize(new Dimension(400, 40)); // Increased width for full visibility
         securityQuestionComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);

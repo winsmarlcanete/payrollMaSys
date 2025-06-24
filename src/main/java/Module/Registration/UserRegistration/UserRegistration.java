@@ -13,7 +13,7 @@ public class UserRegistration {
         // Updated SQL to include security_question and security_answer_hash
         String sql = "INSERT INTO payrollmsdb.users " +
                 "(first_name, last_name, email, password, access_level, " +
-                "creation_date, account_status, user_name, security_question, security_answer_hash) " +
+                "creation_date, account_status, user_name, security_question, security_answer) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Added two placeholders
 
         Connection conn = null; // Initialize to null

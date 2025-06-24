@@ -47,6 +47,6 @@ public class ForgotPassword {
             e.printStackTrace();
         }
 
-        return false; // Return false if verification fails
+        return false;
     }
 }

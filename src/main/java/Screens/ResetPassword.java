@@ -9,6 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage; // Added this import just in case for logo fallback
 
+import Algorithms.OTPGenerator;
+import Config.EmailService;
+import Module.Security.ForgotPassword;
+import Module.Security.UserAuthenticator;
+
 
 public class ResetPassword {
 
@@ -256,7 +261,8 @@ class EnterCodeScreen {
                     frame.dispose(); // Close current frame
                     NewPasswordScreen.showNewPasswordScreen(); // Open the new New Password screen
                 } else {
-                    frame.dispose(); // Close current frame if invalid
+                    JOptionPane.showMessageDialog(frame, "Invalid code. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    codeField.setText(""); // Clear the field for re-entry
                 }
             }
         });
@@ -655,44 +661,10 @@ class RoundedButton extends JButton {
     }
 }
 
-// Dummy OTPGenerator
-class OTPGenerator {
-    public static String generateOTP() {
-        return "123456"; // Dummy OTP
-    }
-}
 
-// Dummy EmailService
-class EmailService {
-    public static void sendEmail(String to, String otp) {
-        System.out.println("Sending OTP " + otp + " to " + to);
-    }
-}
-
-// Dummy ForgotPassword
-class ForgotPassword {
-    private static String storedOtp = "";
-    private static String storedEmail = "";
-
-    public static void saveOtp(String email, String otp) {
-        storedEmail = email;
-        storedOtp = otp;
-        System.out.println("OTP " + otp + " saved for " + email);
-    }
-
-    public static boolean verifyOtp(String email, String otp) {
-        return storedEmail.equals(email) && storedOtp.equals(otp);
-    }
-}
 
 // Dummy UserAuthenticator for updating password
-class UserAuthenticator {
-    public static boolean updatePassword(String email, String newPassword) {
-        System.out.println("Updating password for " + email + " to " + newPassword);
-        // Simulate a successful update
-        return true;
-    }
-}
+
 
 // New PasswordChangedScreen Class
 class PasswordChangedScreen {
