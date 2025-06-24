@@ -317,15 +317,12 @@ public class Register extends JFrame {
 
             if (registrationSuccess) {
                 JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                // Optionally clear fields or navigate to login screen
-                fnameField.setText("");
-                lnameField.setText("");
-                emailField.setText("");
-                passwordField.setText("");
-                cpasswordField.setText("");
-                securityQuestionComboBox.setSelectedIndex(0); // Reset dropdown
-                securityAnswerField.setText("");
-                positionGroup.clearSelection();
+                // Dispose of the current frame
+                this.dispose();
+                // Redirect to UserRegConfirmation
+                SwingUtilities.invokeLater(() -> {
+                    new UserRegConfirmation(email);
+                });
             } else {
                 JOptionPane.showMessageDialog(this, "Registration failed. Email might already be registered or internal error.", "Registration Error", JOptionPane.ERROR_MESSAGE);
             }

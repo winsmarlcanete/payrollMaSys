@@ -1,13 +1,19 @@
 package Screens;
 
+import Config.JDBC;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class UserRegConfirmation {
 
-    public UserRegConfirmation() {
+    public UserRegConfirmation(String userEmail) {
         // Create the frame
         JFrame frame = new JFrame("SynergyGrafixCorp - User Registration");
         frame.setSize(400, 300);
@@ -61,15 +67,36 @@ public class UserRegConfirmation {
         panel.add(continueButton);
 
         // Simulate backend approval (for demonstration purposes)
-        Timer timer = new Timer(5000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                approvalMessage.setVisible(true); // Show the approval message
-                continueButton.setEnabled(true); // Enable the continue button
+        new Thread(() -> {
+            try (Connection conn = JDBC.getConnection()) {
+                while (true) {
+                    String query = "SELECT account_status FROM users WHERE email = ?";
+                    PreparedStatement stmt = conn.prepareStatement(query);
+                    stmt.setString(1, userEmail);
+
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        int accountStatus = rs.getInt("account_status");
+                        if (accountStatus == 1) {
+                            SwingUtilities.invokeLater(() -> {
+                                approvalMessage.setVisible(true); // Show the approval message
+                                continueButton.setEnabled(true); // Enable the continue button
+
+                                continueButton.addActionListener(e -> {
+                                    frame.dispose(); // Close the current frame
+                                    new Login(); // Navigate to the login screen
+                                });
+                            });
+                            break; // Exit the loop when account_status is 1
+                        }
+                    }
+                    Thread.sleep(5000); // Wait for 5 seconds before checking again
+                }
+            } catch (SQLException | InterruptedException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Failed to check account status.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        });
-        timer.setRepeats(false); // Run only once
-        timer.start();
+        }).start();
 
         // Add the panel to the frame
         frame.add(panel, BorderLayout.CENTER);
@@ -89,6 +116,6 @@ public class UserRegConfirmation {
     }
 
     public static void main(String[] args) {
-        new UserRegConfirmation();
+
     }
 }
