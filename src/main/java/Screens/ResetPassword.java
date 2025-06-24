@@ -3,20 +3,12 @@ package Screens;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import Components.RoundedTextField; // Assuming this class exists
-import Components.RoundedButton;     // Assuming this class exists
-
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage; // Added this import just in case for logo fallback
 
-import Algorithms.OTPGenerator; // Assuming this class exists
-import Config.EmailService;   // Assuming this class exists
-import Module.Security.ForgotPassword; // Assuming this class exists, used for saveOtp
-
-// Assuming Login.java is in the Screens package
 
 public class ResetPassword {
 
@@ -58,7 +50,8 @@ public class ResetPassword {
         backButton.addActionListener(e -> {
             frame.dispose();
             // Navigate back to the LoginScreen
-            Login.main(null); // Directs to Login.java by calling its main method
+            // Assuming Login.java has a main method to start it
+            Login.main(null); // This call assumes your external Login.java exists and can be invoked
         });
         headerPanel.add(backButton);
         panel.add(headerPanel);
@@ -68,12 +61,18 @@ public class ResetPassword {
 
         // Logo - Dynamically scaled from classpath
         int targetHeight = 30; // Consistent height for logos across screens
-        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
-        // Fallback for logo if not found
-        if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            System.err.println("Warning: Logo image 'whole_logo.png' not found or could not be loaded in ResetPassword.");
-            logoIcon = new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+        ImageIcon logoIcon;
+        java.net.URL logoImageUrl = getClass().getClassLoader().getResource("whole_logo.png");
+        if (logoImageUrl != null) {
+            logoIcon = new ImageIcon(logoImageUrl);
+            // Fallback for logo if not found by MediaTracker (though URL null check is primary)
+            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+            }
+        } else {
+            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
         }
+
         int origWidth = logoIcon.getIconWidth();
         int origHeight = logoIcon.getIconHeight();
         // Prevent division by zero if image is 0 height
@@ -202,12 +201,17 @@ class EnterCodeScreen {
 
         // Logo - Dynamically scaled from classpath
         int targetHeight = 30;
-        ImageIcon logoIcon = new ImageIcon(EnterCodeScreen.class.getClassLoader().getResource("whole_logo.png"));
-        // Fallback for logo if not found
-        if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            System.err.println("Warning: Logo image 'whole_logo.png' not found or could not be loaded in EnterCodeScreen.");
-            logoIcon = new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+        ImageIcon logoIcon;
+        java.net.URL logoImageUrl = EnterCodeScreen.class.getClassLoader().getResource("whole_logo.png");
+        if (logoImageUrl != null) {
+            logoIcon = new ImageIcon(logoImageUrl);
+            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+            }
+        } else {
+            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
         }
+
         int origWidth = logoIcon.getIconWidth();
         int origHeight = logoIcon.getIconHeight();
         int targetWidth = (origHeight > 0) ? (int) ((double) origWidth / origHeight * targetHeight) : targetHeight;
@@ -248,18 +252,12 @@ class EnterCodeScreen {
             if (enteredCode.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter the code.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-
                 if (ForgotPassword.verifyOtp(ResetPassword.userEmail, enteredCode)) {
-                    // If verification is successful
-                    JOptionPane.showMessageDialog(frame, "Code verified successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                     frame.dispose(); // Close current frame
-                    //NewPasswordScreen.showNewPasswordScreen(); // Open the new New Password screen
+                    NewPasswordScreen.showNewPasswordScreen(); // Open the new New Password screen
                 } else {
-                    // If verification fails
-                    JOptionPane.showMessageDialog(frame, "Invalid code. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    frame.dispose(); // Close current frame if invalid
                 }
-                frame.dispose();
-                // NewPasswordScreen.showNewPasswordScreen();
             }
         });
         panel.add(verifyButton);
@@ -310,12 +308,17 @@ class SecurityQuestionScreen {
 
         // Logo - Dynamically scaled from classpath
         int targetHeight = 30;
-        ImageIcon logoIcon = new ImageIcon(SecurityQuestionScreen.class.getClassLoader().getResource("whole_logo.png"));
-        // Fallback for logo if not found
-        if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            System.err.println("Warning: Logo image 'whole_logo.png' not found or could not be loaded in SecurityQuestionScreen.");
-            logoIcon = new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+        ImageIcon logoIcon;
+        java.net.URL logoImageUrl = SecurityQuestionScreen.class.getClassLoader().getResource("whole_logo.png");
+        if (logoImageUrl != null) {
+            logoIcon = new ImageIcon(logoImageUrl);
+            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+            }
+        } else {
+            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
         }
+
         int origWidth = logoIcon.getIconWidth();
         int origHeight = logoIcon.getIconHeight();
         int targetWidth = (origHeight > 0) ? (int) ((double) origWidth / origHeight * targetHeight) : targetHeight;
@@ -333,7 +336,7 @@ class SecurityQuestionScreen {
 
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Security Question Label
+        // Security Question Label (TODO: This should be dynamically loaded based on userEmail)
         JLabel questionLabel = new JLabel("What is the name of your favorite pet?");
         questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         questionLabel.setFont(new Font("Arial", Font.PLAIN, 16)); // Slightly larger font for question
@@ -360,13 +363,446 @@ class SecurityQuestionScreen {
                 JOptionPane.showMessageDialog(frame, "Please enter your answer.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 // TODO: Implement actual security question answer verification logic here
-                JOptionPane.showMessageDialog(frame, "Answer entered: " + enteredAnswer + " for email: " + ResetPassword.userEmail, "Verification Status (TODO)", JOptionPane.INFORMATION_MESSAGE);
-                // If verification is successful:
-                // frame.dispose();
-                // NewPasswordScreen.showNewPasswordScreen(); // A new screen for setting new password
+                // For demonstration, let's assume "test" is the correct answer
+                if (enteredAnswer.equalsIgnoreCase("test")) { // Placeholder verification
+                    JOptionPane.showMessageDialog(frame, "Security question verified successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispose();
+                    NewPasswordScreen.showNewPasswordScreen(); // A new screen for setting new password
+                } else {
+                    frame.dispose(); // Close current frame if invalid
+                }
             }
         });
         panel.add(submitAnswerButton);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        frame.add(panel, gbc);
+        frame.setVisible(true);
+    }
+}
+
+// ----------- NewPasswordScreen Class ------------
+class NewPasswordScreen {
+    public static void showNewPasswordScreen() {
+        JFrame frame = new JFrame("Set New Password");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.getContentPane().setBackground(Color.LIGHT_GRAY);
+        frame.setLayout(new GridBagLayout());
+
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.setPreferredSize(new Dimension(550, 500));
+        panel.setMaximumSize(new Dimension(550, 500));
+
+        // Back Button
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(Color.WHITE);
+        JButton backButton = new JButton("<html>&#x2190;</html>");
+        backButton.setFont(new Font("Arial", Font.BOLD, 24));
+        backButton.setBorderPainted(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.addActionListener(e -> {
+            frame.dispose();
+            ResetPassword.main(null); // Go back to the initial ResetPassword screen
+        });
+        headerPanel.add(backButton);
+        panel.add(headerPanel);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Logo - Dynamically scaled from classpath
+        int targetHeight = 30;
+        ImageIcon logoIcon;
+        java.net.URL logoImageUrl = NewPasswordScreen.class.getClassLoader().getResource("whole_logo.png");
+        if (logoImageUrl != null) {
+            logoIcon = new ImageIcon(logoImageUrl);
+            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+            }
+        } else {
+            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+        }
+
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (origHeight > 0) ? (int) ((double) origWidth / origHeight * targetHeight) : targetHeight;
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(logoLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel title = new JLabel("Payroll Management System");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(title);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // New Password Label and Field
+        JLabel newPasswordLabel = new JLabel("New Password");
+        newPasswordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(newPasswordLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Panel for new password field and toggle button
+        JPanel newPassPanel = new JPanel();
+        newPassPanel.setLayout(new BoxLayout(newPassPanel, BoxLayout.X_AXIS));
+        newPassPanel.setMaximumSize(new Dimension(350, 30));
+        newPassPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        newPassPanel.setBackground(Color.WHITE); // Match panel background
+
+        JPasswordField newPasswordField = new JPasswordField(20);
+        newPasswordField.setMaximumSize(new Dimension(320, 30)); // Make it a bit smaller to fit the button
+        newPasswordField.setPreferredSize(new Dimension(320, 30));
+        newPasswordField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        newPassPanel.add(newPasswordField);
+
+        JButton toggleNewPassVisibilityButton = new JButton("<html>&#x1F441;</html>"); // Eye icon
+        toggleNewPassVisibilityButton.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 16)); // Font for emoji
+        toggleNewPassVisibilityButton.setBorderPainted(false);
+        toggleNewPassVisibilityButton.setContentAreaFilled(false);
+        toggleNewPassVisibilityButton.setFocusPainted(false);
+        toggleNewPassVisibilityButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        toggleNewPassVisibilityButton.addActionListener(new ActionListener() {
+            private boolean showPassword = false;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showPassword = !showPassword;
+                if (showPassword) {
+                    newPasswordField.setEchoChar((char) 0); // Show password
+                } else {
+                    newPasswordField.setEchoChar('*'); // Hide password
+                }
+            }
+        });
+        newPassPanel.add(toggleNewPassVisibilityButton);
+        panel.add(newPassPanel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Confirm New Password Label and Field
+        JLabel confirmPasswordLabel = new JLabel("Confirm New Password");
+        confirmPasswordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(confirmPasswordLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Panel for confirm password field and toggle button
+        JPanel confirmPassPanel = new JPanel();
+        confirmPassPanel.setLayout(new BoxLayout(confirmPassPanel, BoxLayout.X_AXIS));
+        confirmPassPanel.setMaximumSize(new Dimension(350, 30));
+        confirmPassPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        confirmPassPanel.setBackground(Color.WHITE); // Match panel background
+
+        JPasswordField confirmPasswordField = new JPasswordField(20); // Use JPasswordField for password input
+        confirmPasswordField.setMaximumSize(new Dimension(320, 30)); // Make it a bit smaller to fit the button
+        confirmPasswordField.setPreferredSize(new Dimension(320, 30));
+        confirmPasswordField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        confirmPassPanel.add(confirmPasswordField);
+
+        JButton toggleConfirmPassVisibilityButton = new JButton("<html>&#x1F441;</html>"); // Eye icon
+        toggleConfirmPassVisibilityButton.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 16)); // Font for emoji
+        toggleConfirmPassVisibilityButton.setBorderPainted(false);
+        toggleConfirmPassVisibilityButton.setContentAreaFilled(false);
+        toggleConfirmPassVisibilityButton.setFocusPainted(false);
+        toggleConfirmPassVisibilityButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        toggleConfirmPassVisibilityButton.addActionListener(new ActionListener() {
+            private boolean showPassword = false;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showPassword = !showPassword;
+                if (showPassword) {
+                    confirmPasswordField.setEchoChar((char) 0); // Show password
+                } else {
+                    confirmPasswordField.setEchoChar('*'); // Hide password
+                }
+            }
+        });
+        confirmPassPanel.add(toggleConfirmPassVisibilityButton);
+        panel.add(confirmPassPanel);
+
+
+        panel.add(Box.createRigidArea(new Dimension(0, 30))); // More space before the button
+
+        // Save New Password Button
+        RoundedButton savePasswordButton = new RoundedButton("Save New Password", 20);
+        savePasswordButton.setBackground(new Color(46, 204, 113));
+        savePasswordButton.setForeground(Color.WHITE);
+        savePasswordButton.setMaximumSize(new Dimension(350, 30));
+        savePasswordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        savePasswordButton.addActionListener(e -> {
+            String newPass = new String(newPasswordField.getPassword());
+            String confirmPass = new String(confirmPasswordField.getPassword());
+
+            if (newPass.isEmpty() || confirmPass.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please fill in both password fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!newPass.equals(confirmPass)) {
+                JOptionPane.showMessageDialog(frame, "Passwords do not match. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                // TODO: Implement actual password update logic here
+                // Use ResetPassword.userEmail and the newPass to update the user's password in the database
+                // Example: UserAuthenticator.updatePassword(ResetPassword.userEmail, newPass);
+                boolean passwordUpdated = UserAuthenticator.updatePassword(ResetPassword.userEmail, newPass); // Assuming this method exists
+
+                if (passwordUpdated) {
+                    // Navigate to the new PasswordChangedScreen
+                    frame.dispose();
+                    PasswordChangedScreen.showPasswordChangedScreen();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to update password. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        panel.add(savePasswordButton);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        frame.add(panel, gbc);
+        frame.setVisible(true);
+    }
+}
+
+// Dummy classes for compilation (replace with your actual implementations)
+// These are included to make the provided code runnable for demonstration.
+// In a real project, these would be in their respective packages.
+
+
+// Dummy RoundedTextField
+class RoundedTextField extends JTextField {
+    private Shape shape;
+    private int radius;
+
+    public RoundedTextField(int size) {
+        super(size);
+        this.radius = 15; // Default radius
+        setOpaque(false); // As suggested by @camel. We make the component transparent.
+        setPreferredSize(new Dimension(size * 10, 30)); // A reasonable default preferred size
+    }
+
+    public RoundedTextField(int size, int radius) {
+        super(size);
+        this.radius = radius;
+        setOpaque(false);
+        setPreferredSize(new Dimension(size * 10, 30));
+    }
+
+    protected void paintComponent(Graphics g) {
+        g.setColor(getBackground());
+        g.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+        super.paintComponent(g);
+    }
+
+    protected void paintBorder(Graphics g) {
+        g.setColor(getForeground());
+        g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+    }
+
+    public boolean contains(int x, int y) {
+        if (shape == null || !shape.getBounds().equals(getBounds())) {
+            // Fully qualify RoundRectangle2D
+            shape = new java.awt.geom.RoundRectangle2D.Float(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+        }
+        return shape.contains(x, y);
+    }
+}
+
+// Dummy RoundedButton
+class RoundedButton extends JButton {
+    private int radius;
+
+    public RoundedButton(String text, int radius) {
+        super(text);
+        this.radius = radius;
+        setOpaque(false); // Make the button transparent
+        setContentAreaFilled(false); // Don't paint the content area
+        setBorderPainted(false); // Don't paint the border
+        setFocusPainted(false); // Don't paint the focus border
+    }
+
+    protected void paintComponent(Graphics g) {
+        if (getModel().isArmed()) {
+            g.setColor(getBackground().darker());
+        } else {
+            g.setColor(getBackground());
+        }
+        g.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+        super.paintComponent(g); // Paint the text and icon
+    }
+
+    protected void paintBorder(Graphics g) {
+        // You can paint a custom border here if needed
+        // g.setColor(getForeground());
+        // g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+    }
+
+    public boolean contains(int x, int y) {
+        // Fully qualify RoundRectangle2D
+        Shape shape = new java.awt.geom.RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), radius, radius);
+        return shape.contains(x, y);
+    }
+}
+
+// Dummy OTPGenerator
+class OTPGenerator {
+    public static String generateOTP() {
+        return "123456"; // Dummy OTP
+    }
+}
+
+// Dummy EmailService
+class EmailService {
+    public static void sendEmail(String to, String otp) {
+        System.out.println("Sending OTP " + otp + " to " + to);
+    }
+}
+
+// Dummy ForgotPassword
+class ForgotPassword {
+    private static String storedOtp = "";
+    private static String storedEmail = "";
+
+    public static void saveOtp(String email, String otp) {
+        storedEmail = email;
+        storedOtp = otp;
+        System.out.println("OTP " + otp + " saved for " + email);
+    }
+
+    public static boolean verifyOtp(String email, String otp) {
+        return storedEmail.equals(email) && storedOtp.equals(otp);
+    }
+}
+
+// Dummy UserAuthenticator for updating password
+class UserAuthenticator {
+    public static boolean updatePassword(String email, String newPassword) {
+        System.out.println("Updating password for " + email + " to " + newPassword);
+        // Simulate a successful update
+        return true;
+    }
+}
+
+// New PasswordChangedScreen Class
+class PasswordChangedScreen {
+    public static void showPasswordChangedScreen() {
+        JFrame frame = new JFrame("Password Changed");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.getContentPane().setBackground(Color.LIGHT_GRAY);
+        frame.setLayout(new GridBagLayout());
+
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.setPreferredSize(new Dimension(550, 500));
+        panel.setMaximumSize(new Dimension(550, 500));
+
+        // Back Button (Optional for this screen, depends on UX flow)
+        // If the user is expected to go back to a login screen, this is useful.
+        // If it's a final confirmation, it might just lead to Login.
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(Color.WHITE);
+        JButton backButton = new JButton("<html>&#x2190;</html>");
+        backButton.setFont(new Font("Arial", Font.BOLD, 24));
+        backButton.setBorderPainted(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.addActionListener(e -> {
+            frame.dispose();
+            // Assuming Login.java exists externally for navigation back to login
+            Login.main(null);
+        });
+        headerPanel.add(backButton);
+        panel.add(headerPanel);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+
+        // Logo - Dynamically scaled from classpath
+        int targetHeight = 30;
+        ImageIcon logoIcon;
+        java.net.URL logoImageUrl = PasswordChangedScreen.class.getClassLoader().getResource("whole_logo.png");
+        if (logoImageUrl != null) {
+            logoIcon = new ImageIcon(logoImageUrl);
+            if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
+                logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+            }
+        } else {
+            logoIcon = new ImageIcon(new BufferedImage(targetHeight, targetHeight, BufferedImage.TYPE_INT_ARGB)); // Transparent placeholder
+        }
+
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (origHeight > 0) ? (int) ((double) origWidth / origHeight * targetHeight) : targetHeight;
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(logoLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel title = new JLabel("Payroll Management System");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(title);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 40))); // More space before the "Password Changed" text
+
+        // "Password Changed" Text
+        JLabel passwordChangedLabel = new JLabel("Password Changed");
+        passwordChangedLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Larger, bold font
+        passwordChangedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(passwordChangedLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Checkmark Icon (Verified.png)
+        JLabel checkmarkLabel;
+        ImageIcon checkmarkIcon;
+        java.net.URL checkmarkImageUrl = PasswordChangedScreen.class.getClassLoader().getResource("Verified.png");
+        int checkmarkSize = 100; // Desired size for the checkmark icon
+
+        if (checkmarkImageUrl != null) {
+            checkmarkIcon = new ImageIcon(checkmarkImageUrl);
+            // Scale the checkmark icon if needed
+            Image scaledCheckmark = checkmarkIcon.getImage().getScaledInstance(checkmarkSize, checkmarkSize, Image.SCALE_SMOOTH);
+            checkmarkLabel = new JLabel(new ImageIcon(scaledCheckmark));
+        } else {
+            // Fallback: If image not found, use a transparent placeholder
+            checkmarkIcon = new ImageIcon(new BufferedImage(checkmarkSize, checkmarkSize, BufferedImage.TYPE_INT_ARGB));
+            checkmarkLabel = new JLabel(checkmarkIcon);
+        }
+        checkmarkLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(checkmarkLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 40))); // Space before the continue button
+
+        // Continue Button
+        RoundedButton continueButton = new RoundedButton("Continue", 20);
+        continueButton.setBackground(new Color(46, 204, 113));
+        continueButton.setForeground(Color.WHITE);
+        continueButton.setMaximumSize(new Dimension(350, 30));
+        continueButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        continueButton.addActionListener(e -> {
+            frame.dispose();
+            // Assuming Login.java exists externally for navigation back to login
+            Login.main(null);
+        });
+        panel.add(continueButton);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

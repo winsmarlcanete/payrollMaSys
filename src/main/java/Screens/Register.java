@@ -5,15 +5,28 @@ import Module.Registration.UserRegistration.UserRegistration;
 import Algorithms.sha256;
 
 import javax.swing.*;
-
 import java.awt.*;
-// import java.time.LocalDate;
+import java.util.Arrays; // Import Arrays for comparing char arrays
 
 public class Register extends JFrame {
+    // Add JComboBox and JTextField as class members so they can be accessed in the action listener
+    private JComboBox<String> securityQuestionComboBox;
+    private JTextField securityAnswerField;
+    private JPasswordField passwordField;
+    private JPasswordField cpasswordField;
+    private JTextField fnameField;
+    private JTextField lnameField;
+    private JTextField emailField;
+    private JRadioButton hrButton;
+    private JRadioButton accountantButton;
+
     public Register() {
         setTitle("SynergyGrafixCorp. Payroll Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initComponents();
+        // Pack the frame and center it after all components are added
+        pack();
+        setLocationRelativeTo(null); // Center the window on the screen
     }
 
     private void initComponents() {
@@ -21,6 +34,7 @@ public class Register extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.LIGHT_GRAY);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add some padding
 
         // Logo
         JLabel logoLabel = new JLabel("SynergyGrafixCorp.");
@@ -34,10 +48,11 @@ public class Register extends JFrame {
 
         mainPanel.add(logoLabel);
         mainPanel.add(systemLabel);
+        mainPanel.add(Box.createVerticalStrut(20)); // Spacing after title
 
         // Center form (2 columns)
-        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0));
-        centerPanel.setMaximumSize(new Dimension(450, 150));
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0)); // 2 columns with horizontal gap
+        centerPanel.setMaximumSize(new Dimension(650, 300)); // Adjusted maximum width for new fields and longer dropdown
         centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         centerPanel.setBackground(Color.LIGHT_GRAY);
 
@@ -47,20 +62,20 @@ public class Register extends JFrame {
         leftColumn.setBackground(Color.LIGHT_GRAY);
 
         // First Name field
-        JTextField fnameField = new JTextField(20);
-        fnameField.setMaximumSize(new Dimension(250, 30));
+        fnameField = new JTextField(20);
+        fnameField.setMaximumSize(new Dimension(250, 40)); // Increased height for better appearance
         fnameField.setAlignmentX(Component.CENTER_ALIGNMENT);
         fnameField.setBorder(BorderFactory.createTitledBorder("First Name"));
-        
+
         // Last Name field
-        JTextField lnameField = new JTextField(20);
-        lnameField.setMaximumSize(new Dimension(250, 30));
+        lnameField = new JTextField(20);
+        lnameField.setMaximumSize(new Dimension(250, 40)); // Increased height
         lnameField.setAlignmentX(Component.CENTER_ALIGNMENT);
         lnameField.setBorder(BorderFactory.createTitledBorder("Last Name"));
 
-        // Position
-        JRadioButton hrButton = new JRadioButton("HR");
-        JRadioButton accountantButton = new JRadioButton("Accountant");
+        // Position Radio Buttons
+        hrButton = new JRadioButton("HR");
+        accountantButton = new JRadioButton("Accountant");
 
         ButtonGroup positionGroup = new ButtonGroup();
         positionGroup.add(hrButton);
@@ -71,6 +86,8 @@ public class Register extends JFrame {
         accountantButton.setBackground(Color.LIGHT_GRAY);
         hrButton.setForeground(Color.BLACK);
         accountantButton.setForeground(Color.BLACK);
+        hrButton.setFocusPainted(false); // Remove focus border
+        accountantButton.setFocusPainted(false);
 
         // Subpanel for radio buttons side-by-side
         JPanel radioPanel = new JPanel();
@@ -86,16 +103,16 @@ public class Register extends JFrame {
         positionPanel.setBorder(BorderFactory.createTitledBorder("Position"));
         positionPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         positionPanel.setMaximumSize(new Dimension(250, 70));
-        positionPanel.setPreferredSize(new Dimension(250, 70));
+        positionPanel.setPreferredSize(new Dimension(250, 70)); // Maintain preferred size
 
         // Add the radio buttons panel to the main panel
         positionPanel.add(radioPanel);
 
 
         leftColumn.add(fnameField);
-        leftColumn.add(Box.createVerticalStrut(10));
+        leftColumn.add(Box.createVerticalStrut(15)); // Increased spacing
         leftColumn.add(lnameField);
-        leftColumn.add(Box.createVerticalStrut(10));
+        leftColumn.add(Box.createVerticalStrut(15)); // Increased spacing
         leftColumn.add(positionPanel);
 
         // ============= Right column =============
@@ -104,12 +121,12 @@ public class Register extends JFrame {
         rightColumn.setBackground(Color.LIGHT_GRAY);
 
         // Email field
-        JTextField emailField = new JTextField(20);
-        emailField.setMaximumSize(new Dimension(250, 40));
+        emailField = new JTextField(20);
+        emailField.setMaximumSize(new Dimension(250, 40)); // Increased height
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
         emailField.setBorder(BorderFactory.createTitledBorder("Email"));
 
-        // =============== Password field =============== 
+        // =============== Password field ===============
         // Create the password panel with titled border
         JPanel passwordPanel = new JPanel();
         passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.X_AXIS));
@@ -117,7 +134,7 @@ public class Register extends JFrame {
         passwordPanel.setBorder(BorderFactory.createTitledBorder("Password"));
 
         // Password field
-        JPasswordField passwordField = new JPasswordField(20);
+        passwordField = new JPasswordField(20);
         passwordField.setMaximumSize(new Dimension(250, 30));
         passwordField.setEchoChar('•');
 
@@ -144,14 +161,14 @@ public class Register extends JFrame {
 
 
         // =============== Confirm Password field ===============
-        // Create the password panel with titled border
+        // Create the confirm password panel with titled border
         JPanel cpasswordPanel = new JPanel();
         cpasswordPanel.setLayout(new BoxLayout(cpasswordPanel, BoxLayout.X_AXIS));
         cpasswordPanel.setMaximumSize(new Dimension(300, 50));
         cpasswordPanel.setBorder(BorderFactory.createTitledBorder("Confirm Password"));
 
-        // Password field
-        JPasswordField cpasswordField = new JPasswordField(20);
+        // Confirm Password field
+        cpasswordField = new JPasswordField(20);
         cpasswordField.setMaximumSize(new Dimension(250, 30));
         cpasswordField.setEchoChar('•');
 
@@ -176,48 +193,143 @@ public class Register extends JFrame {
         cpasswordPanel.add(ctoggleButton);
         cpasswordPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // =============== Security Question Dropdown ===============
+        String[] securityQuestions = {
+                "Select a question", // Placeholder
+                "What is the name of your favorite pet?",
+                "What is the name of the town where you were born?",
+                "What was your childhood nickname?",
+                "What was the name of your first school?",
+                "What is your dream vacation destination?"
+        };
+        securityQuestionComboBox = new JComboBox<>(securityQuestions);
+        securityQuestionComboBox.setMaximumSize(new Dimension(400, 40)); // Increased width for full visibility
+        securityQuestionComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        securityQuestionComboBox.setBorder(BorderFactory.createTitledBorder("Security Question"));
+        ((JLabel)securityQuestionComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER); // Center text in combobox
+
+        // =============== Security Answer Field ===============
+        securityAnswerField = new JTextField(20);
+        securityAnswerField.setMaximumSize(new Dimension(250, 40));
+        securityAnswerField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        securityAnswerField.setBorder(BorderFactory.createTitledBorder("Security Answer"));
+
         rightColumn.add(emailField);
-        rightColumn.add(Box.createVerticalStrut(10));
+        rightColumn.add(Box.createVerticalStrut(15)); // Increased spacing
         rightColumn.add(passwordPanel);
-        rightColumn.add(Box.createVerticalStrut(10));
+        rightColumn.add(Box.createVerticalStrut(15)); // Increased spacing
         rightColumn.add(cpasswordPanel);
+        rightColumn.add(Box.createVerticalStrut(15)); // Spacing before security question
+        rightColumn.add(securityQuestionComboBox);
+        rightColumn.add(Box.createVerticalStrut(15)); // Spacing before security answer
+        rightColumn.add(securityAnswerField);
+
 
         centerPanel.add(leftColumn);
         centerPanel.add(rightColumn);
         mainPanel.add(centerPanel);
-        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(Box.createVerticalStrut(30)); // Spacing before button
 
         // Buttons
         JButton regButton = new JButton("Register");
-        Dimension buttonSize = new Dimension(200, 30);
+        Dimension buttonSize = new Dimension(200, 40); // Increased height for button
         regButton.setMaximumSize(buttonSize);
         regButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         regButton.setBackground(new Color(0, 153, 0));
         regButton.setForeground(Color.WHITE);
+        regButton.setFocusPainted(false); // Remove focus border from button
+        regButton.setFont(new Font("SansSerif", Font.BOLD, 16)); // Make button text a bit bigger
 
         regButton.addActionListener(e -> {
-            String first_name = fnameField.getText();
-            String last_name = lnameField.getText();
-            String email = emailField.getText();
+            String first_name = fnameField.getText().trim();
+            String last_name = lnameField.getText().trim();
+            String email = emailField.getText().trim();
             char[] passwordChar = passwordField.getPassword();
+            char[] cpasswordChar = cpasswordField.getPassword();
+            String securityQuestion = (String) securityQuestionComboBox.getSelectedItem();
+            String securityAnswer = securityAnswerField.getText().trim();
+
+            // --- Input Validation ---
+            if (first_name.isEmpty() || last_name.isEmpty() || email.isEmpty() ||
+                    passwordChar.length == 0 || cpasswordChar.length == 0 || securityAnswer.isEmpty() ||
+                    (!hrButton.isSelected() && !accountantButton.isSelected())) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!Arrays.equals(passwordChar, cpasswordChar)) {
+                JOptionPane.showMessageDialog(this, "Passwords do not match.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                // Clear password fields for security
+                passwordField.setText("");
+                cpasswordField.setText("");
+                return;
+            }
+
+            if (securityQuestion.equals("Select a question")) {
+                JOptionPane.showMessageDialog(this, "Please select a security question.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Basic email format validation (can be more robust with regex)
+            if (!email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")) {
+                JOptionPane.showMessageDialog(this, "Invalid email format.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Basic password strength check (e.g., minimum 8 characters)
+            if (passwordChar.length < 8) {
+                JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                passwordField.setText("");
+                cpasswordField.setText("");
+                return;
+            }
+
+            // Convert password char array to String after all checks
             String password = new String(passwordChar);
             sha256 sha256 = new sha256();
             String passwordHashed = sha256.stringToSHA256(password);
+
+            // Hash security answer
+            String securityAnswerHashed = sha256.stringToSHA256(securityAnswer);
+
             int access_level;
-            if(hrButton.isSelected()){
-                access_level = 2;
+            if (hrButton.isSelected()) {
+                access_level = 2; // HR access level
             } else {
-                access_level = 3;
+                access_level = 3; // Accountant access level
             }
-            int account_status = 0;
-            String user_name = fnameField.getText();
+            int account_status = 0; // Default status, typically for new users
+            String user_name = first_name; // Using first name as user_name for now
 
-            User user = new User(first_name,last_name,email,passwordHashed,
-                    access_level,account_status,user_name);
+            // Create user object
+            User user = new User(first_name, last_name, email, passwordHashed,
+                    access_level, account_status, user_name);
 
-            UserRegistration.registerUser(user);
+            // Add security question and answer to user object
+            user.setSecurityQuestion(securityQuestion);
+            user.setSecurityAnswerHash(securityAnswerHashed);
 
+            // Attempt to register user
+            boolean registrationSuccess = UserRegistration.registerUser(user);
 
+            if (registrationSuccess) {
+                JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                // Optionally clear fields or navigate to login screen
+                fnameField.setText("");
+                lnameField.setText("");
+                emailField.setText("");
+                passwordField.setText("");
+                cpasswordField.setText("");
+                securityQuestionComboBox.setSelectedIndex(0); // Reset dropdown
+                securityAnswerField.setText("");
+                positionGroup.clearSelection();
+            } else {
+                JOptionPane.showMessageDialog(this, "Registration failed. Email might already be registered or internal error.", "Registration Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Clear sensitive password data from memory
+            Arrays.fill(passwordChar, ' ');
+            Arrays.fill(cpasswordChar, ' ');
         });
         mainPanel.add(regButton);
 
@@ -227,7 +339,6 @@ public class Register extends JFrame {
         wrapper.add(mainPanel);
 
         add(wrapper);
-        pack();
     }
 
     public static void main(String[] args) {
