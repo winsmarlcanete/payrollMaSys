@@ -757,12 +757,129 @@ public class PayrollScreen extends JPanel {
         // Synchronize vertical scrolling
         frozenScroll.getVerticalScrollBar().setModel(scrollScroll.getVerticalScrollBar().getModel());
 
+        String[] columns = {
+                "Frozen",
+                "Rate",
+                "Rate Per Hour",
+                "Days Present",
+                "OT In Hours",
+                "Night Differential In Hours",
+                "Special Holiday In Hours",
+                "Legal Holiday In Hours",
+                "Late In Minutes",
+                "Overtime Amount",
+                "Night Differential Amount",
+                "Special Holiday Amount",
+                "Legal Holiday Amount",
+                "Late Amount",
+                "Wage",
+                "PhilHealth Deduction",
+                "SSS Deduction",
+                "Pag-IBIG Deduction",
+                "E-Fund Deduction",
+                "Other Deduction",
+                "Salary Adjustment",
+                "Allowance Adjustment",
+                "Other Compensations",
+                "Total Deduction",
+                "Gross Pay",
+                "Net Pay"};
+
+// Set only 2 rows
+        Object[][] data2 = new Object[2][columns.length];
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < columns.length; j++) {
+                data2[i][j] = columns[j] + " " + (i + 1);
+            }
+        }
+
+// Frozen column model (column 0 only)
+        Object[][] frozenData = new Object[2][1];
+        for (int i = 0; i < 2; i++) {
+            frozenData[i][0] = data2[i][0];
+        }
+        DefaultTableModel frozenModel = new DefaultTableModel(frozenData, new String[]{columns[0]});
+
+// Scrollable column model (columns 1 to end)
+        Object[][] scrollData = new Object[2][columns.length - 1];
+        for (int i = 0; i < 2; i++) {
+            System.arraycopy(data2[i], 1, scrollData[i], 0, columns.length - 1);
+        }
+        DefaultTableModel scrollModel = new DefaultTableModel(scrollData,
+                java.util.Arrays.copyOfRange(columns, 1, columns.length));
+
+        JTable frozenTable2 = new JTable(frozenModel);
+        JTable scrollTable2 = new JTable(scrollModel);
+
+// Match row heights
+        frozenTable2.setRowHeight(40);
+        scrollTable2.setRowHeight(40);
+
+// Scroll panes
+        JScrollPane frozenScroll2 = new JScrollPane(frozenTable2);
+        JScrollPane scrollScroll2 = new JScrollPane(scrollTable2);
+
+        scrollScroll2.getHorizontalScrollBar().setModel(scrollScroll.getHorizontalScrollBar().getModel());
+
+//        scrollScroll2.getHorizontalScrollBar().addAdjustmentListener(e -> {
+//            scrollScroll.getHorizontalScrollBar().setValue(e.getValue());
+//        });
+
+//        AdjustmentListener syncScroll = e -> {
+//            scrollScroll2.getHorizontalScrollBar().setValue(scrollScroll.getHorizontalScrollBar().getValue());
+//            scrollScroll.getHorizontalScrollBar().setValue(scrollScroll2.getHorizontalScrollBar().getValue());
+//        };
+//
+//// Add listener to both scroll bars
+//        scrollScroll.getHorizontalScrollBar().addAdjustmentListener(syncScroll);
+//        scrollScroll2.getHorizontalScrollBar().addAdjustmentListener(syncScroll);
+
+
+        frozenScroll2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollScroll2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+
+        frozenTable2.setTableHeader(null);
+        scrollTable2.setTableHeader(null);
+
+        frozenScroll2.setColumnHeaderView(null);
+        scrollScroll2.setColumnHeaderView(null);
+
+        frozenScroll2.setBorder(BorderFactory.createEmptyBorder());
+        scrollScroll2.setBorder(BorderFactory.createEmptyBorder());
+
+// Hide horizontal scrollbar of frozen column
+        frozenScroll2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+// Sync vertical scroll bars
+        frozenScroll2.getVerticalScrollBar().setModel(
+                scrollScroll2.getVerticalScrollBar().getModel()
+        );
+
+        int rowHeight = frozenTable2.getRowHeight();
+        int rowCount = frozenTable2.getRowCount();
+//        int headerHeight = frozenTable.getTableHeader().getPreferredSize().height;
+        int totalHeight = (rowHeight * rowCount);
+
+        frozenScroll2.setPreferredSize(new Dimension(300, totalHeight));
+
+// Layout
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(frozenScroll2, BorderLayout.CENTER);
+
+        panel.setPreferredSize(new Dimension(300, totalHeight));
+        panel.add(leftPanel, BorderLayout.WEST);
+        panel.add(scrollScroll2, BorderLayout.CENTER);
+
+
         // Place both tables in a panel
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
         tablePanel.setOpaque(false);
         tablePanel.add(frozenScroll, BorderLayout.WEST);
         tablePanel.add(scrollScroll, BorderLayout.CENTER);
+        tablePanel.add(panel, BorderLayout.SOUTH);
 
         // Place both headers in a panel
         JPanel headerPanel = new JPanel();
