@@ -9,12 +9,14 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.ComboPopup;
+import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 
@@ -370,7 +372,7 @@ public class PayrollScreen extends JPanel {
         JPanel periodPanel = new JPanel();
         periodPanel.setOpaque(false);
         periodPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        periodPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        periodPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
         // Set periodPanel height to fit its components
         periodPanel.setPreferredSize(null);
         periodPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, periodPanel.getPreferredSize().height));
@@ -379,155 +381,15 @@ public class PayrollScreen extends JPanel {
         periodLabel.setFont(new Font("Arial", Font.BOLD, 22));
         periodLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
-        // Load calendar icon from resources
-        ImageIcon calendarIcon = new ImageIcon(
-            new ImageIcon(getClass().getClassLoader().getResource("Calendar.png"))
-            .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
-        );
-
-        // Replace JTextField with JButton for date selection
-        JButton fromDateBtn = new JButton("");
-        JButton toDateBtn = new JButton(""); // Declare toDateBtn before using it
-        fromDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
-        fromDateBtn.setBackground(Color.BLACK);
-        fromDateBtn.setForeground(Color.WHITE);
-        fromDateBtn.setFocusPainted(false);
-        fromDateBtn.setIcon(calendarIcon);
-        fromDateBtn.setHorizontalTextPosition(SwingConstants.LEFT); // Text left, icon right
-        fromDateBtn.setIconTextGap(12); // Space between text and icon
-
-
-
-        // Add hover effect and hand cursor
-        fromDateBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        fromDateBtn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
-        fromDateBtn.addMouseListener(new MouseAdapter() {
-            Color normalBg = Color.BLACK;
-            Color hoverBg = new Color(34, 177, 76);
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                fromDateBtn.setBackground(hoverBg);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                fromDateBtn.setBackground(normalBg);
-            }
-        });
-
-        toDateBtn.setFont(new Font("Arial", Font.BOLD, 18));
-        toDateBtn.setBackground(Color.BLACK);
-        toDateBtn.setForeground(Color.WHITE);
-        toDateBtn.setFocusPainted(false);
-        toDateBtn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
-        toDateBtn.setIcon(calendarIcon);
-        toDateBtn.setHorizontalTextPosition(SwingConstants.LEFT);
-        toDateBtn.setIconTextGap(12);
-        
-        // Add hover effect and hand cursor
-        toDateBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        toDateBtn.addMouseListener(new MouseAdapter() {
-            Color normalBg = Color.BLACK;
-            Color hoverBg = new Color(34, 177, 76);
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                toDateBtn.setBackground(hoverBg);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                toDateBtn.setBackground(normalBg);
-            }
-        });
-
-        final java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy");
-        final java.util.Date[] fromDate = {null};
-        final java.util.Date[] toDate = {null};
-
-        // Show date picker dialog on click
-        fromDateBtn.addActionListener(e -> {
-            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
-            java.util.Properties p = new java.util.Properties();
-            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
-            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
-
-            // Set max selectable date to today using Calendar
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            int year = cal.get(java.util.Calendar.YEAR);
-            int month = cal.get(java.util.Calendar.MONTH);
-            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
-            datePanel.getModel().setSelected(true);
-            datePanel.getModel().setDate(year, month, day);
-            datePanel.getModel().setSelected(false);
-
-            java.util.Date today = cal.getTime();
-
-            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-                java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
-                if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    fromDate[0] = selectedDate;
-                    fromDateBtn.setText(sdf.format(selectedDate));
-                    // If toDate is before new fromDate, reset toDate
-                    if (toDate[0] != null && toDate[0].before(fromDate[0])) {
-                        toDate[0] = null;
-                        toDateBtn.setText("Select End Date");
-                    }
-                }
-            }
-            if (fromDate[0] != null && toDate[0] != null) {
-                java.sql.Date sqlFromDate = new java.sql.Date(fromDate[0].getTime());
-                java.sql.Date sqlToDate = new java.sql.Date(toDate[0].getTime());
-                refreshPayrollData(sqlFromDate, sqlToDate);
-            }
-        });
-
-        JLabel dashLabel = new JLabel(" - ");
-        dashLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        dashLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-
-        // Repeat for toDate
-        toDateBtn.addActionListener(e -> {
-            org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
-            java.util.Properties p = new java.util.Properties();
-            org.jdatepicker.impl.JDatePanelImpl datePanel = new org.jdatepicker.impl.JDatePanelImpl(model, p);
-            org.jdatepicker.impl.JDatePickerImpl picker = new org.jdatepicker.impl.JDatePickerImpl(datePanel, new org.jdatepicker.impl.DateComponentFormatter());
-
-            java.util.Date today = new java.util.Date();
-            java.util.Date minDate = fromDate[0];
-            if (minDate == null) {
-            JOptionPane.showMessageDialog(null, "Please select a start date first.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-            }
-
-            // Set picker to minDate by default
-            model.setValue(minDate);
-
-            int result = JOptionPane.showConfirmDialog(null, picker, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-            java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
-            if (selectedDate != null) {
-                if (selectedDate.before(minDate)) {
-                JOptionPane.showMessageDialog(null, "End date cannot be before start date.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                return;
-                }
-                if (selectedDate.after(today)) {
-                JOptionPane.showMessageDialog(null, "End date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                return;
-                }
-                toDate[0] = selectedDate;
-                toDateBtn.setText(sdf.format(selectedDate));
-            }
-            }
-
-            if (fromDate[0] != null && toDate[0] != null) {
-                java.sql.Date sqlFromDate = new java.sql.Date(fromDate[0].getTime());
-                java.sql.Date sqlToDate = new java.sql.Date(toDate[0].getTime());
-                refreshPayrollData(sqlFromDate, sqlToDate);
-            }
-        });
+        String samplePeriodStart1 = "Oct 21, 2024";
+        String samplePeriodEnd1 = "Nov 5, 2024";
+        String samplePeriodStart2 = "Nov 21, 2024";
+        String samplePeriodEnd2 = "Dec 5, 2024";
+        String samplePeriodStart3 = "Jan 21, 2024";
+        String samplePeriodEnd3 = "Feb 5, 2024";
+        RoundedComboBox<String> payrollPeriod = new RoundedComboBox<>(new String[]{samplePeriodStart1 + " — " + samplePeriodEnd1, samplePeriodStart2 + " — " + samplePeriodEnd2, samplePeriodStart3 + " — " + samplePeriodEnd3});
+        payrollPeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        payrollPeriod.setSize(new Dimension(100, 75));
 
         JLabel adminLabel = new JLabel((String) sortCombo.getSelectedItem());
         // Update adminLabel text when sortCombo selection changes
@@ -539,9 +401,10 @@ public class PayrollScreen extends JPanel {
         adminLabel.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
 
         periodPanel.add(periodLabel);
-        periodPanel.add(fromDateBtn);
-        periodPanel.add(dashLabel);
-        periodPanel.add(toDateBtn);
+        periodPanel.add(payrollPeriod);
+//        periodPanel.add(fromDateBtn);
+//        periodPanel.add(dashLabel);
+//        periodPanel.add(toDateBtn);
         periodPanel.add(Box.createHorizontalStrut(10));
         periodPanel.add(adminLabel);
 
@@ -596,15 +459,15 @@ public class PayrollScreen extends JPanel {
 
         }
 
-        frozenColumns = Arrays.copyOfRange(columnNames, 0, 2);
-         scrollColumns = Arrays.copyOfRange(columnNames, 2, columnNames.length);
+        frozenColumns = Arrays.copyOfRange(columnNames, 0, 1);
+        scrollColumns = Arrays.copyOfRange(columnNames, 1, columnNames.length);
 
-        frozenData = new Object[data.length][2];
-        scrollData = new Object[data.length][columnNames.length - 2];
+        frozenData = new Object[data.length][1];
+        scrollData = new Object[data.length][columnNames.length - 1];
         for (int i = 0; i < data.length; i++) {
             frozenData[i][0] = data[i][0];
-            frozenData[i][1] = data[i][1];
-            System.arraycopy(data[i], 2, scrollData[i], 0, columnNames.length - 2);
+//            frozenData[i][1] = data[i][1];
+            System.arraycopy(data[i], 1, scrollData[i], 0, columnNames.length - 1);
         }
 
         frozenModel = new DefaultTableModel(frozenData, frozenColumns) {
@@ -617,11 +480,12 @@ public class PayrollScreen extends JPanel {
 
         frozenTable = new JTable(frozenModel);
         TableStyler.styleTable(frozenTable);
+//        frozenTable.getTableHeader().setReorderingAllowed(false);
 
 
         scrollTable = new JTable(scrollModel);
         TableStyler.styleTable(scrollTable);
-
+        scrollTable.getTableHeader().setReorderingAllowed(false);
 
         scrollTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -663,11 +527,16 @@ public class PayrollScreen extends JPanel {
         JScrollPane frozenScroll = new JScrollPane(frozenTable);
         frozenScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         frozenScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        frozenScroll.setBorder(BorderFactory.createEmptyBorder(10, 10, 17, 0));
+//        frozenScroll.setPreferredSize(new Dimension(80, frozenTable.getPreferredSize().height));
+//        frozenScroll.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
+//        frozenScroll.setOpaque(false);
+        frozenScroll.setBorder(BorderFactory.createEmptyBorder(2, 2, 17, 0));
         JScrollPane scrollScroll = new JScrollPane(scrollTable,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollScroll.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
+//        scrollScroll.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
+        scrollScroll.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
+
 
         // Custom scrollbars
         frozenScroll.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
@@ -778,9 +647,10 @@ public class PayrollScreen extends JPanel {
 
         // Place both tables in a panel
         JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.X_AXIS));
-        tablePanel.add(frozenScroll);
-        tablePanel.add(scrollScroll);
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.setOpaque(false);
+        tablePanel.add(frozenScroll, BorderLayout.WEST);
+        tablePanel.add(scrollScroll, BorderLayout.CENTER);
 
         // Place both headers in a panel
         JPanel headerPanel = new JPanel();
@@ -920,6 +790,7 @@ public class PayrollScreen extends JPanel {
         final java.util.Date[] periodStartDate = {null};
         final java.util.Date[] periodEndDate = {null};
 
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM/dd/yyy");
         periodStartButton.addActionListener(e -> {
             org.jdatepicker.impl.UtilDateModel model = new org.jdatepicker.impl.UtilDateModel();
             java.util.Properties p = new java.util.Properties();
@@ -1150,8 +1021,10 @@ public class PayrollScreen extends JPanel {
             };
 
             // Adjust frozen columns with fixed widths
-            frozenTable.getColumnModel().getColumn(0).setPreferredWidth(50); // Set width for "Name" column
-            frozenTable.getColumnModel().getColumn(1).setPreferredWidth(50); // Set width for "Rate" column
+//            TableColumn frozenCol = frozenTable.getColumnModel().getColumn(0);
+//            frozenCol.setMinWidth(50);
+//            frozenCol.setMaxWidth(100);
+//            frozenCol.setPreferredWidth(80);
 
             // Adjust scrollable columns dynamically
             int scrollCols = scrollTable.getColumnCount();
