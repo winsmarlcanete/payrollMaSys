@@ -4,12 +4,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.ComboPopup;
-import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -316,7 +313,7 @@ public class PayrollScreen extends JPanel {
         // Use GridBagLayout for vertical centering
         JPanel btnPanel = new JPanel(new GridBagLayout());
         btnPanel.setOpaque(false);
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding   
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
         GridBagConstraints gbcBtn = new GridBagConstraints();
         gbcBtn.gridx = 0;
         gbcBtn.gridy = 0;
@@ -794,22 +791,25 @@ public class PayrollScreen extends JPanel {
         }
 
 // Frozen column model (column 0 only)
-        Object[][] frozenData = new Object[2][1];
+        Object[][] frozenData2 = new Object[2][1];
         for (int i = 0; i < 2; i++) {
-            frozenData[i][0] = data2[i][0];
+            frozenData2[i][0] = data2[i][0];
         }
-        DefaultTableModel frozenModel = new DefaultTableModel(frozenData, new String[]{columns[0]});
+        DefaultTableModel frozenModel2 = new DefaultTableModel(frozenData2, new String[]{columns[0]});
 
 // Scrollable column model (columns 1 to end)
-        Object[][] scrollData = new Object[2][columns.length - 1];
+        Object[][] scrollData2 = new Object[2][columns.length - 1];
         for (int i = 0; i < 2; i++) {
-            System.arraycopy(data2[i], 1, scrollData[i], 0, columns.length - 1);
+            System.arraycopy(data2[i], 1, scrollData2[i], 0, columns.length - 1);
         }
-        DefaultTableModel scrollModel = new DefaultTableModel(scrollData,
+        DefaultTableModel scrollModel2 = new DefaultTableModel(scrollData2,
                 java.util.Arrays.copyOfRange(columns, 1, columns.length));
 
-        JTable frozenTable2 = new JTable(frozenModel);
-        JTable scrollTable2 = new JTable(scrollModel);
+        JTable frozenTable2 = new JTable(frozenModel2);
+        JTable scrollTable2 = new JTable(scrollModel2);
+
+        TableStyler.styleTable(frozenTable2);
+        TableStyler.styleTable(scrollTable2);
 
 // Match row heights
         frozenTable2.setRowHeight(40);
@@ -850,11 +850,6 @@ public class PayrollScreen extends JPanel {
 
 // Hide horizontal scrollbar of frozen column
         frozenScroll2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-// Sync vertical scroll bars
-        frozenScroll2.getVerticalScrollBar().setModel(
-                scrollScroll2.getVerticalScrollBar().getModel()
-        );
 
         int rowHeight = frozenTable2.getRowHeight();
         int rowCount = frozenTable2.getRowCount();
@@ -904,6 +899,10 @@ public class PayrollScreen extends JPanel {
         whitePanel.add(Box.createVerticalStrut(10));
         whitePanel.add(headerPanel);
         whitePanel.add(tablePanel);
+
+        SwingUtilities.invokeLater(() -> {
+            matchColumnWidths(scrollTable, scrollTable2);
+        });
 
         JLayeredPane layeredPane = new JLayeredPane();
 
@@ -1319,6 +1318,43 @@ public class PayrollScreen extends JPanel {
 
     }
 
+//    private Object[][] convertToTableData(List<PayrollClass> allPayroll) {
+//        Object[][] data = new Object[payrollClasses.size()][26]; // Adjust column count as needed
+//        for (int i = 0; i < payrollClasses.size(); i++) {
+//            PayrollClass pc = payrollClasses.get(i);
+//            data[i][0] = pc.getName();
+//            data[i][1] = pc.getRate();
+//            // Fill in other columns with dummy data or actual data from PayrollClass
+//            for (int j = 2; j < 26; j++) {
+//                data[i][j] = "Data " + j;
+//            }
+//        }
+//        return data;
+//    }
+
+    private void matchColumnWidths(JTable sourceTable, JTable targetTable) {
+        TableColumnModel sourceColumnModel = sourceTable.getColumnModel();
+        TableColumnModel targetColumnModel = targetTable.getColumnModel();
+
+        // Ensure both tables have the same number of columns for the scrollable part
+        if (sourceColumnModel.getColumnCount() != targetColumnModel.getColumnCount()) {
+            System.err.println("Warning: Number of columns in scrollTable and scrollTable2 do not match. Cannot synchronize widths.");
+            return;
+        }
+
+        for (int i = 0; i < sourceColumnModel.getColumnCount(); i++) {
+            TableColumn sourceColumn = sourceColumnModel.getColumn(i);
+            TableColumn targetColumn = targetColumnModel.getColumn(i);
+
+            // Set preferred width based on the source table's column width
+            targetColumn.setPreferredWidth(sourceColumn.getWidth());
+            targetColumn.setMinWidth(sourceColumn.getMinWidth());
+            targetColumn.setMaxWidth(sourceColumn.getMaxWidth());
+        }
+        // Repaint the target table to apply the new widths
+        targetTable.revalidate();
+        targetTable.repaint();
+    }
 
     public DefaultTableModel getFrozenModel() {
         return frozenModel;
