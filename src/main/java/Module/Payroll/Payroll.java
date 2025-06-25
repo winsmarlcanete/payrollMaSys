@@ -121,7 +121,7 @@ public class Payroll {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String employeeName = rs.getString("last_name") + " " + rs.getString("first_name");
+                String employeeName = rs.getString("last_name") + ", " + rs.getString("first_name");
                 BigDecimal payRate = rs.getBigDecimal("pay_rate");
 
                 PayrollClass payroll = new PayrollClass(

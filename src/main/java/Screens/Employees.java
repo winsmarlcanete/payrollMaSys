@@ -10,6 +10,7 @@ import java.awt.event.*;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import Components.RoundedComboBox;
 import Components.TableStyler;
@@ -83,6 +84,8 @@ public class Employees extends JPanel {
         searchButton.setBorder(null);
         searchButton.setFocusable(false);
 
+
+
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.WEST);
 
@@ -143,6 +146,17 @@ public class Employees extends JPanel {
                     c.setBackground(new Color(230, 255, 230)); // light greenish
                 }
                 return c;
+            }
+        });
+
+        sortCombo.addActionListener(e -> {
+            String selected = (String) sortCombo.getSelectedItem();
+            TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(table.getModel());
+            table.setRowSorter(rowSorter);
+            if (selected != null && selected.equals("All Departments")) {
+                rowSorter.setRowFilter(null);
+            } else if (selected != null) {
+                rowSorter.setRowFilter(RowFilter.regexFilter("^" + Pattern.quote(selected) + "$", 2));
             }
         });
 

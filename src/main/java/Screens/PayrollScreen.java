@@ -18,10 +18,12 @@ import java.util.Arrays;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import Components.BlackRoundedComboBox;
 import Components.RoundedButton;
@@ -44,6 +46,8 @@ public class PayrollScreen extends JPanel {
     private Object[][] scrollData1;
     private String[] frozenColumns1;
     private String[] scrollColumns1;
+    private Date startDate;
+    private Date endDate;
 
     private String[] loadPeriod() {
         try {
@@ -67,38 +71,39 @@ public class PayrollScreen extends JPanel {
         }
     }
 
-    public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate) {
+    public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate, String department) {
         // Retrieve all payrolls using the retrieveAllPayrolls function
         List<PayrollClass> allPayrolls = Payroll.retrieveAllPayrolls(startDate, endDate);
 
-        for (PayrollClass payroll : allPayrolls) {
-            System.out.println(payroll);
-        }
+        // Retrieve all employees and map their employee_id to department
+        List<Employee> allEmployees = Payroll.retrieveAllEmployee();
+        Map<Integer, String> employeeDepartmentMap = allEmployees.stream()
+                .collect(Collectors.toMap(Employee::getEmployee_id, Employee::getDepartment));
 
-        Object[][] tableData = convertToTableData(allPayrolls);
-        System.out.println("Table Data:");
+        // Filter payrolls based on the chosen department
+        List<PayrollClass> filteredPayrolls = allPayrolls.stream()
+                .filter(payroll -> {
+                    String payrollDepartment = employeeDepartmentMap.get(payroll.getEmployee_id());
+                    return "All Departments".equals(department) || department.equals(payrollDepartment);
+                })
+                .toList();
+
+        // Convert filtered payrolls to table data
+        Object[][] tableData = convertToTableData(filteredPayrolls);
+
+        // Clear existing rows in the models
+        frozenModel1.setRowCount(0);
+        scrollModel1.setRowCount(0);
+
+        // Update frozenModel1 with the first two columns
         for (Object[] row : tableData) {
-            System.out.println(Arrays.toString(row));
+            frozenModel1.addRow(new Object[]{row[0], row[1]});
         }
 
-        frozenModel1.setDataVector(
-                Arrays.stream(tableData).map(row -> Arrays.copyOf(row, 2)).toArray(Object[][]::new),
-                new String[] {"Name", "Rate"}
-        );
-
-        // Set the scrollModel1 with the remaining columns
-        scrollModel1.setDataVector(
-                Arrays.stream(tableData).map(row -> Arrays.copyOfRange(row, 2, row.length)).toArray(Object[][]::new),
-                new String[] {
-                        "Rate Per Hour", "Days Present", "OT In Hours", "Night Differential In Hours",
-                        "Special Holiday In Hours", "Legal Holiday In Hours", "Late In Minutes",
-                        "Overtime Amount", "Night Differential Amount", "Special Holiday Amount",
-                        "Legal Holiday Amount", "Late Amount", "Wage", "PhilHealth Deduction",
-                        "SSS Deduction", "Pag-IBIG Deduction", "E-Fund Deduction", "Other Deduction",
-                        "Salary Adjustment", "Allowance Adjustment", "Other Compensations",
-                        "Total Deduction", "Gross Pay", "Net Pay"
-                }
-        );
+        // Update scrollModel1 with the remaining columns
+        for (Object[] row : tableData) {
+            scrollModel1.addRow(Arrays.copyOfRange(row, 2, row.length));
+        }
 
         // Repaint and revalidate the tables to reflect the updated data
         frozenTable1.repaint();
@@ -428,11 +433,11 @@ public class PayrollScreen extends JPanel {
 
                     String[] dates = selectedPeriod.split(" - ");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
-                    java.sql.Date startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
-                    java.sql.Date endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
-
+                     startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+                    endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
+                    String selectedDepartment = (String) sortCombo.getSelectedItem();
                     // Call refreshPayrollData with the parsed dates
-                    refreshPayrollData(startDate, endDate);
+                    refreshPayrollData(startDate, endDate,selectedDepartment);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
@@ -480,6 +485,9 @@ public class PayrollScreen extends JPanel {
         sortCombo.addActionListener(e -> {
             String selected = (String) sortCombo.getSelectedItem();
             adminLabel.setText(selected);
+            String selectedDepartment = (String) sortCombo.getSelectedItem();
+            // Call refreshPayrollData with the parsed dates
+            refreshPayrollData(startDate, endDate,selectedDepartment);
         });
 
         periodPanel.add(periodLabel);

@@ -5,11 +5,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import Components.RoundedButton;
 import Components.RoundedComboBox;
@@ -137,6 +140,17 @@ public class LeaveManagement extends JPanel {
                     c.setBackground(new Color(230, 255, 230)); // light greenish
                 }
                 return c;
+            }
+        });
+
+        sortCombo.addActionListener(e -> {
+            String selected = (String) sortCombo.getSelectedItem();
+            TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(table.getModel());
+            table.setRowSorter(rowSorter);
+            if (selected != null && selected.equals("All Departments")) {
+                rowSorter.setRowFilter(null);
+            } else if (selected != null) {
+                rowSorter.setRowFilter(RowFilter.regexFilter("^" + Pattern.quote(selected) + "$", 2));
             }
         });
 
