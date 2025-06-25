@@ -16,11 +16,17 @@ public class RegisterEmployee extends JPanel {
     private final JTextField middleNameField = new JTextField(15);
     private final JTextField lastNameField = new JTextField(15);
     private final JTextField employeeIdField = new JTextField(15);
-    private final JTextField ratePerHourField = new JTextField(15);
+    private final JTextField rateField = new JTextField(15);
     private final JTextField tinNoField = new JTextField(15);
     private final JTextField sssNoField = new JTextField(15);
     private final JTextField pagIbigNoField = new JTextField(15);
     private final JTextField philHealthNoField = new JTextField(15);
+
+    private final JTextField pagIbigPercentageField = new JTextField(15);
+    private final JTextField philHealthPercentageField = new JTextField(15);
+    private final JTextField sssPercentageField = new JTextField(15);
+    private final JTextField efundAmountField = new JTextField(15);
+    private final JTextField otherDeductionsField = new JTextField(15);
 
     private final JSpinner shiftStartSpinner = new JSpinner(new SpinnerDateModel());
     private final JSpinner shiftEndSpinner = new JSpinner(new SpinnerDateModel());
@@ -52,47 +58,48 @@ public class RegisterEmployee extends JPanel {
     }
 
     private JPanel createContentPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(Color.WHITE);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(Color.WHITE);
 
+        // First Panel
+        JPanel firstPanel = new JPanel(new GridBagLayout());
+        firstPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         int row = 0;
-        row = addField(panel, gbc, row, "First Name", firstNameField);
-        row = addField(panel, gbc, row, "Middle Name", middleNameField);
-        row = addField(panel, gbc, row, "Last Name", lastNameField);
-        row = addField(panel, gbc, row, "Department", departmentBox);
-        row = addField(panel, gbc, row, "Employment Status", employmentStatusBox);
-        row = addField(panel, gbc, row, "Rate / Hour (₱)", ratePerHourField);
-        row = addField(panel, gbc, row, "TIN no.", tinNoField);
-        row = addField(panel, gbc, row, "SSS no.", sssNoField);
-        row = addField(panel, gbc, row, "Pag-Ibig no.", pagIbigNoField);
-        row = addField(panel, gbc, row, "PhilHealth no.", philHealthNoField);
-        row = addField(panel, gbc, row, "Shift start", shiftStartSpinner);
-        row = addField(panel, gbc, row, "Shift end", shiftEndSpinner);
+        row = addField(firstPanel, gbc, row, "First Name", firstNameField);
+        row = addField(firstPanel, gbc, row, "Middle Name", middleNameField);
+        row = addField(firstPanel, gbc, row, "Last Name", lastNameField);
+        row = addField(firstPanel, gbc, row, "Department", departmentBox);
+        row = addField(firstPanel, gbc, row, "Employment Status", employmentStatusBox);
+        row = addField(firstPanel, gbc, row, "Rate", rateField);
+        row = addField(firstPanel, gbc, row, "Shift start", shiftStartSpinner);
+        row = addField(firstPanel, gbc, row, "Shift end", shiftEndSpinner);
 
+        // Second Panel
+        JPanel secondPanel = new JPanel(new GridBagLayout());
+        secondPanel.setBackground(Color.WHITE);
+        row = 0; // Reset row for second panel
+        row = addField(secondPanel, gbc, row, "TIN no.", tinNoField);
+        row = addField(secondPanel, gbc, row, "SSS no.", sssNoField);
+        row = addField(secondPanel, gbc, row, "Pag-Ibig no.", pagIbigNoField);
+        row = addField(secondPanel, gbc, row, "Pag-Ibig Percentage (%)", pagIbigPercentageField);
+        row = addField(secondPanel, gbc, row, "PhilHealth no.", philHealthNoField);
+        row = addField(secondPanel, gbc, row, "PhilHealth Percentage (%)", philHealthPercentageField);
+        row = addField(secondPanel, gbc, row, "SSS Percentage (%)", sssPercentageField);
+        row = addField(secondPanel, gbc, row, "E-Fund Amount (₱)", efundAmountField);
+        row = addField(secondPanel, gbc, row, "Other Deductions (₱)", otherDeductionsField);
 
-
-        // Register Button
-        JButton registerButton = createRegisterButton();
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(registerButton, gbc);
-
-        // === Create image label ===
+        // Third Panel (Fingerprint Image)
         JLabel imageLabel = new JLabel();
         imageLabel.setPreferredSize(new Dimension(350, 400));
-        imageLabel.setMinimumSize(new Dimension(350, 400));
-        imageLabel.setMaximumSize(new Dimension(350, 400));
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-// === Create fingerprint button ===
+
         JButton scanFingerprintButton = new JButton("Scan Fingerprint");
         scanFingerprintButton.setFocusPainted(false);
         scanFingerprintButton.setBackground(new Color(0, 102, 204));
@@ -103,9 +110,24 @@ public class RegisterEmployee extends JPanel {
         JLabel statusLabel = new JLabel(" ");
         statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         statusLabel.setForeground(Color.DARK_GRAY);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center the label
 
-// You can add an ActionListener here to trigger fingerprint scanning
+
+
+        JPanel thirdPanel = new JPanel();
+        thirdPanel.setLayout(new BoxLayout(thirdPanel, BoxLayout.Y_AXIS));
+        thirdPanel.setBackground(Color.WHITE);
+        thirdPanel.add(imageLabel);
+        thirdPanel.add(Box.createVerticalStrut(50));
+        thirdPanel.add(scanFingerprintButton);
+
+        thirdPanel.add(statusLabel);
+
+
+        // Add panels to the main panel
+        mainPanel.add(firstPanel, BorderLayout.WEST);
+        mainPanel.add(secondPanel, BorderLayout.CENTER);
+        mainPanel.add(thirdPanel, BorderLayout.EAST);
+
         scanFingerprintButton.addActionListener(e -> {
             new Thread(() -> {
                 zkFinger.init();
@@ -119,35 +141,10 @@ public class RegisterEmployee extends JPanel {
                     }
                 });
             }).start();
-
-
         });
 
 
-// === Group image and button into a vertical panel ===
-        JPanel imagePanel = new JPanel();
-        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
-        imagePanel.setBackground(Color.WHITE);
-        imagePanel.add(imageLabel);
-        imagePanel.add(Box.createVerticalStrut(10));
-        imagePanel.add(scanFingerprintButton);
-        imagePanel.add(Box.createVerticalStrut(5));
-        imagePanel.add(statusLabel);
-
-
-// === Add the image panel to the main panel (right side) ===
-        GridBagConstraints imageGbc = new GridBagConstraints();
-        imageGbc.gridx = 2; // Rightmost column
-        imageGbc.gridy = 0; // Align to top
-        imageGbc.gridheight = row; // Span height of the form
-        imageGbc.insets = new Insets(10, 20, 10, 10);
-        imageGbc.fill = GridBagConstraints.NONE;
-        imageGbc.anchor = GridBagConstraints.CENTER;
-
-        panel.add(imagePanel, imageGbc);
-
-
-        return panel;
+        return mainPanel;
     }
 
     private int addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent component) {
@@ -180,23 +177,25 @@ public class RegisterEmployee extends JPanel {
                 String lastName = lastNameField.getText().trim();
                 String department = (String) departmentBox.getSelectedItem();
                 String employmentStatus = (String) employmentStatusBox.getSelectedItem();
-                BigDecimal ratePerHour = new BigDecimal(ratePerHourField.getText().trim());
+                BigDecimal rate = new BigDecimal(rateField.getText().trim());
                 String tin = tinNoField.getText().trim();
                 String philhealth = philHealthNoField.getText().trim();
+                BigDecimal philhealthPercentage = new BigDecimal(philHealthPercentageField.getText().trim());
                 String pagibig = pagIbigNoField.getText().trim();
+                BigDecimal pagibigPercentage = new BigDecimal(pagIbigPercentageField.getText().trim());
                 String sss = sssNoField.getText().trim();
+                BigDecimal sssPercentage = new BigDecimal(sssPercentageField.getText().trim());
+                BigDecimal efundAmount = new BigDecimal(efundAmountField.getText().trim());
+                BigDecimal otherDeductions = new BigDecimal(otherDeductionsField.getText().trim());
                 java.util.Date shiftStartUtilDate = (java.util.Date) shiftStartSpinner.getValue();
                 java.util.Date shiftEndUtilDate = (java.util.Date) shiftEndSpinner.getValue();
-
 
                 Time shiftStart = new Time(shiftStartUtilDate.getTime());
                 Time shiftEnd = new Time(shiftEndUtilDate.getTime());
 
                 Employee emp = new Employee(firstName, lastName, middleName, department,
-                        employmentStatus, ratePerHour, tin, philhealth, pagibig, sss, shiftStart, shiftEnd, enrolled);
-
-                System.out.println("Shift Start: " + shiftStart);
-                System.out.println("Shift End: " + shiftEnd);
+                        employmentStatus, rate, tin, philhealth, philhealthPercentage, pagibig, pagibigPercentage,
+                        sss, sssPercentage, efundAmount, otherDeductions, shiftStart, shiftEnd, enrolled);
 
                 Employees.loadEmployeeTabledata();
                 Attendance.loadEmployeeTabledata();
@@ -204,9 +203,9 @@ public class RegisterEmployee extends JPanel {
                 zkFinger.close();
 
                 EmployeeRegistration.registerEmployee(emp);
-                } catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this,
-                        "Please enter a valid numeric value for Rate per Hour.",
+                        "Please enter valid numeric values for percentages and amounts.",
                         "Invalid Input",
                         JOptionPane.ERROR_MESSAGE);
             }

@@ -545,9 +545,9 @@ public class Employees extends JPanel {
                 String sssNumber = sssField.getText();
                 String philhealthNumber = philhealthField.getText();
 
-                E201File.updateEmployeeData( lastName, firstName, middleName, department,
-                        employmentStatus, payRate, tinNumber, pagibigNumber,
-                        sssNumber, philhealthNumber,employeeId);
+                //E201File.updateEmployeeData( lastName, firstName, middleName, department,
+                 //       employmentStatus, payRate, tinNumber, pagibigNumber,
+                   //     sssNumber, philhealthNumber,employeeId);
 
                 // Reset fields to non-editable
                 lastNameField.setEditable(false);
