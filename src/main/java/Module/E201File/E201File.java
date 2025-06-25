@@ -73,7 +73,9 @@ public class E201File {
         String query = """
     SELECT employee_id, last_name, first_name, middle_name,
            department, employment_status, shift_start, shift_end,
-           pay_rate, tin_number, pagibig_number, sss_number, philhealth_number
+           pay_rate, tin_number, pagibig_number, pagibig_percentage,
+           sss_number, sss_percentage, philhealth_number, philhealth_percentage,
+           efund_amount, other_deductions
     FROM employees""";
 
         try (Connection conn = JDBC.getConnection();
@@ -81,21 +83,30 @@ public class E201File {
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
+                int id = rs.getInt("employee_id");
                 String lastName = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
                 String middleName = rs.getString("middle_name");
-                int id = rs.getInt("employee_id");
                 String department = rs.getString("department");
                 String employmentStatus = rs.getString("employment_status");
+                Time shiftStart = rs.getTime("shift_start");
+                Time shiftEnd = rs.getTime("shift_end");
                 double payRate = rs.getDouble("pay_rate");
                 String tinNumber = rs.getString("tin_number");
                 String pagibigNumber = rs.getString("pagibig_number");
+                double pagibigPercentage = rs.getDouble("pagibig_percentage");
                 String sssNumber = rs.getString("sss_number");
+                double sssPercentage = rs.getDouble("sss_percentage");
                 String philhealthNumber = rs.getString("philhealth_number");
+                double philhealthPercentage = rs.getDouble("philhealth_percentage");
+                double efundAmount = rs.getDouble("efund_amount");
+                double otherDeductions = rs.getDouble("other_deductions");
 
                 Object[] row = {
-                        lastName, firstName, middleName, id, department, employmentStatus,
-                        payRate, tinNumber, pagibigNumber, sssNumber, philhealthNumber
+                        id, lastName, firstName, middleName, department, employmentStatus,
+                        shiftStart, shiftEnd, payRate, tinNumber, pagibigNumber, pagibigPercentage,
+                        sssNumber, sssPercentage, philhealthNumber, philhealthPercentage,
+                        efundAmount, otherDeductions
                 };
                 dataList.add(row);
             }
@@ -109,11 +120,16 @@ public class E201File {
 
     public static void updateEmployeeData(String lastName, String firstName, String middleName,
                                           String department, String employmentStatus, double payRate,
-                                          String tinNumber, String pagibigNumber, String sssNumber, String philhealthNumber, int employeeId) {
+                                          String tinNumber, String pagibigNumber, double pagibigPercentage,
+                                          String sssNumber, double sssPercentage, String philhealthNumber,
+                                          double philhealthPercentage, double efundAmount, double otherDeductions,
+                                          int employeeId) {
         String query = """
         UPDATE employees
         SET last_name = ?, first_name = ?, middle_name = ?, department = ?, employment_status = ?,
-            pay_rate = ?, tin_number = ?, pagibig_number = ?, sss_number = ?, philhealth_number = ?
+            pay_rate = ?, tin_number = ?, pagibig_number = ?, pagibig_percentage = ?, sss_number = ?, 
+            sss_percentage = ?, philhealth_number = ?, philhealth_percentage = ?, efund_amount = ?, 
+            other_deductions = ?
         WHERE employee_id = ?
     """;
 
@@ -128,9 +144,14 @@ public class E201File {
             pstmt.setDouble(6, payRate);
             pstmt.setString(7, tinNumber);
             pstmt.setString(8, pagibigNumber);
-            pstmt.setString(9, sssNumber);
-            pstmt.setString(10, philhealthNumber);
-            pstmt.setInt(11, employeeId);
+            pstmt.setDouble(9, pagibigPercentage);
+            pstmt.setString(10, sssNumber);
+            pstmt.setDouble(11, sssPercentage);
+            pstmt.setString(12, philhealthNumber);
+            pstmt.setDouble(13, philhealthPercentage);
+            pstmt.setDouble(14, efundAmount);
+            pstmt.setDouble(15, otherDeductions);
+            pstmt.setInt(16, employeeId);
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {

@@ -13,8 +13,13 @@ public class Employee {
     private String middle_name;
     private String tin_number;
     private String philhealth_number;
+    private BigDecimal philhealth_percentage;
     private String pagibig_number;
+    private BigDecimal pagibig_percentage;
     private String sss_number;
+    private BigDecimal sss_percentage;
+    private BigDecimal efund_amount;
+    private BigDecimal other_deductions;
     private BigDecimal pay_rate;
     private String employment_status;
     private String department;
@@ -59,7 +64,7 @@ public class Employee {
 
     }
 
-    public Employee(String first_name, String last_name, String middle_name, String department, String employment_status, BigDecimal pay_rate, String tin_number, String philhealth_number, String pagibig_number, String sss_number, Time shift_start, Time shift_end, ZkFinger.FingerprintTemplate fingerprint){
+    public Employee(String first_name, String last_name, String middle_name, String department, String employment_status, BigDecimal pay_rate, String tin_number, String philhealth_number, BigDecimal philhealth_percentage, String pagibig_number,BigDecimal pagibig_percentage, String sss_number, BigDecimal sss_percentage, BigDecimal efund_amount, BigDecimal other_deductions, Time shift_start, Time shift_end, ZkFinger.FingerprintTemplate fingerprint){
         this.first_name = first_name;
         this.last_name = last_name;
         this.middle_name = middle_name;
@@ -82,8 +87,13 @@ public class Employee {
     public String getMiddle_name(){return middle_name;}
     public  String getTin_number(){return tin_number;}
     public String getPhilhealth_number(){return philhealth_number;}
+    public BigDecimal getPhilhealth_percentage() {return philhealth_percentage;}
     public String getPagibig_number() {return pagibig_number;}
+    public BigDecimal getPagibig_percentage() {return pagibig_percentage;}
     public String getSss_number(){return sss_number;}
+    public BigDecimal getSss_percentage() {return sss_percentage;}
+    public BigDecimal getEfund_amount() {return efund_amount;}
+    public BigDecimal getOther_deductions() {return other_deductions;}
     public BigDecimal getPay_rate(){return pay_rate;}
     public String getEmployment_status(){return employment_status;}
     public String getDepartment(){return department;}
