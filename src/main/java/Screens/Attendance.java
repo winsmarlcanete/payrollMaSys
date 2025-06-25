@@ -49,7 +49,7 @@ public class Attendance extends JPanel {
         // Map data for table view
         tableViewData = new Object[rawData.length][tableViewHeaders.length];
         for (int i = 0; i < rawData.length; i++) {
-            tableViewData[i][0] = rawData[i][2] + " " + rawData[i][1]; // Combine last name and first name
+            tableViewData[i][0] = rawData[i][1] + ", " + rawData[i][2]; // Combine last name and first name
             tableViewData[i][1] = rawData[i][0]; // ID
             tableViewData[i][2] = rawData[i][4]; // Department
             tableViewData[i][3] = rawData[i][5]; // Employment Status
