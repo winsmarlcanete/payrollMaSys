@@ -136,15 +136,133 @@ public class LeaveReport extends JPanel {
         setLayout(new BorderLayout());
         add(searchPanel, BorderLayout.NORTH);
 
-        // Table
+        // Leave Type and Date Taken Table
         DefaultTableModel rightTableModel = new DefaultTableModel(
                 new Object[][] {
                         {"Sick Leave", "Jan 10, 2024"},
                         {"Sick Leave", "Feb 12, 2024"},
-                        {"Maternity Leave", "2023-03-20"}
+                        {"Maternity Leave", "2023-03-20"},
+                        {"Vacation Leave", "2023-04-15"},
+                        {"Vacation Leave", "2023-05-10"},
+                        {"Vacation Leave", "2023-06-05"},
+                        {"Sick Leave", "2023-07-20"},
+                        {"Sick Leave", "2023-08-25"},
+                        {"Maternity Leave", "2023-09-30"},
+                        {"Vacation Leave", "2023-10-15"},
+                        {"Vacation Leave", "2023-11-10"},
+                        {"Vacation Leave", "2023-12-05"},
+                        {"Sick Leave", "2024-01-20"},
+                        {"Sick Leave", "2024-02-25"},
+                        {"Maternity Leave", "2024-03-30"},
+                        {"Vacation Leave", "2024-04-15"},
+                        {"Vacation Leave", "2024-05-10"},
+                        {"Vacation Leave", "2024-06-05"},
+                        {"Sick Leave", "2024-07-20"},
+                        {"Sick Leave", "2024-08-25"},
+                        {"Maternity Leave", "2024-09-30"},
+                        {"Vacation Leave", "2024-10-15"},
+                        {"Vacation Leave", "2024-11-10"},
+                        {"Vacation Leave", "2024-12-05"},
+                        {"Sick Leave", "Jan 10, 2024"},
+                        {"Sick Leave", "Feb 12, 2024"},
+                        {"Maternity Leave", "2023-03-20"},
+                        {"Vacation Leave", "2023-04-15"},
+                        {"Vacation Leave", "2023-05-10"},
+                        {"Vacation Leave", "2023-06-05"},
+                        {"Sick Leave", "2023-07-20"},
+                        {"Sick Leave", "2023-08-25"},
+                        {"Maternity Leave", "2023-09-30"},
+                        {"Vacation Leave", "2023-10-15"},
+                        {"Vacation Leave", "2023-11-10"},
+                        {"Vacation Leave", "2023-12-05"},
+                        {"Sick Leave", "2024-01-20"},
+                        {"Sick Leave", "2024-02-25"},
+                        {"Maternity Leave", "2024-03-30"},
+                        {"Vacation Leave", "2024-04-15"},
+                        {"Vacation Leave", "2024-05-10"},
+                        {"Vacation Leave", "2024-06-05"},
+                        {"Sick Leave", "2024-07-20"},
+                        {"Sick Leave", "2024-08-25"},
+                        {"Maternity Leave", "2024-09-30"},
+                        {"Vacation Leave", "2024-10-15"},
+                        {"Vacation Leave", "2024-11-10"},
+                        {"Vacation Leave", "2024-12-05"},
+                        {"Sick Leave", "Jan 10, 2024"},
+                        {"Sick Leave", "Feb 12, 2024"},
+                        {"Maternity Leave", "2023-03-20"},
+                        {"Vacation Leave", "2023-04-15"},
+                        {"Vacation Leave", "2023-05-10"},
+                        {"Vacation Leave", "2023-06-05"},
+                        {"Sick Leave", "2023-07-20"},
+                        {"Sick Leave", "2023-08-25"},
+                        {"Maternity Leave", "2023-09-30"},
+                        {"Vacation Leave", "2023-10-15"},
+                        {"Vacation Leave", "2023-11-10"},
+                        {"Vacation Leave", "2023-12-05"},
+                        {"Sick Leave", "2024-01-20"},
+                        {"Sick Leave", "2024-02-25"},
+                        {"Maternity Leave", "2024-03-30"},
+                        {"Vacation Leave", "2024-04-15"},
+                        {"Vacation Leave", "2024-05-10"},
+                        {"Vacation Leave", "2024-06-05"},
+                        {"Sick Leave", "2024-07-20"},
+                        {"Sick Leave", "2024-08-25"},
+                        {"Maternity Leave", "2024-09-30"},
+                        {"Vacation Leave", "2024-10-15"},
+                        {"Vacation Leave", "2024-11-10"},
+                        {"Vacation Leave", "2024-12-05"},
+                        {"Sick Leave", "Jan 10, 2024"},
+                        {"Sick Leave", "Feb 12, 2024"},
+                        {"Maternity Leave", "2023-03-20"},
+                        {"Vacation Leave", "2023-04-15"},
+                        {"Vacation Leave", "2023-05-10"},
+                        {"Vacation Leave", "2023-06-05"},
+                        {"Sick Leave", "2023-07-20"},
+                        {"Sick Leave", "2023-08-25"},
+                        {"Maternity Leave", "2023-09-30"},
+                        {"Vacation Leave", "2023-10-15"},
+                        {"Vacation Leave", "2023-11-10"},
+                        {"Vacation Leave", "2023-12-05"},
+                        {"Sick Leave", "2024-01-20"},
+                        {"Sick Leave", "2024-02-25"},
+                        {"Maternity Leave", "2024-03-30"},
+                        {"Vacation Leave", "2024-04-15"},
+                        {"Vacation Leave", "2024-05-10"},
+                        {"Vacation Leave", "2024-06-05"},
+                        {"Sick Leave", "2024-07-20"},
+                        {"Sick Leave", "2024-08-25"},
+                        {"Maternity Leave", "2024-09-30"},
+                        {"Vacation Leave", "2024-10-15"},
+                        {"Vacation Leave", "2024-11-10"},
+                        {"Vacation Leave", "2024-12-05"},
+                        {"Sick Leave", "Jan 10, 2024"},
+                        {"Sick Leave", "Feb 12, 2024"},
+                        {"Maternity Leave", "2023-03-20"},
+                        {"Vacation Leave", "2023-04-15"},
+                        {"Vacation Leave", "2023-05-10"},
+                        {"Vacation Leave", "2023-06-05"},
+                        {"Sick Leave", "2023-07-20"},
+                        {"Sick Leave", "2023-08-25"},
+                        {"Maternity Leave", "2023-09-30"},
+                        {"Vacation Leave", "2023-10-15"},
+                        {"Vacation Leave", "2023-11-10"},
+                        {"Vacation Leave", "2023-12-05"},
+                        {"Sick Leave", "2024-01-20"},
+                        {"Sick Leave", "2024-02-25"},
+                        {"Maternity Leave", "2024-03-30"},
+                        {"Vacation Leave", "2024-04-15"},
+                        {"Vacation Leave", "2024-05-10"},
+                        {"Vacation Leave", "2024-06-05"},
+                        {"Sick Leave", "2024-07-20"},
+                        {"Sick Leave", "2024-08-25"},
+                        {"Maternity Leave", "2024-09-30"},
+                        {"Vacation Leave", "2024-10-15"},
+                        {"Vacation Leave", "2024-11-10"},
+                        {"Vacation Leave", "2024-12-05"},
                 },
                 new String[] {"Leave Type", "Date Taken"}
         );
+
         JTable rightTable = new JTable(rightTableModel);
         rightTable.setFont(new Font("Arial", Font.PLAIN, 16));
         rightTable.setRowHeight(40);
@@ -153,34 +271,110 @@ public class LeaveReport extends JPanel {
 
         JScrollPane rightTableScrollPane = new JScrollPane(rightTable);
         rightTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
-//        rightTableScrollPane.setPreferredSize(new Dimension(0, 300));
         rightTableScrollPane.add(rightTable.getTableHeader());
 
-        DefaultTableModel leftTableModel = new DefaultTableModel(
+        // Name Column Table
+        DefaultTableModel nameTableModel = new DefaultTableModel(
                 new Object[][] {
-                        {"Supan, Marc", "0/5"},
-                        {"Cañete, Winsmarl", "3/5"},
-                        {"Serrano, Jerwin", "4/5"},
-
+                        {"Supan, Marc"},
+                        {"Cañete, Winsmarl"},
+                        {"Serrano, Jerwin"},
+                        {"Dela Cruz, Adrian"},
+                        {"Santos, Bianca"},
+                        {"Garcia, Lorenzo"},
+                        {"Reyes, Camille"},
+                        {"Mendoza, Ethan"},
+                        {"Torres, Sofia"},
+                        {"Ramos, Miguel"},
+                        {"Flores, Alyssa"},
+                        {"Gomez, Nathaniel"},
+                        {"Castro, Isabelle"},
+                        {"Alvarez, Joshua"},
+                        {"Gutierrez, Clarisse"},
+                        {"Lopez, Samuel"},
+                        {"Morales, Kristine"},
+                        {"Diaz, Patrick"}
                 },
-                new String[] {"Name", "Remaining Leaves"}
+                new String[] {"Name"}
         );
 
-        JTable leftTable = new JTable(leftTableModel);
-        leftTable.setFont(new Font("Arial", Font.PLAIN, 16));
-        leftTable.setRowHeight(40);
-        leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        leftTable.setDefaultEditor(Object.class, null); // Make cells non-editable
+        JTable nameColumn = new JTable(nameTableModel);
+        nameColumn.setFont(new Font("Arial", Font.PLAIN, 16));
+        nameColumn.setRowHeight(200);
+        nameColumn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        nameColumn.setDefaultEditor(Object.class, null); // Make cells non-editable
 
-        JScrollPane leftTableScrollPane = new JScrollPane(leftTable);
-        leftTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
-//        leftTableScrollPane.setPreferredSize(new Dimension(0, 300));
-        leftTableScrollPane.add(leftTable.getTableHeader());
+        JScrollPane nameTableScrollPane = new JScrollPane(nameColumn);
+        nameTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        nameTableScrollPane.add(nameColumn.getTableHeader());
+
+        // SIL Column Table
+        DefaultTableModel leaveTableModel = new DefaultTableModel(
+                new Object[][] {
+                        {"2/5"},
+                        {"4/5"},
+                        {"1/5"},
+                        {"3/5"},
+                        {"0/5"},
+                        {"5/5"},
+                        {"2/5"},
+                        {"1/5"},
+                        {"4/5"},
+                        {"3/5"},
+                        {"2/5"},
+                        {"5/5"},
+                        {"0/5"}
+                },
+                new String[] {"Leave Remaining"}
+        );
+
+        JTable leaveColumn = new JTable(leaveTableModel);
+        leaveColumn.setFont(new Font("Arial", Font.PLAIN, 16));
+        leaveColumn.setRowHeight(200);
+        leaveColumn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        leaveColumn.setDefaultEditor(Object.class, null);
+
+        JScrollPane leaveTableScrollPane = new JScrollPane(leaveColumn);
+        leaveTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        leaveTableScrollPane.add(leaveColumn.getTableHeader());
+
+        JPanel leftTablePanel = new JPanel();
+        leftTablePanel.setLayout(new BoxLayout(leftTablePanel, BoxLayout.X_AXIS));
+        leftTablePanel.add(nameTableScrollPane);
+        leftTablePanel.add(leaveTableScrollPane);
+
+        JPanel rightTablePanel = new JPanel(new BorderLayout());
+        rightTablePanel.add(rightTableScrollPane, BorderLayout.CENTER);
+
+        nameColumn.getTableHeader().setReorderingAllowed(false);
+        leaveColumn.getTableHeader().setReorderingAllowed(false);
+        rightTable.getTableHeader().setReorderingAllowed(false);
+
+        // Synchronize vertical scrolling between rightTable and nameColumn
+        nameTableScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        leaveTableScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        JScrollBar rightVertical = rightTableScrollPane.getVerticalScrollBar();
+        JScrollBar nameVertical = nameTableScrollPane.getVerticalScrollBar();
+        JScrollBar leaveVertical = leaveTableScrollPane.getVerticalScrollBar();
+
+        int rightRowHeight = rightTable.getRowHeight();
+        int nameRowHeight = nameColumn.getRowHeight();
+        int leaveRowHeight = leaveColumn.getRowHeight();
+
+        rightVertical.addAdjustmentListener(e -> {
+            int rightValue = rightVertical.getValue();
+            // Scale the scroll position by the row height ratio
+            int nameValue = (int) ((rightValue / (double) rightRowHeight) * nameRowHeight);
+            nameVertical.setValue(nameValue);
+            int leaveValue = (int) ((rightValue / (double) rightRowHeight) * leaveRowHeight);
+            leaveVertical.setValue(leaveValue);
+        });
 
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.X_AXIS));
-        tablePanel.add(leftTableScrollPane);
-        tablePanel.add(rightTableScrollPane);
+        tablePanel.add(leftTablePanel);
+        tablePanel.add(rightTablePanel);
 
         add(tablePanel, BorderLayout.CENTER);
     }
