@@ -73,6 +73,11 @@ public class Employee {
         this.pay_rate = pay_rate;
         this.tin_number = tin_number;
         this.philhealth_number = philhealth_number;
+        this.philhealth_percentage = philhealth_percentage;
+        this.pagibig_percentage = pagibig_percentage;
+        this.sss_percentage = sss_percentage;
+        this.efund_amount = efund_amount;
+        this.other_deductions = other_deductions;
         this.pagibig_number = pagibig_number;
         this.sss_number = sss_number;
         this.shift_start = shift_start;
