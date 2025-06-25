@@ -45,6 +45,28 @@ public class PayrollScreen extends JPanel {
     private String[] frozenColumns1;
     private String[] scrollColumns1;
 
+    private String[] loadPeriod() {
+        try {
+            // Retrieve all payroll periods from the database
+            List<java.sql.Date[]> periods = Payroll.retrieveAllPeriods();
+
+            // Format each period as "Start Date - End Date"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+            String[] formattedPeriods = periods.stream()
+                    .map(period -> dateFormat.format(period[0]) + " - " + dateFormat.format(period[1]))
+                    .toArray(String[]::new);
+
+            return formattedPeriods;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "An error occurred while loading payroll periods.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return new String[0]; // Return an empty array in case of an error
+        }
+    }
+
     public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate) {
         // Retrieve all payrolls using the retrieveAllPayrolls function
         List<PayrollClass> allPayrolls = Payroll.retrieveAllPayrolls(startDate, endDate);
@@ -377,11 +399,8 @@ public class PayrollScreen extends JPanel {
         periodLabel.setFont(new Font("Arial", Font.BOLD, 22));
         periodLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
-        BlackRoundedComboBox<String> payrollPeriod = new BlackRoundedComboBox<>(new String[]{
-                "Oct 21, 2024 - Nov 5, 2024",
-                "Nov 21, 2024 - Dec 5, 2024",
-                "Jan 21, 2024 - Feb 5, 2024"
-        });
+        BlackRoundedComboBox<String> payrollPeriod = new BlackRoundedComboBox<>(loadPeriod());
+
         payrollPeriod.setName("payrollPeriod");
         payrollPeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         payrollPeriod.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
@@ -1098,6 +1117,10 @@ public class PayrollScreen extends JPanel {
 
             // Call generatePayrollForAllEmployees
             Payroll.generatePayrollForAllEmployees(sqlPeriodStart, sqlPeriodEnd);
+
+            // Reload periods and update the combo box
+            String[] updatedPeriods = loadPeriod();
+            payrollPeriod.setModel(new DefaultComboBoxModel<>(updatedPeriods));
 
             // Optionally close the popup
             createPeriodPopup.setVisible(false);

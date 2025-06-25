@@ -753,4 +753,30 @@ public class Payroll {
 
     }
 
+    public static List<Date[]> retrieveAllPeriods() {
+        List<Date[]> periods = new ArrayList<>();
+        Connection conn;
+
+        try {
+            // Use DISTINCT to ensure unique period_start and period_end dates
+            String sql = "SELECT DISTINCT period_start, period_end FROM payrollmsdb.payroll";
+            conn = JDBC.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Date periodStart = rs.getDate("period_start");
+                Date periodEnd = rs.getDate("period_end");
+                periods.add(new Date[]{periodStart, periodEnd});
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving payroll periods", e);
+        }
+
+        return periods;
+    }
 }
