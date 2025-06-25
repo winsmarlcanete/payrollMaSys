@@ -99,7 +99,6 @@ public class RegisterEmployee extends JPanel {
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-
         JButton scanFingerprintButton = new JButton("Scan Fingerprint");
         scanFingerprintButton.setFocusPainted(false);
         scanFingerprintButton.setBackground(new Color(0, 102, 204));
@@ -111,22 +110,25 @@ public class RegisterEmployee extends JPanel {
         statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         statusLabel.setForeground(Color.DARK_GRAY);
 
-
-
         JPanel thirdPanel = new JPanel();
         thirdPanel.setLayout(new BoxLayout(thirdPanel, BoxLayout.Y_AXIS));
         thirdPanel.setBackground(Color.WHITE);
         thirdPanel.add(imageLabel);
         thirdPanel.add(Box.createVerticalStrut(50));
         thirdPanel.add(scanFingerprintButton);
-
         thirdPanel.add(statusLabel);
-
 
         // Add panels to the main panel
         mainPanel.add(firstPanel, BorderLayout.WEST);
         mainPanel.add(secondPanel, BorderLayout.CENTER);
         mainPanel.add(thirdPanel, BorderLayout.EAST);
+
+        // Add Register Button
+        JButton registerButton = createRegisterButton();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.add(registerButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         scanFingerprintButton.addActionListener(e -> {
             new Thread(() -> {
@@ -142,7 +144,6 @@ public class RegisterEmployee extends JPanel {
                 });
             }).start();
         });
-
 
         return mainPanel;
     }
@@ -172,6 +173,25 @@ public class RegisterEmployee extends JPanel {
 
         button.addActionListener(e -> {
             try {
+                // Validate required fields
+                if (firstNameField.getText().trim().isEmpty() ||
+                        lastNameField.getText().trim().isEmpty() ||
+                        departmentBox.getSelectedItem() == null ||
+                        employmentStatusBox.getSelectedItem() == null ||
+                        rateField.getText().trim().isEmpty() ||
+                        tinNoField.getText().trim().isEmpty() ||
+                        sssNoField.getText().trim().isEmpty() ||
+                        pagIbigNoField.getText().trim().isEmpty() ||
+                        philHealthNoField.getText().trim().isEmpty()) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "Please fill in all required fields.",
+                            "Missing Fields",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Parse and debug values
                 String firstName = firstNameField.getText().trim();
                 String middleName = middleNameField.getText().trim();
                 String lastName = lastNameField.getText().trim();
@@ -193,6 +213,25 @@ public class RegisterEmployee extends JPanel {
                 Time shiftStart = new Time(shiftStartUtilDate.getTime());
                 Time shiftEnd = new Time(shiftEndUtilDate.getTime());
 
+                // Debugging values
+                System.out.println("First Name: " + firstName);
+                System.out.println("Middle Name: " + middleName);
+                System.out.println("Last Name: " + lastName);
+                System.out.println("Department: " + department);
+                System.out.println("Employment Status: " + employmentStatus);
+                System.out.println("Rate: " + rate);
+                System.out.println("TIN: " + tin);
+                System.out.println("PhilHealth Number: " + philhealth);
+                System.out.println("PhilHealth Percentage: " + philhealthPercentage);
+                System.out.println("Pag-Ibig Number: " + pagibig);
+                System.out.println("Pag-Ibig Percentage: " + pagibigPercentage);
+                System.out.println("SSS Number: " + sss);
+                System.out.println("SSS Percentage: " + sssPercentage);
+                System.out.println("E-Fund Amount: " + efundAmount);
+                System.out.println("Other Deductions: " + otherDeductions);
+                System.out.println("Shift Start: " + shiftStart);
+                System.out.println("Shift End: " + shiftEnd);
+
                 Employee emp = new Employee(firstName, lastName, middleName, department,
                         employmentStatus, rate, tin, philhealth, philhealthPercentage, pagibig, pagibigPercentage,
                         sss, sssPercentage, efundAmount, otherDeductions, shiftStart, shiftEnd, enrolled);
@@ -203,10 +242,20 @@ public class RegisterEmployee extends JPanel {
                 zkFinger.close();
 
                 EmployeeRegistration.registerEmployee(emp);
+
+                JOptionPane.showMessageDialog(this,
+                        "Employee registered successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this,
                         "Please enter valid numeric values for percentages and amounts.",
                         "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred during registration. Please try again.",
+                        "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
