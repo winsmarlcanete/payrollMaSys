@@ -1,21 +1,19 @@
 package Screens;
 
 import Components.RoundedComboBox;
-import Module.E201File.E201File;
+import javafx.scene.shape.Box;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.ComboPopup;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-public class Reports extends javax.swing.JPanel {
-
-    public Reports() {
+public class LeaveReport extends JPanel {
+    public LeaveReport() {
         // Search bar
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout(10, 0));
@@ -138,84 +136,52 @@ public class Reports extends javax.swing.JPanel {
         setLayout(new BorderLayout());
         add(searchPanel, BorderLayout.NORTH);
 
-        CardLayout cardLayout = new CardLayout();
-        JPanel cardPanel = new JPanel(cardLayout);
+        // Table
+        DefaultTableModel rightTableModel = new DefaultTableModel(
+                new Object[][] {
+                        {"Sick Leave", "Jan 10, 2024"},
+                        {"Sick Leave", "Feb 12, 2024"},
+                        {"Maternity Leave", "2023-03-20"}
+                },
+                new String[] {"Leave Type", "Date Taken"}
+        );
+        JTable rightTable = new JTable(rightTableModel);
+        rightTable.setFont(new Font("Arial", Font.PLAIN, 16));
+        rightTable.setRowHeight(40);
+        rightTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        rightTable.setDefaultEditor(Object.class, null); // Make cells non-editable
 
-        AttendanceReport attendanceReport = new AttendanceReport();
-        LeaveReport leaveReport = new LeaveReport();
-        Payslip payslip = new Payslip();
-        ChangeLog changeLog = new ChangeLog();
+        JScrollPane rightTableScrollPane = new JScrollPane(rightTable);
+        rightTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+//        rightTableScrollPane.setPreferredSize(new Dimension(0, 300));
+        rightTableScrollPane.add(rightTable.getTableHeader());
 
-        // Map for button names and panels
-        Map<String, JPanel> panelMap = new LinkedHashMap<>();
-        panelMap.put("Attendance Report", attendanceReport);
-        panelMap.put("Leave Report", leaveReport);
-        panelMap.put("Payslip", payslip);
-        panelMap.put("Change Log", changeLog);
+        DefaultTableModel leftTableModel = new DefaultTableModel(
+                new Object[][] {
+                        {"Supan, Marc", "0/5"},
+                        {"Cañete, Winsmarl", "3/5"},
+                        {"Serrano, Jerwin", "4/5"},
 
-// Add panels to cardPanel
-        for (Map.Entry<String, JPanel> entry : panelMap.entrySet()) {
-            cardPanel.add(entry.getValue(), entry.getKey());
-        }
+                },
+                new String[] {"Name", "Remaining Leaves"}
+        );
 
-        // Custom button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setBackground(Color.WHITE);
+        JTable leftTable = new JTable(leftTableModel);
+        leftTable.setFont(new Font("Arial", Font.PLAIN, 16));
+        leftTable.setRowHeight(40);
+        leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        leftTable.setDefaultEditor(Object.class, null); // Make cells non-editable
 
-        Color activeColor = new Color(0, 158, 0);
-        Color defaultColor = UIManager.getColor("Button.background");
+        JScrollPane leftTableScrollPane = new JScrollPane(leftTable);
+        leftTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+//        leftTableScrollPane.setPreferredSize(new Dimension(0, 300));
+        leftTableScrollPane.add(leftTable.getTableHeader());
 
-        // Store buttons for color management
-        Map<String, JButton> buttonMap = new LinkedHashMap<>();
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.X_AXIS));
+        tablePanel.add(leftTableScrollPane);
+        tablePanel.add(rightTableScrollPane);
 
-        for (String name : panelMap.keySet()) {
-            JButton btn = new JButton(name);
-            btn.setFont(new Font("Arial", Font.PLAIN, 16));
-            btn.setFocusPainted(false);
-//                    btn.setPreferredSize(new Dimension(btn.getPreferredSize().width, 35));
-//                    btn.setMaximumSize(new Dimension(btn.getPreferredSize().width, 35));
-            btn.setPreferredSize(new Dimension(0, 45));
-            btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-            btn.setBackground(new Color(217, 217, 217));
-            btn.setBorderPainted(false); // Hide border, keep padding
-            buttonPanel.add(btn);
-            buttonPanel.add(Box.createRigidArea(new Dimension(1, 0)));
-            buttonMap.put(name, btn);
-
-            btn.addActionListener(e -> {
-                cardLayout.show(cardPanel, name);
-                // Set active color for selected, default for others
-                for (Map.Entry<String, JButton> entry : buttonMap.entrySet()) {
-                    if (entry.getKey().equals(name)) {
-                        entry.getValue().setBackground(activeColor);
-                        entry.getValue().setForeground(Color.WHITE);
-                        entry.getValue().setFont(new Font("Arial", Font.BOLD, 16));
-                    } else {
-                        entry.getValue().setBackground(new Color(217, 217, 217));
-                        entry.getValue().setForeground(Color.BLACK);
-                        entry.getValue().setFont(new Font("Arial", Font.PLAIN, 16));
-                    }
-                }
-            });
-        }
-        // Set the first button as active
-        if (!buttonMap.isEmpty()) {
-            JButton firstBtn = buttonMap.values().iterator().next();
-            firstBtn.setBackground(activeColor);
-            firstBtn.setForeground(Color.WHITE);
-            firstBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        }
-
-        // Layout
-        setLayout(new BorderLayout());
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout());
-        topPanel.add(buttonPanel, BorderLayout.NORTH);
-
-        add(topPanel, BorderLayout.NORTH);
-        add(cardPanel, BorderLayout.CENTER);
-
+        add(tablePanel, BorderLayout.CENTER);
     }
-    
 }
