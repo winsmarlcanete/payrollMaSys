@@ -1,6 +1,7 @@
 package Module.E201File;
 import Config.JDBC;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,17 +119,16 @@ public class E201File {
         return dataList.toArray(new Object[0][]);
     }
 
-    public static void updateEmployeeData(String lastName, String firstName, String middleName,
-                                          String department, String employmentStatus, double payRate,
-                                          String tinNumber, String pagibigNumber, double pagibigPercentage,
-                                          String sssNumber, double sssPercentage, String philhealthNumber,
-                                          double philhealthPercentage, double efundAmount, double otherDeductions,
-                                          int employeeId) {
+    public static void updateEmployeeData(int employeeId, String lastName, String firstName, String middleName,
+                                          String department, String employmentStatus, Time shiftStart, Time shiftEnd,
+                                          BigDecimal payRate, String tinNumber, String pagibigNumber, BigDecimal pagibigPercentage,
+                                          String sssNumber, BigDecimal sssPercentage, String philhealthNumber, BigDecimal philhealthPercentage,
+                                          BigDecimal efundAmount, BigDecimal otherDeductions) {
         String query = """
         UPDATE employees
         SET last_name = ?, first_name = ?, middle_name = ?, department = ?, employment_status = ?,
-            pay_rate = ?, tin_number = ?, pagibig_number = ?, pagibig_percentage = ?, sss_number = ?, 
-            sss_percentage = ?, philhealth_number = ?, philhealth_percentage = ?, efund_amount = ?, 
+            shift_start = ?, shift_end = ?, pay_rate = ?, tin_number = ?, pagibig_number = ?, pagibig_percentage = ?,
+            sss_number = ?, sss_percentage = ?, philhealth_number = ?, philhealth_percentage = ?, efund_amount = ?,
             other_deductions = ?
         WHERE employee_id = ?
     """;
@@ -141,17 +141,19 @@ public class E201File {
             pstmt.setString(3, middleName);
             pstmt.setString(4, department);
             pstmt.setString(5, employmentStatus);
-            pstmt.setDouble(6, payRate);
-            pstmt.setString(7, tinNumber);
-            pstmt.setString(8, pagibigNumber);
-            pstmt.setDouble(9, pagibigPercentage);
-            pstmt.setString(10, sssNumber);
-            pstmt.setDouble(11, sssPercentage);
-            pstmt.setString(12, philhealthNumber);
-            pstmt.setDouble(13, philhealthPercentage);
-            pstmt.setDouble(14, efundAmount);
-            pstmt.setDouble(15, otherDeductions);
-            pstmt.setInt(16, employeeId);
+            pstmt.setTime(6, shiftStart);
+            pstmt.setTime(7, shiftEnd);
+            pstmt.setBigDecimal(8, payRate);
+            pstmt.setString(9, tinNumber);
+            pstmt.setString(10, pagibigNumber);
+            pstmt.setBigDecimal(11, pagibigPercentage);
+            pstmt.setString(12, sssNumber);
+            pstmt.setBigDecimal(13, sssPercentage);
+            pstmt.setString(14, philhealthNumber);
+            pstmt.setBigDecimal(15, philhealthPercentage);
+            pstmt.setBigDecimal(16, efundAmount);
+            pstmt.setBigDecimal(17, otherDeductions);
+            pstmt.setInt(18, employeeId);
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
