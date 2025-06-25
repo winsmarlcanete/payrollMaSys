@@ -18,36 +18,52 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Payroll {
-    public static List<Employee> retrieveAllEmployee(){
+    public static List<Employee> retrieveAllEmployee() {
         List<Employee> employees = new ArrayList<>();
-        Connection conn;
 
-        try{
-            String sql = "SELECT `employee_id`, `last_name`, `first_name`, `middle_name`, `pay_rate`, `department`, `employment_status` " +
-                    "FROM `payrollmsdb`.`employees`";
-            conn = JDBC.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+        String query = """
+        SELECT employee_id, last_name, first_name, middle_name, department, employment_status, pay_rate,
+               sss_percentage, philhealth_percentage, pagibig_percentage, efund_amount, other_deductions,
+               shift_start, shift_end, salary_adj_percentage, allowance_amount, other_comp_amount
+        FROM employees""";
+
+        try (Connection conn = JDBC.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
                 int employeeId = rs.getInt("employee_id");
                 String lastName = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
                 String middleName = rs.getString("middle_name");
-                BigDecimal payRate = rs.getBigDecimal("pay_rate");
                 String department = rs.getString("department");
                 String employmentStatus = rs.getString("employment_status");
+                BigDecimal payRate = rs.getBigDecimal("pay_rate");
+                BigDecimal sssPercentage = rs.getBigDecimal("sss_percentage");
+                BigDecimal philhealthPercentage = rs.getBigDecimal("philhealth_percentage");
+                BigDecimal pagibigPercentage = rs.getBigDecimal("pagibig_percentage");
+                BigDecimal efundAmount = rs.getBigDecimal("efund_amount");
+                BigDecimal otherDeductions = rs.getBigDecimal("other_deductions");
+                Time shiftStart = rs.getTime("shift_start");
+                Time shiftEnd = rs.getTime("shift_end");
+                BigDecimal salaryAdjPercentage = rs.getBigDecimal("salary_adj_percentage");
+                BigDecimal allowanceAmount = rs.getBigDecimal("allowance_amount");
+                BigDecimal otherCompAmount = rs.getBigDecimal("other_comp_amount");
 
-                Employee emp = new Employee(employeeId, lastName, firstName, middleName, payRate, department, employmentStatus);
-                employees.add(emp);
+                // Pass all retrieved fields to the Employee constructor
+                Employee employee = new Employee(
+                        employeeId, lastName, firstName, middleName, department, employmentStatus, payRate,
+                        sssPercentage, philhealthPercentage, pagibigPercentage, efundAmount, otherDeductions,
+                        shiftStart, shiftEnd, salaryAdjPercentage, allowanceAmount, otherCompAmount
+                );
+
+                employees.add(employee);
             }
 
-            stmt.close();
-            conn.close();
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
         return employees;
     }
 
@@ -419,7 +435,7 @@ public class Payroll {
             for (Employee employee : employees) {
                 int employeeId = employee.getEmployee_id();
 
-                // Step 4: Retrieve timecard data for the employee
+
                 String timecardSql = "SELECT tc.date, tc.hours_clocked, e.shift_start, e.shift_end, " +
                         "p.overtime_hours, p.nd_hours, p.sholiday_hours, p.lholiday_hours, p.late_minutes " +
                         "FROM payrollmsdb.timecards tc " +
@@ -649,11 +665,14 @@ public class Payroll {
                 int employeeId = employee.getEmployee_id();
 
                 // Step 2: Retrieve payroll data for the employee
-                String sql = "SELECT days_present, overtime_hours, nd_hours, sholiday_hours, lholiday_hours, late_minutes, " +
-                        "e.pay_rate " +
-                        "FROM payrollmsdb.payroll p " +
-                        "JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id " +
-                        "WHERE p.employee_id = ?";
+                String sql = """
+                SELECT p.days_present, p.overtime_hours, p.nd_hours, p.sholiday_hours, p.lholiday_hours, p.late_minutes,
+                       e.pay_rate, e.philhealth_percentage, e.sss_percentage, e.pagibig_percentage, e.efund_amount,
+                       e.other_deductions, e.salary_adj_percentage, e.allowance_amount, e.other_comp_amount
+                FROM payrollmsdb.payroll p
+                JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id
+                WHERE p.employee_id = ?
+            """;
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, employeeId);
 
@@ -668,6 +687,15 @@ public class Payroll {
                     double lholidayHours = rs.getDouble("lholiday_hours");
                     double lateMinutes = rs.getDouble("late_minutes");
 
+                    BigDecimal philhealthPercentage = rs.getBigDecimal("philhealth_percentage");
+                    BigDecimal sssPercentage = rs.getBigDecimal("sss_percentage");
+                    BigDecimal pagibigPercentage = rs.getBigDecimal("pagibig_percentage");
+                    BigDecimal efundAmount = rs.getBigDecimal("efund_amount");
+                    BigDecimal otherDeductions = rs.getBigDecimal("other_deductions");
+                    BigDecimal salaryAdjPercentage = rs.getBigDecimal("salary_adj_percentage");
+                    BigDecimal allowanceAmount = rs.getBigDecimal("allowance_amount");
+                    BigDecimal otherCompAmount = rs.getBigDecimal("other_comp_amount");
+
                     // Step 3: Calculate payroll details using formulas
                     BigDecimal overtimeAmount = Formula.computeOvertimeAmount(payRate, overtimeHours);
                     BigDecimal ndAmount = Formula.computeNightDifferentialAmount(payRate, ndHours);
@@ -677,28 +705,32 @@ public class Payroll {
                     BigDecimal wage = Formula.computeWage(payRate, lateAmount, daysPresent);
 
                     // Deductions
-                    BigDecimal philhealthDeduction = new BigDecimal("0");
-                    BigDecimal sssDeduction = new BigDecimal("0");
-                    BigDecimal pagibigDeduction = new BigDecimal("0");
-                    BigDecimal efundDeduction = new BigDecimal("0");
-                    BigDecimal otherDeduction = new BigDecimal("0");
+                    BigDecimal philhealthDeduction = wage.multiply(philhealthPercentage);
+                    BigDecimal sssDeduction = wage.multiply(sssPercentage);
+                    BigDecimal pagibigDeduction = wage.multiply(pagibigPercentage);
 
-                    // Compensations
-                    BigDecimal salaryAdjustment = new BigDecimal("0");
-                    BigDecimal allowanceAdjustment = new BigDecimal("0");
-                    BigDecimal otherCompensations = new BigDecimal("0");
+                    // Adjustments and compensations
+                    BigDecimal salaryAdjustment = wage.multiply(salaryAdjPercentage);
 
-                    BigDecimal totalDeduction = Formula.computeTotalDeductionAmount(philhealthDeduction, sssDeduction, pagibigDeduction, efundDeduction, otherDeduction);
-                    BigDecimal grossPay = Formula.computeTotalGrossAmount(wage, overtimeAmount, ndAmount, sholidayAmount, lholidayAmount);
-                    BigDecimal netPay = Formula.computeNetPay(grossPay, totalDeduction, salaryAdjustment, allowanceAdjustment, otherCompensations);
+                    BigDecimal totalDeduction = Formula.computeTotalDeductionAmount(
+                            philhealthDeduction, sssDeduction, pagibigDeduction, efundAmount, otherDeductions
+                    );
+                    BigDecimal grossPay = Formula.computeTotalGrossAmount(
+                            wage, overtimeAmount, ndAmount, sholidayAmount, lholidayAmount
+                    );
+                    BigDecimal netPay = Formula.computeNetPay(
+                            grossPay, totalDeduction, salaryAdjustment, allowanceAmount, otherCompAmount
+                    );
 
                     // Step 4: Update payroll data in the database
-                    String updateSql = "UPDATE payrollmsdb.payroll SET " +
-                            "overtime_amount = ?, nd_amount = ?, sholiday_amount = ?, lholiday_amount = ?, late_amount = ?, " +
-                            "wage = ?, philhealth_deduction = ?, sss_deduction = ?, pagibig_deduction = ?, efund_deduction = ?, " +
-                            "other_deduction = ?, salary_adjustment = ?, allowance_adjustment = ?, other_compensations = ?, " +
-                            "total_deduction = ?, gross_pay = ?, net_pay = ? " +
-                            "WHERE employee_id = ?";
+                    String updateSql = """
+                    UPDATE payrollmsdb.payroll SET
+                        overtime_amount = ?, nd_amount = ?, sholiday_amount = ?, lholiday_amount = ?, late_amount = ?,
+                        wage = ?, philhealth_deduction = ?, sss_deduction = ?, pagibig_deduction = ?, efund_deduction = ?,
+                        other_deduction = ?, salary_adjustment = ?, allowance_adjustment = ?, other_compensations = ?,
+                        total_deduction = ?, gross_pay = ?, net_pay = ?
+                    WHERE employee_id = ?
+                """;
                     PreparedStatement updateStmt = conn.prepareStatement(updateSql);
                     updateStmt.setBigDecimal(1, overtimeAmount);
                     updateStmt.setBigDecimal(2, ndAmount);
@@ -709,11 +741,11 @@ public class Payroll {
                     updateStmt.setBigDecimal(7, philhealthDeduction);
                     updateStmt.setBigDecimal(8, sssDeduction);
                     updateStmt.setBigDecimal(9, pagibigDeduction);
-                    updateStmt.setBigDecimal(10, efundDeduction);
-                    updateStmt.setBigDecimal(11, otherDeduction);
+                    updateStmt.setBigDecimal(10, efundAmount);
+                    updateStmt.setBigDecimal(11, otherDeductions);
                     updateStmt.setBigDecimal(12, salaryAdjustment);
-                    updateStmt.setBigDecimal(13, allowanceAdjustment);
-                    updateStmt.setBigDecimal(14, otherCompensations);
+                    updateStmt.setBigDecimal(13, allowanceAmount);
+                    updateStmt.setBigDecimal(14, otherCompAmount);
                     updateStmt.setBigDecimal(15, totalDeduction);
                     updateStmt.setBigDecimal(16, grossPay);
                     updateStmt.setBigDecimal(17, netPay);

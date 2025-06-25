@@ -391,96 +391,146 @@ public class Employees extends JPanel {
         JTextField otherDeductionsField = new JTextField();
         otherDeductionsField.setEditable(false);
 
+        JLabel salaryAdjPercentageLabel = new JLabel("Salary Adjustment Percentage:");
+        JTextField salaryAdjPercentageField = new JTextField();
+        salaryAdjPercentageField.setEditable(false);
+
+        JLabel allowanceAmountLabel = new JLabel("Allowance Amount:");
+        JTextField allowanceAmountField = new JTextField();
+        allowanceAmountField.setEditable(false);
+
+        JLabel otherCompAmountLabel = new JLabel("Other Compensation Amount:");
+        JTextField otherCompAmountField = new JTextField();
+        otherCompAmountField.setEditable(false);
+
 // Add fields to combinedDetailsPanel
-        gbc.gridx = 0; gbc.gridy = 0;
+        // First column
+        gbc.gridy = 0; // Start at row 0
+        gbc.gridx = 0;
         combinedDetailsPanel.add(idLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(idField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridy++;
+        gbc.gridx = 0;
         combinedDetailsPanel.add(lastNameLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(lastNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridy++;
+        gbc.gridx = 0;
         combinedDetailsPanel.add(firstNameLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(firstNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridy++;
+        gbc.gridx = 0;
         combinedDetailsPanel.add(middleNameLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(middleNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridy++;
+        gbc.gridx = 0;
         combinedDetailsPanel.add(departmentLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(departmentField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridy++;
+        gbc.gridx = 0;
         combinedDetailsPanel.add(employmentStatusLabel, gbc);
         gbc.gridx = 1;
         combinedDetailsPanel.add(employmentStatusField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 6;
+// Second column
+        gbc.gridy = 0; // Reset row for second column
+        gbc.gridx = 2;
         combinedDetailsPanel.add(shiftStartLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(shiftStartField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 7;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(shiftEndLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(shiftEndField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 8;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(payRateLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(payRateField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 9;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(tinNumberLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(tinNumberField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 10;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(pagibigNumberLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(pagibigNumberField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 11;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(pagibigPercentageLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(pagibigPercentageField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 12;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(sssNumberLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(sssNumberField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 13;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(sssPercentageLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(sssPercentageField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 14;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(philhealthNumberLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(philhealthNumberField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 15;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(philhealthPercentageLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(philhealthPercentageField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 16;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(efundAmountLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(efundAmountField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 17;
+        gbc.gridy++;
+        gbc.gridx = 2;
         combinedDetailsPanel.add(otherDeductionsLabel, gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 3;
         combinedDetailsPanel.add(otherDeductionsField, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 2;
+        combinedDetailsPanel.add(salaryAdjPercentageLabel, gbc);
+        gbc.gridx = 3;
+        combinedDetailsPanel.add(salaryAdjPercentageField, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 2;
+        combinedDetailsPanel.add(allowanceAmountLabel, gbc);
+        gbc.gridx = 3;
+        combinedDetailsPanel.add(allowanceAmountField, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 2;
+        combinedDetailsPanel.add(otherCompAmountLabel, gbc);
+        gbc.gridx = 3;
+        combinedDetailsPanel.add(otherCompAmountField, gbc);
 
 
         detailsPanel.add(combinedDetailsPanel, BorderLayout.CENTER);
@@ -518,6 +568,9 @@ public class Employees extends JPanel {
             philhealthPercentageField.setBorder(emptyBorder);
             efundAmountField.setBorder(emptyBorder);
             otherDeductionsField.setBorder(emptyBorder);
+            salaryAdjPercentageField.setBorder(emptyBorder);
+            allowanceAmountField.setBorder(emptyBorder);
+            otherCompAmountField.setBorder(emptyBorder);
 
             Color bg = combinedDetailsPanel.getBackground();
             lastNameField.setBackground(bg);
@@ -538,6 +591,9 @@ public class Employees extends JPanel {
             philhealthPercentageField.setBackground(bg);
             efundAmountField.setBackground(bg);
             otherDeductionsField.setBackground(bg);
+            salaryAdjPercentageField.setBackground(bg);
+            allowanceAmountField.setBackground(bg);
+            otherCompAmountField.setBackground(bg);
         };
 
         // Helper to restore default borders
@@ -560,6 +616,9 @@ public class Employees extends JPanel {
             philhealthPercentageField.setBorder(defaultBorder);
             efundAmountField.setBorder(defaultBorder);
             otherDeductionsField.setBorder(defaultBorder);
+            salaryAdjPercentageField.setBorder(defaultBorder);
+            allowanceAmountField.setBorder(defaultBorder);
+            otherCompAmountField.setBorder(defaultBorder);
 
             Color bg = Color.WHITE;
             lastNameField.setBackground(bg);
@@ -580,6 +639,9 @@ public class Employees extends JPanel {
             philhealthPercentageField.setBackground(bg);
             efundAmountField.setBackground(bg);
             otherDeductionsField.setBackground(bg);
+            salaryAdjPercentageField.setBackground(bg);
+            allowanceAmountField.setBackground(bg);
+            otherCompAmountField.setBackground(bg);
         };
 
         // Set plain text look initially
@@ -608,6 +670,9 @@ public class Employees extends JPanel {
                     philhealthPercentageField.setText(detailsViewData[row][15].toString());
                     efundAmountField.setText(detailsViewData[row][16].toString());
                     otherDeductionsField.setText(detailsViewData[row][17].toString());
+                    salaryAdjPercentageField.setText(detailsViewData[row][18].toString());
+                    allowanceAmountField.setText(detailsViewData[row][19].toString());
+                    otherCompAmountField.setText(detailsViewData[row][20].toString());
 
                     setPlainTextLook.run();
 
@@ -651,6 +716,9 @@ public class Employees extends JPanel {
                 philhealthPercentageField.setEditable(true);
                 efundAmountField.setEditable(true);
                 otherDeductionsField.setEditable(true);
+                salaryAdjPercentageField.setEditable(true);
+                allowanceAmountField.setEditable(true);
+                otherCompAmountField.setEditable(true);
 
                 setEditableLook.run();
 
@@ -685,12 +753,15 @@ public class Employees extends JPanel {
                     BigDecimal philhealthPercentage = new BigDecimal(philhealthPercentageField.getText());
                     BigDecimal efundAmount = new BigDecimal(efundAmountField.getText());
                     BigDecimal otherDeductions = new BigDecimal(otherDeductionsField.getText());
+                    BigDecimal salaryAdjPercentage = new BigDecimal(salaryAdjPercentageField.getText());
+                    BigDecimal allowanceAmount = new BigDecimal(allowanceAmountField.getText());
+                    BigDecimal otherCompAmount = new BigDecimal(otherCompAmountField.getText());
 
                     // Update employee data in the database or data source
                     E201File.updateEmployeeData(employeeId, lastName, firstName, middleName, department,
                             employmentStatus, shiftStart, shiftEnd, payRate, tinNumber, pagibigNumber,
                             pagibigPercentage, sssNumber, sssPercentage, philhealthNumber, philhealthPercentage,
-                            efundAmount, otherDeductions);
+                            efundAmount, otherDeductions, salaryAdjPercentage, allowanceAmount, otherCompAmount);
                     // Reset fields to non-editable
                     lastNameField.setEditable(false);
                     firstNameField.setEditable(false);
@@ -709,6 +780,9 @@ public class Employees extends JPanel {
                     philhealthPercentageField.setEditable(false);
                     efundAmountField.setEditable(false);
                     otherDeductionsField.setEditable(false);
+                    salaryAdjPercentageField.setEditable(false);
+                    allowanceAmountField.setEditable(false);
+                    otherCompAmountField.setEditable(false);
 
                     setPlainTextLook.run();
 
@@ -855,6 +929,18 @@ public class Employees extends JPanel {
         otherDeductionsLabel.setFont(detailsFont);
         otherDeductionsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         otherDeductionsField.setFont(detailsFont);
+
+        salaryAdjPercentageLabel.setFont(detailsFont);
+        salaryAdjPercentageLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        salaryAdjPercentageField.setFont(detailsFont);
+
+        allowanceAmountLabel.setFont(detailsFont);
+        allowanceAmountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        allowanceAmountField.setFont(detailsFont);
+
+        otherCompAmountLabel.setFont(detailsFont);
+        otherCompAmountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        otherCompAmountField.setFont(detailsFont);
     }
 
 

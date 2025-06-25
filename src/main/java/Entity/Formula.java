@@ -106,6 +106,8 @@ public class Formula {
                 .multiply(BigDecimal.valueOf(lholiday_hours));
     }
 
+
+
     public static BigDecimal computeTotalGrossAmount(BigDecimal wage, BigDecimal overtime_amount, BigDecimal nd_amount,
                                                   BigDecimal sholiday_amount, BigDecimal lholiday_amount) {
 

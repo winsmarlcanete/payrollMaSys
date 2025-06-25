@@ -437,6 +437,7 @@ public class PayrollScreen extends JPanel {
                     endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
                     String selectedDepartment = (String) sortCombo.getSelectedItem();
                     // Call refreshPayrollData with the parsed dates
+
                     refreshPayrollData(startDate, endDate,selectedDepartment);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -444,6 +445,8 @@ public class PayrollScreen extends JPanel {
                 }
             }
         });
+
+
 
 
 // ✅ Override the renderer

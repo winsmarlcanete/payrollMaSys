@@ -28,6 +28,10 @@ public class RegisterEmployee extends JPanel {
     private final JTextField efundAmountField = new JTextField(15);
     private final JTextField otherDeductionsField = new JTextField(15);
 
+    private final JTextField salaryAdjPercentageField = new JTextField(15);
+    private final JTextField allowanceAmountField = new JTextField(15);
+    private final JTextField otherCompAmountField = new JTextField(15);
+
     private final JSpinner shiftStartSpinner = new JSpinner(new SpinnerDateModel());
     private final JSpinner shiftEndSpinner = new JSpinner(new SpinnerDateModel());
 
@@ -92,6 +96,9 @@ public class RegisterEmployee extends JPanel {
         row = addField(secondPanel, gbc, row, "SSS Percentage (%)", sssPercentageField);
         row = addField(secondPanel, gbc, row, "E-Fund Amount (₱)", efundAmountField);
         row = addField(secondPanel, gbc, row, "Other Deductions (₱)", otherDeductionsField);
+        row = addField(secondPanel, gbc, row, "Salary Adjustment Percentage (%)", salaryAdjPercentageField);
+        row = addField(secondPanel, gbc, row, "Allowance Amount (₱)", allowanceAmountField);
+        row = addField(secondPanel, gbc, row, "Other Compensation Amount (₱)", otherCompAmountField);
 
         // Third Panel (Fingerprint Image)
         JLabel imageLabel = new JLabel();
@@ -207,6 +214,9 @@ public class RegisterEmployee extends JPanel {
                 BigDecimal sssPercentage = new BigDecimal(sssPercentageField.getText().trim());
                 BigDecimal efundAmount = new BigDecimal(efundAmountField.getText().trim());
                 BigDecimal otherDeductions = new BigDecimal(otherDeductionsField.getText().trim());
+                BigDecimal salaryAdjPercentage = new BigDecimal(salaryAdjPercentageField.getText().trim());
+                BigDecimal allowanceAmount = new BigDecimal(allowanceAmountField.getText().trim());
+                BigDecimal otherCompAmount = new BigDecimal(otherCompAmountField.getText().trim());
                 java.util.Date shiftStartUtilDate = (java.util.Date) shiftStartSpinner.getValue();
                 java.util.Date shiftEndUtilDate = (java.util.Date) shiftEndSpinner.getValue();
 
@@ -229,17 +239,16 @@ public class RegisterEmployee extends JPanel {
                 System.out.println("SSS Percentage: " + sssPercentage);
                 System.out.println("E-Fund Amount: " + efundAmount);
                 System.out.println("Other Deductions: " + otherDeductions);
+                System.out.println("Salary Adjustment Percentage: " + salaryAdjPercentage);
+                System.out.println("Allowance Amount: " + allowanceAmount);
+                System.out.println("Other Compensation Amount: " + otherCompAmount);
                 System.out.println("Shift Start: " + shiftStart);
                 System.out.println("Shift End: " + shiftEnd);
 
                 Employee emp = new Employee(firstName, lastName, middleName, department,
                         employmentStatus, rate, tin, philhealth, philhealthPercentage, pagibig, pagibigPercentage,
-                        sss, sssPercentage, efundAmount, otherDeductions, shiftStart, shiftEnd, enrolled);
-
-                Employees.loadEmployeeTabledata();
-                Attendance.loadEmployeeTabledata();
-
-                zkFinger.close();
+                        sss, sssPercentage, efundAmount, otherDeductions, salaryAdjPercentage, allowanceAmount,
+                        otherCompAmount, shiftStart, shiftEnd);
 
                 EmployeeRegistration.registerEmployee(emp);
 

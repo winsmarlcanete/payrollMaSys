@@ -73,12 +73,12 @@ public class E201File {
         List<Object[]> dataList = new ArrayList<>();
 
         String query = """
-        SELECT employee_id, last_name, first_name, middle_name,
-               department, employment_status, shift_start, shift_end,
-               pay_rate, tin_number, pagibig_number, pagibig_percentage,
-               sss_number, sss_percentage, philhealth_number, philhealth_percentage,
-               efund_amount, other_deductions
-        FROM employees""";
+    SELECT employee_id, last_name, first_name, middle_name,
+           department, employment_status, shift_start, shift_end,
+           pay_rate, tin_number, pagibig_number, pagibig_percentage,
+           sss_number, sss_percentage, philhealth_number, philhealth_percentage,
+           efund_amount, other_deductions, salary_adj_percentage, allowance_amount, other_comp_amount
+    FROM employees""";
 
         try (Connection conn = JDBC.getConnection();
              Statement stmt = conn.createStatement();
@@ -103,7 +103,10 @@ public class E201File {
                         rs.getString("philhealth_number"),
                         rs.getDouble("philhealth_percentage"),
                         rs.getDouble("efund_amount"),
-                        rs.getDouble("other_deductions")
+                        rs.getDouble("other_deductions"),
+                        rs.getDouble("salary_adj_percentage"),
+                        rs.getDouble("allowance_amount"),
+                        rs.getDouble("other_comp_amount")
                 };
 
                 dataList.add(row);
@@ -126,13 +129,14 @@ public class E201File {
                                           String department, String employmentStatus, Time shiftStart, Time shiftEnd,
                                           BigDecimal payRate, String tinNumber, String pagibigNumber, BigDecimal pagibigPercentage,
                                           String sssNumber, BigDecimal sssPercentage, String philhealthNumber, BigDecimal philhealthPercentage,
-                                          BigDecimal efundAmount, BigDecimal otherDeductions) {
+                                          BigDecimal efundAmount, BigDecimal otherDeductions, BigDecimal salaryAdjPercentage,
+                                          BigDecimal allowanceAmount, BigDecimal otherCompAmount) {
         String query = """
         UPDATE employees
         SET last_name = ?, first_name = ?, middle_name = ?, department = ?, employment_status = ?,
             shift_start = ?, shift_end = ?, pay_rate = ?, tin_number = ?, pagibig_number = ?, pagibig_percentage = ?,
             sss_number = ?, sss_percentage = ?, philhealth_number = ?, philhealth_percentage = ?, efund_amount = ?,
-            other_deductions = ?
+            other_deductions = ?, salary_adj_percentage = ?, allowance_amount = ?, other_comp_amount = ?
         WHERE employee_id = ?
     """;
 
@@ -156,7 +160,10 @@ public class E201File {
             pstmt.setBigDecimal(15, philhealthPercentage);
             pstmt.setBigDecimal(16, efundAmount);
             pstmt.setBigDecimal(17, otherDeductions);
-            pstmt.setInt(18, employeeId);
+            pstmt.setBigDecimal(18, salaryAdjPercentage);
+            pstmt.setBigDecimal(19, allowanceAmount);
+            pstmt.setBigDecimal(20, otherCompAmount);
+            pstmt.setInt(21, employeeId);
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
