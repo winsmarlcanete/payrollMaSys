@@ -421,6 +421,26 @@ public class PayrollScreen extends JPanel {
             }
         });
 
+        payrollPeriod.addActionListener(e -> {
+            String selectedPeriod = (String) payrollPeriod.getSelectedItem();
+            if (selectedPeriod != null && !selectedPeriod.isEmpty()) {
+                try {
+
+                    String[] dates = selectedPeriod.split(" - ");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+                    java.sql.Date startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+                    java.sql.Date endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
+
+                    // Call refreshPayrollData with the parsed dates
+                    refreshPayrollData(startDate, endDate);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
 // ✅ Override the renderer
         payrollPeriod.setRenderer(new ListCellRenderer<Object>() {
             private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();

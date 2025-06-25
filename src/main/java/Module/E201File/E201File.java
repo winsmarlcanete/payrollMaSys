@@ -1,4 +1,5 @@
 package Module.E201File;
+import Algorithms.QuicksortClass;
 import Config.JDBC;
 
 import java.math.BigDecimal;
@@ -72,43 +73,39 @@ public class E201File {
         List<Object[]> dataList = new ArrayList<>();
 
         String query = """
-    SELECT employee_id, last_name, first_name, middle_name,
-           department, employment_status, shift_start, shift_end,
-           pay_rate, tin_number, pagibig_number, pagibig_percentage,
-           sss_number, sss_percentage, philhealth_number, philhealth_percentage,
-           efund_amount, other_deductions
-    FROM employees""";
+        SELECT employee_id, last_name, first_name, middle_name,
+               department, employment_status, shift_start, shift_end,
+               pay_rate, tin_number, pagibig_number, pagibig_percentage,
+               sss_number, sss_percentage, philhealth_number, philhealth_percentage,
+               efund_amount, other_deductions
+        FROM employees""";
 
         try (Connection conn = JDBC.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                int id = rs.getInt("employee_id");
-                String lastName = rs.getString("last_name");
-                String firstName = rs.getString("first_name");
-                String middleName = rs.getString("middle_name");
-                String department = rs.getString("department");
-                String employmentStatus = rs.getString("employment_status");
-                Time shiftStart = rs.getTime("shift_start");
-                Time shiftEnd = rs.getTime("shift_end");
-                double payRate = rs.getDouble("pay_rate");
-                String tinNumber = rs.getString("tin_number");
-                String pagibigNumber = rs.getString("pagibig_number");
-                double pagibigPercentage = rs.getDouble("pagibig_percentage");
-                String sssNumber = rs.getString("sss_number");
-                double sssPercentage = rs.getDouble("sss_percentage");
-                String philhealthNumber = rs.getString("philhealth_number");
-                double philhealthPercentage = rs.getDouble("philhealth_percentage");
-                double efundAmount = rs.getDouble("efund_amount");
-                double otherDeductions = rs.getDouble("other_deductions");
-
                 Object[] row = {
-                        id, lastName, firstName, middleName, department, employmentStatus,
-                        shiftStart, shiftEnd, payRate, tinNumber, pagibigNumber, pagibigPercentage,
-                        sssNumber, sssPercentage, philhealthNumber, philhealthPercentage,
-                        efundAmount, otherDeductions
+                        rs.getInt("employee_id"),
+                        rs.getString("last_name"),
+                        rs.getString("first_name"),
+                        rs.getString("middle_name"),
+                        rs.getString("department"),
+                        rs.getString("employment_status"),
+                        rs.getTime("shift_start"),
+                        rs.getTime("shift_end"),
+                        rs.getDouble("pay_rate"),
+                        rs.getString("tin_number"),
+                        rs.getString("pagibig_number"),
+                        rs.getDouble("pagibig_percentage"),
+                        rs.getString("sss_number"),
+                        rs.getDouble("sss_percentage"),
+                        rs.getString("philhealth_number"),
+                        rs.getDouble("philhealth_percentage"),
+                        rs.getDouble("efund_amount"),
+                        rs.getDouble("other_deductions")
                 };
+
                 dataList.add(row);
             }
 
@@ -116,8 +113,14 @@ public class E201File {
             e.printStackTrace();
         }
 
-        return dataList.toArray(new Object[0][]);
+        Object[][] data = dataList.toArray(new Object[0][]);
+
+        // Sort by last name (column index 1)
+        QuicksortClass.quicksort(data, 0, data.length - 1, 1);
+
+        return data;
     }
+
 
     public static void updateEmployeeData(int employeeId, String lastName, String firstName, String middleName,
                                           String department, String employmentStatus, Time shiftStart, Time shiftEnd,
