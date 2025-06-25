@@ -35,15 +35,15 @@ import org.payroll.MainWindow;
 public class PayrollScreen extends JPanel {
     private JTextField searchField;
 
-    private DefaultTableModel frozenModel;
-    private DefaultTableModel scrollModel;
-    private JTable frozenTable;
-    private JTable scrollTable;
+    private DefaultTableModel frozenModel1;
+    private DefaultTableModel scrollModel1;
+    private JTable frozenTable1;
+    private JTable scrollTable1;
 
-    private Object[][] frozenData;
-    private Object[][] scrollData;
-    private String[] frozenColumns;
-    private String[] scrollColumns;
+    private Object[][] frozenData1;
+    private Object[][] scrollData1;
+    private String[] frozenColumns1;
+    private String[] scrollColumns1;
 
     public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate) {
         // Retrieve all payrolls using the retrieveAllPayrolls function
@@ -59,13 +59,13 @@ public class PayrollScreen extends JPanel {
             System.out.println(Arrays.toString(row));
         }
 
-        frozenModel.setDataVector(
+        frozenModel1.setDataVector(
                 Arrays.stream(tableData).map(row -> Arrays.copyOf(row, 2)).toArray(Object[][]::new),
                 new String[] {"Name", "Rate"}
         );
 
-        // Set the scrollModel with the remaining columns
-        scrollModel.setDataVector(
+        // Set the scrollModel1 with the remaining columns
+        scrollModel1.setDataVector(
                 Arrays.stream(tableData).map(row -> Arrays.copyOfRange(row, 2, row.length)).toArray(Object[][]::new),
                 new String[] {
                         "Rate Per Hour", "Days Present", "OT In Hours", "Night Differential In Hours",
@@ -79,10 +79,10 @@ public class PayrollScreen extends JPanel {
         );
 
         // Repaint and revalidate the tables to reflect the updated data
-        frozenTable.repaint();
-        frozenTable.revalidate();
-        scrollTable.repaint();
-        scrollTable.revalidate();
+        frozenTable1.repaint();
+        frozenTable1.revalidate();
+        scrollTable1.repaint();
+        scrollTable1.revalidate();
     }
     private Object[][] convertToTableData(List<PayrollClass> payrollList) {
         Object[][] data = new Object[payrollList.size()][26]; // Adjust size to match the number of columns
@@ -232,6 +232,7 @@ public class PayrollScreen extends JPanel {
         gbcCombo.gridx = 0;
         gbcCombo.gridy = 0;
         gbcCombo.anchor = GridBagConstraints.CENTER;
+
         JLabel sortLabel = new JLabel("Sort by Department: ");
         sortLabel.setFont(new Font("Arial", Font.BOLD, 16));
         sortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
@@ -568,87 +569,85 @@ public class PayrollScreen extends JPanel {
 
         }
 
-        frozenColumns = Arrays.copyOfRange(columnNames, 0, 1);
-        scrollColumns = Arrays.copyOfRange(columnNames, 1, columnNames.length);
+        frozenColumns1 = Arrays.copyOfRange(columnNames, 0, 1);
+        scrollColumns1 = Arrays.copyOfRange(columnNames, 1, columnNames.length);
 
-        frozenData = new Object[data.length][1];
-        scrollData = new Object[data.length][columnNames.length - 1];
+        frozenData1 = new Object[data.length][1];
+        scrollData1 = new Object[data.length][columnNames.length - 1];
         for (int i = 0; i < data.length; i++) {
-            frozenData[i][0] = data[i][0];
-//            frozenData[i][1] = data[i][1];
-            System.arraycopy(data[i], 1, scrollData[i], 0, columnNames.length - 1);
+            frozenData1[i][0] = data[i][0];
+//            frozenData1[i][1] = data[i][1];
+            System.arraycopy(data[i], 1, scrollData1[i], 0, columnNames.length - 1);
         }
 
-        frozenModel = new DefaultTableModel(frozenData, frozenColumns) {
+        frozenModel1 = new DefaultTableModel(frozenData1, frozenColumns1) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
-        scrollModel = new DefaultTableModel(scrollData, scrollColumns) {
+        scrollModel1 = new DefaultTableModel(scrollData1, scrollColumns1) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
 
 
-        frozenTable = new JTable(frozenModel);
-        TableStyler.styleTable(frozenTable);
-//        frozenTable.getTableHeader().setReorderingAllowed(false);
+        frozenTable1 = new JTable(frozenModel1);
+        TableStyler.styleTable(frozenTable1);
+//        frozenTable1.getTableHeader().setReorderingAllowed(false);
 
 
-        scrollTable = new JTable(scrollModel);
-        TableStyler.styleTable(scrollTable);
-        scrollTable.getTableHeader().setReorderingAllowed(false);
+        scrollTable1 = new JTable(scrollModel1);
+        TableStyler.styleTable(scrollTable1);
+        scrollTable1.getTableHeader().setReorderingAllowed(false);
 
-        scrollTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-
+        scrollTable1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         // Synchronize row selection
-        ListSelectionModel selectionModel = frozenTable.getSelectionModel();
-        scrollTable.setSelectionModel(selectionModel);
+        ListSelectionModel selectionModel = frozenTable1.getSelectionModel();
+        scrollTable1.setSelectionModel(selectionModel);
 
         // Highlight row on mouse hover (like Employees.java)
-        frozenTable.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        frozenTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
-                int row = frozenTable.rowAtPoint(e.getPoint());
+                int row = frozenTable1.rowAtPoint(e.getPoint());
                 if (row != -1) {
-                    frozenTable.setRowSelectionInterval(row, row);
+                    frozenTable1.setRowSelectionInterval(row, row);
                 } else {
-                    frozenTable.clearSelection();
+                    frozenTable1.clearSelection();
                 }
             }
         });
-        scrollTable.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        scrollTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
-                int row = scrollTable.rowAtPoint(e.getPoint());
+                int row = scrollTable1.rowAtPoint(e.getPoint());
                 if (row != -1) {
-                    scrollTable.setRowSelectionInterval(row, row);
+                    scrollTable1.setRowSelectionInterval(row, row);
                 } else {
-                    scrollTable.clearSelection();
+                    scrollTable1.clearSelection();
                 }
             }
         });
 
         // Set table header background to green and foreground to white
-        JTableHeader frozenHeader = frozenTable.getTableHeader();
-        JTableHeader scrollHeader = scrollTable.getTableHeader();
+        JTableHeader frozenHeader = frozenTable1.getTableHeader();
+        JTableHeader scrollHeader = scrollTable1.getTableHeader();
 
         // Scroll panes for both tables
-        JScrollPane frozenScroll = new JScrollPane(frozenTable);
-        frozenScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        frozenScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        frozenScroll.setPreferredSize(new Dimension(300, frozenTable.getPreferredSize().height));
-//        frozenScroll.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
-//        frozenScroll.setOpaque(false);
-        frozenScroll.setBorder(BorderFactory.createEmptyBorder(2, 2, 17, 0));
-        JScrollPane scrollScroll = new JScrollPane(scrollTable,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//        scrollScroll.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
-        scrollScroll.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
+        JScrollPane frozenScroll1 = new JScrollPane(frozenTable1);
+        frozenScroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        frozenScroll1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        frozenScroll1.setPreferredSize(new Dimension(300, frozenTable1.getPreferredSize().height));
+//        frozenScroll1.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
+//        frozenScroll1.setOpaque(false);
+        frozenScroll1.setBorder(BorderFactory.createEmptyBorder(2, 2, 17, 0));
 
+        JScrollPane scrollScroll1 = new JScrollPane(scrollTable1,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
+        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
 
         // Custom scrollbars
-        frozenScroll.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+        scrollScroll1.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
             @Override
             protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
             @Override
@@ -682,77 +681,43 @@ public class PayrollScreen extends JPanel {
                 g2.dispose();
             }
         });
-        scrollScroll.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
-            @Override
-            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
-            @Override
-            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setMinimumSize(new Dimension(0, 0));
-                button.setMaximumSize(new Dimension(0, 0));
-                button.setVisible(false);
-                return button;
-            }
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = new Color(34, 177, 76);
-                this.trackColor = new Color(220, 255, 220);
-            }
-            @Override
-            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(34, 177, 76));
-                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
-                g2.dispose();
-            }
-            @Override
-            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(new Color(220, 255, 220));
-                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
-                g2.dispose();
-            }
-        });
-        scrollScroll.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
-            @Override
-            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
-            @Override
-            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setMinimumSize(new Dimension(0, 0));
-                button.setMaximumSize(new Dimension(0, 0));
-                button.setVisible(false);
-                return button;
-            }
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = new Color(34, 177, 76);
-                this.trackColor = new Color(220, 255, 220);
-            }
-            @Override
-            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(34, 177, 76));
-                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
-                g2.dispose();
-            }
-            @Override
-            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(new Color(220, 255, 220));
-                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
-                g2.dispose();
-            }
-        });
+//        scrollScroll1.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
+//            @Override
+//            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+//            @Override
+//            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+//            private JButton createZeroButton() {
+//                JButton button = new JButton();
+//                button.setPreferredSize(new Dimension(0, 0));
+//                button.setMinimumSize(new Dimension(0, 0));
+//                button.setMaximumSize(new Dimension(0, 0));
+//                button.setVisible(false);
+//                return button;
+//            }
+//            @Override
+//            protected void configureScrollBarColors() {
+//                this.thumbColor = new Color(34, 177, 76);
+//                this.trackColor = new Color(220, 255, 220);
+//            }
+//            @Override
+//            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+//                Graphics2D g2 = (Graphics2D) g.create();
+//                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//                g2.setColor(new Color(34, 177, 76));
+//                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+//                g2.dispose();
+//            }
+//            @Override
+//            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+//                Graphics2D g2 = (Graphics2D) g.create();
+//                g2.setColor(new Color(220, 255, 220));
+//                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+//                g2.dispose();
+//            }
+//        });
 
         // Synchronize vertical scrolling
-        frozenScroll.getVerticalScrollBar().setModel(scrollScroll.getVerticalScrollBar().getModel());
+        frozenScroll1.getVerticalScrollBar().setModel(scrollScroll1.getVerticalScrollBar().getModel());
 
         String[] columns = {
                 "Frozen",
@@ -819,19 +784,19 @@ public class PayrollScreen extends JPanel {
         JScrollPane frozenScroll2 = new JScrollPane(frozenTable2);
         JScrollPane scrollScroll2 = new JScrollPane(scrollTable2);
 
-        scrollScroll2.getHorizontalScrollBar().setModel(scrollScroll.getHorizontalScrollBar().getModel());
+        scrollScroll2.getHorizontalScrollBar().setModel(scrollScroll1.getHorizontalScrollBar().getModel());
 
 //        scrollScroll2.getHorizontalScrollBar().addAdjustmentListener(e -> {
-//            scrollScroll.getHorizontalScrollBar().setValue(e.getValue());
+//            scrollScroll1.getHorizontalScrollBar().setValue(e.getValue());
 //        });
 
 //        AdjustmentListener syncScroll = e -> {
-//            scrollScroll2.getHorizontalScrollBar().setValue(scrollScroll.getHorizontalScrollBar().getValue());
-//            scrollScroll.getHorizontalScrollBar().setValue(scrollScroll2.getHorizontalScrollBar().getValue());
+//            scrollScroll2.getHorizontalScrollBar().setValue(scrollScroll1.getHorizontalScrollBar().getValue());
+//            scrollScroll1.getHorizontalScrollBar().setValue(scrollScroll2.getHorizontalScrollBar().getValue());
 //        };
 //
 //// Add listener to both scroll bars
-//        scrollScroll.getHorizontalScrollBar().addAdjustmentListener(syncScroll);
+//        scrollScroll1.getHorizontalScrollBar().addAdjustmentListener(syncScroll);
 //        scrollScroll2.getHorizontalScrollBar().addAdjustmentListener(syncScroll);
 
 
@@ -853,7 +818,7 @@ public class PayrollScreen extends JPanel {
 
         int rowHeight = frozenTable2.getRowHeight();
         int rowCount = frozenTable2.getRowCount();
-//        int headerHeight = frozenTable.getTableHeader().getPreferredSize().height;
+//        int headerHeight = frozenTable1.getTableHeader().getPreferredSize().height;
         int totalHeight = (rowHeight * rowCount);
 
         frozenScroll2.setPreferredSize(new Dimension(300, totalHeight));
@@ -872,8 +837,8 @@ public class PayrollScreen extends JPanel {
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
         tablePanel.setOpaque(false);
-        tablePanel.add(frozenScroll, BorderLayout.WEST);
-        tablePanel.add(scrollScroll, BorderLayout.CENTER);
+        tablePanel.add(frozenScroll1, BorderLayout.WEST);
+        tablePanel.add(scrollScroll1, BorderLayout.CENTER);
         tablePanel.add(panel, BorderLayout.SOUTH);
 
         // Place both headers in a panel
@@ -901,7 +866,7 @@ public class PayrollScreen extends JPanel {
         whitePanel.add(tablePanel);
 
         SwingUtilities.invokeLater(() -> {
-            matchColumnWidths(scrollTable, scrollTable2);
+            matchColumnWidths(scrollTable1, scrollTable2);
         });
 
         JLayeredPane layeredPane = new JLayeredPane();
@@ -1249,16 +1214,16 @@ public class PayrollScreen extends JPanel {
             };
 
             // Adjust frozen columns with fixed widths
-//            TableColumn frozenCol = frozenTable.getColumnModel().getColumn(0);
+//            TableColumn frozenCol = frozenTable1.getColumnModel().getColumn(0);
 //            frozenCol.setMinWidth(50);
 //            frozenCol.setMaxWidth(100);
 //            frozenCol.setPreferredWidth(80);
 
             // Adjust scrollable columns dynamically
-            int scrollCols = scrollTable.getColumnCount();
+            int scrollCols = scrollTable1.getColumnCount();
             for (int col = 0; col < scrollCols; col++) {
-                int naturalWidth = getPreferredWidth.apply(scrollTable, col);
-                scrollTable.getColumnModel().getColumn(col).setPreferredWidth(naturalWidth);
+                int naturalWidth = getPreferredWidth.apply(scrollTable1, col);
+                scrollTable1.getColumnModel().getColumn(col).setPreferredWidth(naturalWidth);
             }
         };
 
@@ -1293,8 +1258,8 @@ public class PayrollScreen extends JPanel {
             public void changedUpdate(javax.swing.event.DocumentEvent e) { filterTable(); }
             private void filterTable() {
                 String searchText = searchField.getText().toLowerCase();
-                frozenModel.setRowCount(0);
-                scrollModel.setRowCount(0);
+                frozenModel1.setRowCount(0);
+                scrollModel1.setRowCount(0);
                 for (Object[] row : data) {
                     boolean matchFound = false;
                     for (Object cell : row) {
@@ -1304,8 +1269,8 @@ public class PayrollScreen extends JPanel {
                         }
                     }
                     if (matchFound) {
-                        frozenModel.addRow(new Object[]{row[0], row[1]});
-                        scrollModel.addRow(Arrays.copyOfRange(row, 2, row.length));
+                        frozenModel1.addRow(new Object[]{row[0], row[1]});
+                        scrollModel1.addRow(Arrays.copyOfRange(row, 2, row.length));
                     }
                 }
                 adjustColumnWidths.run();
@@ -1338,7 +1303,7 @@ public class PayrollScreen extends JPanel {
 
         // Ensure both tables have the same number of columns for the scrollable part
         if (sourceColumnModel.getColumnCount() != targetColumnModel.getColumnCount()) {
-            System.err.println("Warning: Number of columns in scrollTable and scrollTable2 do not match. Cannot synchronize widths.");
+            System.err.println("Warning: Number of columns in scrollTable1 and scrollTable2 do not match. Cannot synchronize widths.");
             return;
         }
 
@@ -1357,18 +1322,18 @@ public class PayrollScreen extends JPanel {
     }
 
     public DefaultTableModel getFrozenModel() {
-        return frozenModel;
+        return frozenModel1;
     }
 
     public DefaultTableModel getScrollModel() {
-        return scrollModel;
+        return scrollModel1;
     }
 
     public JTable getFrozenTable() {
-        return frozenTable;
+        return frozenTable1;
     }
 
     public JTable getScrollTable() {
-        return scrollTable;
+        return scrollTable1;
     }
 }
