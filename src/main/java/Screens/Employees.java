@@ -240,7 +240,7 @@ public class Employees extends JPanel {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);;
         TableStyler.styleTable(table);
         JScrollPane tableScrollPane = new JScrollPane(table);
 
