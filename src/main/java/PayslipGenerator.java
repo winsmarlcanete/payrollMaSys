@@ -11,100 +11,133 @@ public class PayslipGenerator {
             document.open();
 
             // Title
-            Font bold = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font bold = new Font(Font.HELVETICA, 10, Font.BOLD);
             Font normal = new Font(Font.HELVETICA, 10, Font.NORMAL);
 
-            // Main table
-            PdfPTable mainTable = new PdfPTable(5);
-            mainTable.setWidthPercentage(100);
-            mainTable.setWidths(new float[]{2, 2, 3, 2, 2});
+            // Header Table
+            PdfPTable header = new PdfPTable(3);
+            header.setWidthPercentage(100);
 
-            // First row: Department, Pay Period, Pay Date, Tax Status
-            mainTable.addCell(createCell("Department:\nSales", bold, 1));
-            mainTable.addCell(createCell("Status:\nRegular", bold, 1));
-            mainTable.addCell(createCell("Pay Period:\nOctober 21 - November 5, 2024", bold, 1));
-            mainTable.addCell(createCell("Pay Date:\n10-Nov-24", bold, 1));
-            mainTable.addCell(createCell("Tax Status:\nME2", bold, 1));
+            // Column 1, Row 1
+            header.addCell(new PdfPCell(new Phrase("Department: Sales")));
 
-            // Second row: Employee info
-            PdfPCell empInfoCell = new PdfPCell(new Phrase("Employee Name:\n", bold));
-            empInfoCell.setColspan(1);
-            mainTable.addCell(empInfoCell);
+            // Column 2, Row 1 (merged downwards)
+            PdfPCell col2Cell = new PdfPCell(new Phrase("Pay Period:\nOctober 21 - November 5, 2024"));
+            col2Cell.setRowspan(2);
+            header.addCell(col2Cell);
 
-            mainTable.addCell(createCell("Emp. ID:\n", bold, 1));
-            mainTable.addCell(createCell("Rate:\n", bold, 1));
-            mainTable.addCell(createCell("TIN:\n", bold, 1));
-            mainTable.addCell(createCell("Phil.Health No. / SSS No.:\n233-658-708", bold, 1));
+            // Column 3, Row 1
+            header.addCell(new PdfPCell(new Phrase("Pay Date: Nov 10, 2024")));
 
-            document.add(mainTable);
+            // Column 1, Row 2
+            header.addCell(new PdfPCell(new Phrase("Status: Regular")));
 
-            document.add(Chunk.NEWLINE);
+            // Column 3, Row 2
+            header.addCell(new PdfPCell(new Phrase("Tax Status: ME2")));
 
-            // Salary breakdown table
-            PdfPTable salTable = new PdfPTable(4);
-            salTable.setWidthPercentage(100);
-            salTable.setWidths(new float[]{2, 1, 2, 1});
+            // Top Table
+            PdfPTable topTable = new PdfPTable(8);
+            topTable.setWidthPercentage(100);
+            topTable.setWidths(new float[]{2, 1, 1, 2, 2, 2, 2, 2});
 
-            salTable.addCell(createCell("Days Worked:", normal, 1));
-            salTable.addCell(createCell("13.0000", normal, 1));
-            salTable.addCell(createCell("SSS Deduct:", normal, 1));
-            salTable.addCell(createCell("832.50", normal, 1));
+            topTable.addCell(createCell("Employee Name:\nSupan, Marc Laurence", normal, 1));
+            topTable.addCell(createCell("Emp. ID:\n123", normal, 1));
+            topTable.addCell(createCell("Rate:\nP 123", normal, 1));
+            topTable.addCell(createCell("TIN:\n123-123-123-13", normal, 1));
+            topTable.addCell(createCell("Phil. Health No.:\n233-658-708", normal, 1));
+            topTable.addCell(createCell("SSS No.:\n123-456-789", normal, 1));
+            topTable.addCell(createCell("Pag-ibig No.:\n123-456-789", normal, 1));
+            topTable.addCell(createCell("", normal, 1));
 
-            salTable.addCell(createCell("Late Amount:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("P.Health Deduct:", normal, 1));
-            salTable.addCell(createCell("273.83", normal, 1));
+            // Center Table
+            PdfPTable centerTable = new PdfPTable(8);
+            centerTable.setWidthPercentage(100);
+            centerTable.setWidths(new float[]{2, 1, 1, 2, 2, 2, 2, 2});
 
-            salTable.addCell(createCell("Basic Pay:", normal, 1));
-            salTable.addCell(createCell("8,789.69", normal, 1));
-            salTable.addCell(createCell("Pag-ibig Deduct:", normal, 1));
-            salTable.addCell(createCell("100.00", normal, 1));
+            // Row 1
+            centerTable.addCell(createCell("Days Worked:", bold, 1));
+            centerTable.addCell(createCell("13.0000", normal, 1));
+            centerTable.addCell(createCell("8,789", normal, 1));
+            centerTable.addCell(createCell("SSS Deduct.:", bold, 1));
+            centerTable.addCell(createCell("832.50", normal, 1));
+            centerTable.addCell(createCell("Salary Adj.:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            salTable.addCell(createCell("ND Amount:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("Efund Deduct:", normal, 1));
-            salTable.addCell(createCell("300.00", normal, 1));
+            // Column 8
+            PdfPCell col8Cell = new PdfPCell(new Phrase("\n\n\n\n_____________\n\nReceived By:"));
+            col8Cell.setRowspan(7);
+            centerTable.addCell(col8Cell);
 
-            salTable.addCell(createCell("Sun/Sp Hol.:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("Other Deduct:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
+            // Row 2
+            centerTable.addCell(createCell("Late Amount:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("P.Health Deduct.:", bold, 1));
+            centerTable.addCell(createCell("273.83", normal, 1));
+            centerTable.addCell(createCell("Allowance Adj.:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            salTable.addCell(createCell("Leg. Holiday:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("Salary Adj:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
+            // Row 3
+            centerTable.addCell(createCell("Basic Pay:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("8,789.69", normal, 1));
+            centerTable.addCell(createCell("Pag-Ibig Deduct.:", bold, 1));
+            centerTable.addCell(createCell("100.00", normal, 1));
+            centerTable.addCell(createCell("Other Comp.:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            salTable.addCell(createCell("OT Amount:", normal, 1));
-            salTable.addCell(createCell("118.02", normal, 1));
-            salTable.addCell(createCell("Allowance Adj:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
+            // Row 4
+            centerTable.addCell(createCell("ND Amount:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("EFund Deduct.:", bold, 1));
+            centerTable.addCell(createCell("300.00", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
-            salTable.addCell(createCell("Other Comp:", normal, 1));
-            salTable.addCell(createCell("", normal, 1));
+            // Row 5
+            centerTable.addCell(createCell("Sun/Sp Hol.:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("Other Deduct.:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            document.add(salTable);
+            // Row 6
+            centerTable.addCell(createCell("Leg. Holiday:", bold, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            document.add(Chunk.NEWLINE);
+            // Row 7
+            centerTable.addCell(createCell("OT Amount:", bold, 1));
+            centerTable.addCell(createCell("118.02", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
+            centerTable.addCell(createCell("", normal, 1));
 
-            // Totals
-            PdfPTable totals = new PdfPTable(4);
-            totals.setWidthPercentage(100);
-            totals.setWidths(new float[]{2, 1, 2, 1});
+            PdfPTable bottomTable = new PdfPTable(8);
+            bottomTable.setWidthPercentage(100);
+            bottomTable.setWidths(new float[]{2, 1, 1, 2, 2, 2, 2, 2});
+            bottomTable.addCell(createCell("GROSS INCOME:", bold, 1));
+            bottomTable.addCell(createCell("", normal, 1));
+            bottomTable.addCell(createCell("8,789.69", normal, 1));
+            bottomTable.addCell(createCell("TOTAL DEDUCTION:", bold, 1));
+            bottomTable.addCell(createCell("1,506.33", normal, 1));
+            bottomTable.addCell(createCell("TOTAL COMPENSATION:", bold, 1));
+            bottomTable.addCell(createCell("0", normal, 1));
+            bottomTable.addCell(createCell("7,401.36", bold, 1));
 
-            totals.addCell(createCell("GROSS INCOME:", bold, 1));
-            totals.addCell(createCell("8,907.71", bold, 1));
-            totals.addCell(createCell("TOTAL DEDUCT:", bold, 1));
-            totals.addCell(createCell("1506.33", bold, 1));
-
-            totals.addCell(createCell("TOTAL COMP:", bold, 1));
-            totals.addCell(createCell("0", bold, 1));
-            totals.addCell(createCell("", bold, 1));
-            totals.addCell(createCell("7,401.38", bold, 1));
-
-            document.add(totals);
+            document.add(header);
+            document.add(topTable);
+            document.add(centerTable);
+            document.add(bottomTable);
 
             document.close();
             System.out.println("Payslip generated: payslip.pdf");

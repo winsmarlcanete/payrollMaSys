@@ -1,17 +1,20 @@
 package Screens;
 
+import Components.BlackRoundedComboBox;
 import Components.RoundedComboBox;
 import Components.TableStyler;
 import javafx.scene.shape.Box;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.regex.Pattern;
 
 public class LeaveReport extends JPanel {
     private JTable rightTable;
@@ -168,6 +171,9 @@ public class LeaveReport extends JPanel {
         leftTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
         leftTableScrollPane.add(leftTable.getTableHeader());
 
+        leftTableScrollPane.setPreferredSize(new Dimension(0, 0)); // Let layout manager decide size
+        rightTableScrollPane.setPreferredSize(new Dimension(0, 0));
+
         JPanel rightTablePanel = new JPanel(new BorderLayout());
         rightTablePanel.add(rightTableScrollPane, BorderLayout.CENTER);
 
@@ -240,13 +246,114 @@ public class LeaveReport extends JPanel {
             }
         });
 
+//        JPanel tablePanel = new JPanel();
+//        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.X_AXIS));
+//        tablePanel.add(leftTablePanel);
+//        tablePanel.add(rightTablePanel);
+
+
         JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.X_AXIS));
+        tablePanel.setLayout(new GridLayout(1, 2)); // Change to GridLayout for equal sizing
         tablePanel.add(leftTablePanel);
         tablePanel.add(rightTablePanel);
 
-//        setOpaque(false);
+        // Dropdown
+        BlackRoundedComboBox<String> year = new BlackRoundedComboBox<>(new String[] {
+                "2023", "2024", "2025"
+        }) {
+            @Override
+            protected void paintBorder(Graphics g) {
+                // Do nothing: no border for this instance
+            }
+        };
+        year.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                year.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                year.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        year.setPreferredSize(new Dimension(100, 36));
+        year.setFocusable(false);
+        year.setMaximumRowCount(12);
+        year.setFont(new Font("Arial", Font.BOLD, 16));
+        DefaultListCellRenderer renderer = (DefaultListCellRenderer) year.getRenderer();
+        renderer.setFont(new Font("Arial", Font.BOLD, 16));
+        ((JLabel)year.getRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
+
+        // Custom renderer for hover effect in dropdown list
+        year.setRenderer(new DefaultListCellRenderer() {
+            private int hoveredIndex = -1;
+            {
+                // Add mouse motion listener to popup list for hover effect
+                year.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+                        JList<?> list = getPopupList();
+                        if (list != null) {
+                            list.addMouseMotionListener(new MouseMotionAdapter() {
+                                @Override
+                                public void mouseMoved(MouseEvent e) {
+                                    hoveredIndex = list.locationToIndex(e.getPoint());
+                                    list.repaint();
+                                }
+                            });
+                            list.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mouseExited(MouseEvent e) {
+                                    hoveredIndex = -1;
+                                    list.repaint();
+                                }
+                            });
+                        }
+                    }
+                    @Override public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {}
+                    @Override public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {}
+                    private JList<?> getPopupList() {
+                        ComboPopup popup = (ComboPopup) year.getUI().getAccessibleChild(year, 0);
+                        return popup != null ? popup.getList() : null;
+                    }
+                });
+            }
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (index >= 0 && index == hoveredIndex && !isSelected) {
+                    c.setBackground(new Color(230, 255, 230)); // light greenish
+                }
+                return c;
+            }
+        });
+
+        // Use GridBagLayout for vertical centering
+        JPanel comboPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcCombo = new GridBagConstraints();
+        gbcCombo.gridx = 0;
+        gbcCombo.gridy = 0;
+        gbcCombo.anchor = GridBagConstraints.CENTER;
+        JLabel yearLabel = new JLabel("Year: ");
+        yearLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        yearLabel.setForeground(Color.WHITE);
+        yearLabel.setOpaque(false);
+        yearLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // Add left padding
+        comboPanel.add(yearLabel, gbcCombo);
+
+        gbcCombo.gridx = 1;
+        comboPanel.add(year, gbcCombo);
+        comboPanel.setOpaque(true);
+        comboPanel.setBackground(Color.BLACK);
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(comboPanel, BorderLayout.EAST);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 16));
+
+        setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10));
+        add(topPanel, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
     }
 }
