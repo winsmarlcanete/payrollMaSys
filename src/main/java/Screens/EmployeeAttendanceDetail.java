@@ -3,12 +3,14 @@ package Screens;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.SpinnerDateModel;
 import javax.swing.table.TableColumn;
 
 // JCalendar Imports:
+import Config.JDBC;
 import Module.Payroll.Payroll;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
@@ -21,6 +23,8 @@ public class EmployeeAttendanceDetail extends JPanel {
     private JDateChooser toDateChooser;
     private Object[][] data;
     private JTable table; // Declare table as a class-level variable
+    private Time shiftStart;
+    private Time shiftEnd;
 
     public EmployeeAttendanceDetail(CardLayout cardLayout, JPanel mainContainer, Object[] employeeInfo) {
         setLayout(new BorderLayout());
@@ -54,8 +58,29 @@ public class EmployeeAttendanceDetail extends JPanel {
         infoPanel.add(createInfoField("ID", employeeInfo[1].toString()));
         infoPanel.add(createInfoField("Department", employeeInfo[2].toString()));
         infoPanel.add(createInfoField("Employment", employeeInfo[3].toString()));
-        infoPanel.add(createInfoField("Shift start", "9:00"));
-        infoPanel.add(createInfoField("Shift end", "17:00"));
+        try {
+            int employeeId = Integer.parseInt(employeeInfo[1].toString());
+            Connection conn = JDBC.getConnection();
+            String sql = "SELECT shift_start, shift_end FROM payrollmsdb.employees WHERE employee_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, employeeId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                shiftStart = rs.getTime("shift_start");
+                shiftEnd = rs.getTime("shift_end");
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+
+            infoPanel.add(createInfoField("Shift start", shiftStart != null ? shiftStart.toString() : "N/A"));
+            infoPanel.add(createInfoField("Shift end", shiftEnd != null ? shiftEnd.toString() : "N/A"));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving shift times for employee ID: " + employeeInfo[1], e);
+        }
         infoPanel.add(new JPanel() {{ setOpaque(false); }});
         infoPanel.add(new JPanel() {{ setOpaque(false); }});
         infoPanel.add(new JPanel() {{ setOpaque(false); }});
@@ -102,12 +127,11 @@ public class EmployeeAttendanceDetail extends JPanel {
                         java.sql.Date sqlFromDate = new java.sql.Date(fromDate.getTime());
                         java.sql.Date sqlToDate = new java.sql.Date(toDate.getTime());
 
-                        // Extract employeeId from employeeInfo array
+                        // Extract employeeId, shiftStart, and shiftEnd from employeeInfo array
                         int employeeId = Integer.parseInt(employeeInfo[1].toString());
-                        System.out.println("ETO EMPLOYEE TOL" + employeeId);
 
                         // Retrieve updated data for the specific employee
-                        Object[][] updatedData = Payroll.retrieveTimecards(employeeId, sqlFromDate, sqlToDate);
+                        Object[][] updatedData = Payroll.retrieveTimecards(employeeId, sqlFromDate, sqlToDate, shiftStart, shiftEnd);
 
                         // Update the table model
                         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();

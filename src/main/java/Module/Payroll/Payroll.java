@@ -406,12 +406,12 @@ public class Payroll {
 
     }
 
-    public static Object[][] retrieveTimecards(int employeeId, Date periodStart, Date periodEnd) {
+    public static Object[][] retrieveTimecards(int employeeId, Date periodStart, Date periodEnd, Time shiftStart, Time shiftEnd) {
         List<Object[]> timecards = new ArrayList<>();
         Connection conn;
 
         try {
-            String sql = "SELECT employee_id, date, hours_clocked FROM payrollmsdb.timecards WHERE employee_id = ? AND date BETWEEN ? AND ?";
+            String sql = "SELECT date, time_in, time_out FROM payrollmsdb.timecards WHERE employee_id = ? AND date BETWEEN ? AND ?";
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, employeeId);
@@ -422,10 +422,33 @@ public class Payroll {
 
             while (rs.next()) {
                 Date date = rs.getDate("date");
-                double hoursClocked = rs.getDouble("hours_clocked");
+                Time timeIn = rs.getTime("time_in");
+                Time timeOut = rs.getTime("time_out");
+
+                int lateMinutes = 0;
+                double overtimeHours = 0.0;
+                double undertimeHours = 0.0;
+                int absent = 0;
+
+                if (timeIn == null && timeOut == null) {
+                    absent = 1; // Mark as absent
+                } else {
+                    if (timeIn != null && timeIn.after(shiftStart)) {
+                        lateMinutes = (int) ((timeIn.getTime() - shiftStart.getTime()) / (60 * 1000)); // Compute late in minutes
+                    }
+                    if (timeOut != null) {
+                        if (timeOut.after(shiftEnd)) {
+                            overtimeHours = (timeOut.getTime() - shiftEnd.getTime()) / (60.0 * 60 * 1000); // Compute overtime in hours
+                        } else if (timeOut.before(shiftEnd)) {
+                            undertimeHours = (shiftEnd.getTime() - timeOut.getTime()) / (60.0 * 60 * 1000); // Compute undertime in hours
+                        }
+                    }
+                }
 
                 // Add each record as an Object[] to the list
-                timecards.add(new Object[]{employeeId, date, hoursClocked});
+                timecards.add(new Object[]{
+                        date, timeIn, timeOut, lateMinutes, overtimeHours, undertimeHours, absent
+                });
             }
 
             rs.close();
