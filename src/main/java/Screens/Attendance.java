@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
@@ -35,6 +37,8 @@ public class Attendance extends JPanel {
     private JTextField searchField;
     // Store original raw data for filtering (as in PayrollScreen's approach)
     private Object[][] rawEmployeeData;
+
+    private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
 
 
     /**
@@ -299,15 +303,35 @@ public class Attendance extends JPanel {
 
         // Listener for the search field to filter table rows
         searchField.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { filterTable(); }
-            public void removeUpdate(DocumentEvent e) { filterTable(); }
-            public void changedUpdate(DocumentEvent e) { filterTable(); }
+            public void insertUpdate(DocumentEvent e) { searchUsingBinarySearch(); }
+            public void removeUpdate(DocumentEvent e) { searchUsingBinarySearch(); }
+            public void changedUpdate(DocumentEvent e) { searchUsingBinarySearch();}
 
-            private void filterTable() {
-                String text = searchField.getText().trim();
-                // Apply a regex filter (case-insensitive) to the "Name" column (index 0)
-                // Use Pattern.quote to handle special characters in the search text
-                rowSorter.setRowFilter(text.isEmpty() ? null : RowFilter.regexFilter("(?i)" + Pattern.quote(text), 0));
+            private void searchUsingBinarySearch() {
+                String searchText = searchField.getText().toLowerCase();
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
+                model.setRowCount(0);
+                filteredToOriginalIndex.clear();
+
+                if (searchText.isEmpty()) {
+                    // Display all rows if search field is empty
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        model.addRow(tableViewData[i]);
+                        filteredToOriginalIndex.put(i, i);
+                    }
+                } else {
+                    // Linear search for all matching entries
+                    int filteredIndex = 0;
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        Object[] row = tableViewData[i];
+                        String name = row[0].toString().toLowerCase();
+                        if (name.contains(searchText)) {
+                            model.addRow(row);
+                            filteredToOriginalIndex.put(filteredIndex, i);
+                            filteredIndex++;
+                        }
+                    }
+                }
             }
         });
 
@@ -340,14 +364,18 @@ public class Attendance extends JPanel {
         // Mouse listener for row clicks (to view employee details)
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                int row = table.getSelectedRow();
-                if (row != -1) {
-                    searchField.setText(""); // Clear search field
-                    int modelRow = table.convertRowIndexToModel(row);
+                int viewRow = table.getSelectedRow();
+                if (viewRow != -1) {
+                    // Get the original index from our mapping
+                    int modelRow = filteredToOriginalIndex.get(viewRow);
+
+                    // Get the row data using the original index
                     Object[] rowData = new Object[employeeTableModel.getColumnCount()];
                     for (int i = 0; i < employeeTableModel.getColumnCount(); i++) {
-                        rowData[i] = employeeTableModel.getValueAt(modelRow, i);
+                        rowData[i] = tableViewData[modelRow][i];
                     }
+
+                    searchField.setText(""); // Clear search field
                     EmployeeAttendanceDetail detailPanel = new EmployeeAttendanceDetail(cardLayout, mainContainer, rowData);
                     mainContainer.add(detailPanel, "detail");
                     cardLayout.show(mainContainer, "detail");

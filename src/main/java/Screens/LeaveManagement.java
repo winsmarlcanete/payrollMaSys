@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,8 @@ public class LeaveManagement extends JPanel {
     private JTable table;
     private static Object[][] tableViewData;
     private static Object[][] detailsViewData;
+    private TableRowSorter<DefaultTableModel> rowSorter;
+    private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
     public static void loadEmployeeTabledata() {
         Object[][] rawData = E201File.getEmployeeTableData(); // Query your source
 
@@ -777,14 +781,15 @@ public class LeaveManagement extends JPanel {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                int row = table.getSelectedRow();
-                if (row != -1) {
-                    searchField.setText("");
+                int viewRow = table.getSelectedRow();
+                if (viewRow != -1) {
+                    // Get the original index from our mapping
+                    int modelRow = filteredToOriginalIndex.get(viewRow);
 
-                    nameField.setText(table.getValueAt(row, 0).toString());
-                    idField.setText(table.getValueAt(row, 1).toString());
-                    departmentField.setText(table.getValueAt(row, 2).toString());
-                    employmentStatusField.setText(table.getValueAt(row, 3).toString());
+                    nameField.setText(tableViewData[modelRow][0].toString());
+                    idField.setText(tableViewData[modelRow][1].toString());
+                    departmentField.setText(tableViewData[modelRow][2].toString());
+                    employmentStatusField.setText(tableViewData[modelRow][3].toString());
                     // Set default values when opening details
                     leavesUsedField.setText("0");
                     remainingSILField.setText("5 / 5");
@@ -793,6 +798,8 @@ public class LeaveManagement extends JPanel {
                     typeOfLeave3.setSelectedIndex(0);
                     typeOfLeave4.setSelectedIndex(0);
                     typeOfLeave5.setSelectedIndex(0);
+
+                    searchField.setText(""); // Clear search field
                     cardLayout.show(contentPanel, "DetailsView");
                     nameField.setFocusable(false);
                     idField.setFocusable(false);
@@ -838,27 +845,39 @@ public class LeaveManagement extends JPanel {
         backButton.addActionListener(e -> cardLayout.show(contentPanel, "TableView"));
 
         // --- Search filter logic ---
+
+        rowSorter = new TableRowSorter<>(employeeTableModel);
+        table.setRowSorter(rowSorter);
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { filterTable(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
             @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { filterTable(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
             @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { filterTable(); }
-            private void filterTable() {
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {searchUsingBinarySearch(); }
+            private void searchUsingBinarySearch() {
                 String searchText = searchField.getText().toLowerCase();
-                employeeTableModel.setRowCount(0);
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
+                model.setRowCount(0);
+                filteredToOriginalIndex.clear();
+
                 if (searchText.isEmpty()) {
-                    for (Object[] row : data) employeeTableModel.addRow(row);
+                    // Display all rows if search field is empty
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        model.addRow(tableViewData[i]);
+                        filteredToOriginalIndex.put(i, i);
+                    }
                 } else {
-                    for (Object[] row : data) {
-                        boolean matchFound = false;
-                        for (Object cell : row) {
-                            if (cell != null && cell.toString().toLowerCase().contains(searchText)) {
-                                matchFound = true; break;
-                            }
+                    // Linear search for all matching entries
+                    int filteredIndex = 0;
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        Object[] row = tableViewData[i];
+                        String name = row[0].toString().toLowerCase();
+                        if (name.contains(searchText)) {
+                            model.addRow(row);
+                            filteredToOriginalIndex.put(filteredIndex, i);
+                            filteredIndex++;
                         }
-                        if (matchFound) employeeTableModel.addRow(row);
                     }
                 }
             }

@@ -9,9 +9,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.sql.Time;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import Algorithms.BinarySearch;
 import Components.RoundedComboBox;
 import Components.TableStyler;
 import Module.E201File.E201File;
@@ -21,6 +23,7 @@ import org.payroll.MainWindow;
 public class Employees extends JPanel {
 
     private static DefaultTableModel employeeTableModel;
+    private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
 
 
     private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
@@ -650,29 +653,33 @@ public class Employees extends JPanel {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                int row = table.getSelectedRow();
-                if (row != -1) {
-                    idField.setText(detailsViewData[row][0].toString());
-                    lastNameField.setText(detailsViewData[row][1].toString());
-                    firstNameField.setText(detailsViewData[row][2].toString());
-                    middleNameField.setText(detailsViewData[row][3].toString());
-                    departmentField.setText(detailsViewData[row][4].toString());
-                    employmentStatusField.setText(detailsViewData[row][5].toString());
-                    shiftStartField.setText(detailsViewData[row][6].toString());
-                    shiftEndField.setText(detailsViewData[row][7].toString());
-                    payRateField.setText("₱ " + detailsViewData[row][8].toString());
-                    tinNumberField.setText(detailsViewData[row][9].toString());
-                    pagibigNumberField.setText(detailsViewData[row][10].toString());
-                    pagibigPercentageField.setText(detailsViewData[row][11].toString());
-                    sssNumberField.setText(detailsViewData[row][12].toString());
-                    sssPercentageField.setText(detailsViewData[row][13].toString());
-                    philhealthNumberField.setText(detailsViewData[row][14].toString());
-                    philhealthPercentageField.setText(detailsViewData[row][15].toString());
-                    efundAmountField.setText(detailsViewData[row][16].toString());
-                    otherDeductionsField.setText(detailsViewData[row][17].toString());
-                    salaryAdjPercentageField.setText(detailsViewData[row][18].toString());
-                    allowanceAmountField.setText(detailsViewData[row][19].toString());
-                    otherCompAmountField.setText(detailsViewData[row][20].toString());
+                int viewRow = table.getSelectedRow();
+                if (viewRow != -1) {
+                    // Get the original index from our mapping
+                    int modelRow = filteredToOriginalIndex.get(viewRow);
+
+                    // Use the correct index to populate fields
+                    idField.setText(detailsViewData[modelRow][0].toString());
+                    lastNameField.setText(detailsViewData[modelRow][1].toString());
+                    firstNameField.setText(detailsViewData[modelRow][2].toString());
+                    middleNameField.setText(detailsViewData[modelRow][3].toString());
+                    departmentField.setText(detailsViewData[modelRow][4].toString());
+                    employmentStatusField.setText(detailsViewData[modelRow][5].toString());
+                    shiftStartField.setText(detailsViewData[modelRow][6].toString());
+                    shiftEndField.setText(detailsViewData[modelRow][7].toString());
+                    payRateField.setText("₱ " + detailsViewData[modelRow][8].toString());
+                    tinNumberField.setText(detailsViewData[modelRow][9].toString());
+                    pagibigNumberField.setText(detailsViewData[modelRow][10].toString());
+                    pagibigPercentageField.setText(detailsViewData[modelRow][11].toString());
+                    sssNumberField.setText(detailsViewData[modelRow][12].toString());
+                    sssPercentageField.setText(detailsViewData[modelRow][13].toString());
+                    philhealthNumberField.setText(detailsViewData[modelRow][14].toString());
+                    philhealthPercentageField.setText(detailsViewData[modelRow][15].toString());
+                    efundAmountField.setText(detailsViewData[modelRow][16].toString());
+                    otherDeductionsField.setText(detailsViewData[modelRow][17].toString());
+                    salaryAdjPercentageField.setText(detailsViewData[modelRow][18].toString());
+                    allowanceAmountField.setText(detailsViewData[modelRow][19].toString());
+                    otherCompAmountField.setText(detailsViewData[modelRow][20].toString());
 
                     setPlainTextLook.run();
 
@@ -688,6 +695,7 @@ public class Employees extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // Reload employee table data
                 loadEmployeeTabledata();
+                searchField.setText("");
 
                 // Switch back to the table view
                 CardLayout cl = (CardLayout) (contentPanel.getLayout());
@@ -817,39 +825,34 @@ public class Employees extends JPanel {
 
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-                filterTable();
-            }
-
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
             @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                filterTable();
-            }
-
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
             @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                filterTable();
-            }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
 
-            private void filterTable() {
+            private void searchUsingBinarySearch() {
                 String searchText = searchField.getText().toLowerCase();
                 DefaultTableModel model = (DefaultTableModel) table.getModel();
                 model.setRowCount(0);
+                filteredToOriginalIndex.clear();
+
                 if (searchText.isEmpty()) {
-                    for (Object[] row : data) {
-                        model.addRow(row);
+                    // Display all rows if search field is empty
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        model.addRow(tableViewData[i]);
+                        filteredToOriginalIndex.put(i, i);
                     }
                 } else {
-                    for (Object[] row : data) {
-                        boolean matchFound = false;
-                        for (Object cell : row) {
-                            if (cell != null && cell.toString().toLowerCase().contains(searchText)) {
-                                matchFound = true;
-                                break;
-                            }
-                        }
-                        if (matchFound) {
+                    // Linear search for all matching entries
+                    int filteredIndex = 0;
+                    for (int i = 0; i < tableViewData.length; i++) {
+                        Object[] row = tableViewData[i];
+                        String name = row[0].toString().toLowerCase();
+                        if (name.contains(searchText)) {
                             model.addRow(row);
+                            filteredToOriginalIndex.put(filteredIndex, i);
+                            filteredIndex++;
                         }
                     }
                 }
