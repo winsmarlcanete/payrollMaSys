@@ -716,9 +716,11 @@ public class Payroll {
 
             // Step 1: Retrieve all employees
             List<Employee> employees = retrieveAllEmployee();
+            System.out.println("Retrieved " + employees.size() + " employees.");
 
             for (Employee employee : employees) {
                 int employeeId = employee.getEmployee_id();
+                System.out.println("Processing payroll for Employee ID: " + employeeId);
 
                 // Step 2: Retrieve payroll data for the employee
                 String sql = """
@@ -735,6 +737,8 @@ public class Payroll {
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
+                    System.out.println("Payroll data found for Employee ID: " + employeeId);
+
                     BigDecimal payRate = rs.getBigDecimal("pay_rate");
                     double daysPresent = rs.getDouble("days_present");
                     double overtimeHours = rs.getDouble("overtime_hours");
@@ -752,6 +756,15 @@ public class Payroll {
                     BigDecimal allowanceAmount = rs.getBigDecimal("allowance_amount");
                     BigDecimal otherCompAmount = rs.getBigDecimal("other_comp_amount");
 
+                    // Log retrieved values
+                    System.out.println("Pay Rate: " + payRate);
+                    System.out.println("Days Present: " + daysPresent);
+                    System.out.println("Overtime Hours: " + overtimeHours);
+                    System.out.println("Night Differential Hours: " + ndHours);
+                    System.out.println("Special Holiday Hours: " + sholidayHours);
+                    System.out.println("Legal Holiday Hours: " + lholidayHours);
+                    System.out.println("Late Minutes: " + lateMinutes);
+
                     // Step 3: Calculate payroll details using formulas
                     BigDecimal overtimeAmount = Formula.computeOvertimeAmount(payRate, overtimeHours);
                     BigDecimal ndAmount = Formula.computeNightDifferentialAmount(payRate, ndHours);
@@ -760,10 +773,23 @@ public class Payroll {
                     BigDecimal lateAmount = Formula.computeLateAmount(payRate, lateMinutes);
                     BigDecimal wage = Formula.computeWage(payRate, lateAmount, daysPresent);
 
+                    // Log calculated values
+                    System.out.println("Overtime Amount: " + overtimeAmount);
+                    System.out.println("Night Differential Amount: " + ndAmount);
+                    System.out.println("Special Holiday Amount: " + sholidayAmount);
+                    System.out.println("Legal Holiday Amount: " + lholidayAmount);
+                    System.out.println("Late Amount: " + lateAmount);
+                    System.out.println("Wage: " + wage);
+
                     // Deductions
                     BigDecimal philhealthDeduction = wage.multiply(philhealthPercentage);
                     BigDecimal sssDeduction = wage.multiply(sssPercentage);
                     BigDecimal pagibigDeduction = wage.multiply(pagibigPercentage);
+
+                    // Log deductions
+                    System.out.println("PhilHealth Deduction: " + philhealthDeduction);
+                    System.out.println("SSS Deduction: " + sssDeduction);
+                    System.out.println("Pag-IBIG Deduction: " + pagibigDeduction);
 
                     // Adjustments and compensations
                     BigDecimal salaryAdjustment = wage.multiply(salaryAdjPercentage);
@@ -777,6 +803,11 @@ public class Payroll {
                     BigDecimal netPay = Formula.computeNetPay(
                             grossPay, totalDeduction, salaryAdjustment, allowanceAmount, otherCompAmount
                     );
+
+                    // Log final calculations
+                    System.out.println("Total Deduction: " + totalDeduction);
+                    System.out.println("Gross Pay: " + grossPay);
+                    System.out.println("Net Pay: " + netPay);
 
                     // Step 4: Update payroll data in the database
                     String updateSql = """
@@ -808,11 +839,11 @@ public class Payroll {
                     updateStmt.setInt(18, employeeId);
 
                     int rowsUpdated = updateStmt.executeUpdate();
-                    System.out.println("Payroll updated for employeeId: " + employeeId + ". Rows affected: " + rowsUpdated);
+                    System.out.println("Payroll updated for Employee ID: " + employeeId + ". Rows affected: " + rowsUpdated);
 
                     updateStmt.close();
                 } else {
-                    System.out.println("No payroll record found for employeeId: " + employeeId);
+                    System.out.println("No payroll record found for Employee ID: " + employeeId);
                 }
 
                 rs.close();
@@ -822,6 +853,7 @@ public class Payroll {
             conn.close();
 
         } catch (SQLException e) {
+            System.err.println("Error occurred during payroll calculation: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

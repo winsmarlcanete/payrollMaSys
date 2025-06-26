@@ -300,8 +300,8 @@ public class MainWindow extends JFrame {
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(() -> {
                 System.out.println("Running updatePayrollDetails in the background...");
-                Date periodStart = Date.valueOf("2025-04-01");
-                Date periodEnd = Date.valueOf("2025-04-15");
+                Date periodStart = Date.valueOf("2025-05-01");
+                Date periodEnd = Date.valueOf("2025-05-15");
 
                 Payroll.retrieveAllTimecards(periodStart, periodEnd);
                 System.out.println("updatePayrollDetails completed.");

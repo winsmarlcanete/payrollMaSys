@@ -112,36 +112,37 @@ public class PayrollScreen extends JPanel {
         scrollTable1.revalidate();
     }
     private Object[][] convertToTableData(List<PayrollClass> payrollList) {
-        Object[][] data = new Object[payrollList.size()][26]; // Adjust size to match the number of columns
+        Object[][] data = new Object[payrollList.size()][27]; // Adjust size to match the number of columns
 
         for (int i = 0; i < payrollList.size(); i++) {
             PayrollClass p = payrollList.get(i);
-            data[i][0] = p.getEmployee_name();          // Name
-            data[i][1] = p.getPayrate();                // Rate
-            data[i][2] = p.getPay_rate_per_hour();          // Rate Per Hour
-            data[i][3] = p.getDays_present();           // Days Present
-            data[i][4] = p.getOvertime_hours();         // OT In Hours
-            data[i][5] = p.getNd_hours();               // Night Differential In Hours
-            data[i][6] = p.getSholiday_hours();         // Special Holiday In Hours
-            data[i][7] = p.getLholiday_hours();         // Legal Holiday In Hours
-            data[i][8] = p.getLate_minutes();           // Late In Minutes
-            data[i][9] = p.getOvertime_amount();        // Overtime Amount
-            data[i][10] = p.getNd_amount();             // Night Differential Amount
-            data[i][11] = p.getSholiday_amount();       // Special Holiday Amount
-            data[i][12] = p.getLholiday_amount();       // Legal Holiday Amount
-            data[i][13] = p.getLate_amount();           // Late Amount
-            data[i][14] = p.getWage();                  // Wage
-            data[i][15] = p.getPhilhealth_deduction();  // PhilHealth Deduction
-            data[i][16] = p.getSss_deduction();         // SSS Deduction
-            data[i][17] = p.getPagibig_deduction();     // Pag-IBIG Deduction
-            data[i][18] = p.getEfund_deduction();       // E-Fund Deduction
-            data[i][19] = p.getOther_deduction();       // Other Deduction
-            data[i][20] = p.getSalary_adjustment();     // Salary Adjustment
-            data[i][21] = p.getAllowance_adjustment();  // Allowance Adjustment
-            data[i][22] = p.getOther_compensations();   // Other Compensations
-            data[i][23] = p.getTotal_deduction();       // Total Deduction
-            data[i][24] = p.getGross_pay();             // Gross Pay
-            data[i][25] = p.getNet_pay();               // Net Pay
+            data[i][0] = p.getEmployee_name();
+            data[i][1] = p.getEmployee_name();          // Name
+            data[i][2] = p.getPayrate();                // Rate
+            data[i][3] = p.getPay_rate_per_hour();         // Rate Per Hour
+            data[i][4] = p.getDays_present();           // Days Present
+            data[i][5] = p.getOvertime_hours();         // OT In Hours
+            data[i][6] = p.getNd_hours();               // Night Differential In Hours
+            data[i][7] = p.getSholiday_hours();         // Special Holiday In Hours
+            data[i][8] = p.getLholiday_hours();         // Legal Holiday In Hours
+            data[i][9] = p.getLate_minutes();           // Late In Minutes
+            data[i][10] = p.getOvertime_amount();        // Overtime Amount
+            data[i][11] = p.getNd_amount();             // Night Differential Amount
+            data[i][12] = p.getSholiday_amount();       // Special Holiday Amount
+            data[i][13] = p.getLholiday_amount();       // Legal Holiday Amount
+            data[i][14] = p.getLate_amount();           // Late Amount
+            data[i][15] = p.getWage();                  // Wage
+            data[i][16] = p.getPhilhealth_deduction();  // PhilHealth Deduction
+            data[i][17] = p.getSss_deduction();         // SSS Deduction
+            data[i][18] = p.getPagibig_deduction();     // Pag-IBIG Deduction
+            data[i][19] = p.getEfund_deduction();       // E-Fund Deduction
+            data[i][20] = p.getOther_deduction();       // Other Deduction
+            data[i][21] = p.getSalary_adjustment();     // Salary Adjustment
+            data[i][22] = p.getAllowance_adjustment();  // Allowance Adjustment
+            data[i][23] = p.getOther_compensations();   // Other Compensations
+            data[i][24] = p.getTotal_deduction();       // Total Deduction
+            data[i][25] = p.getGross_pay();             // Gross Pay
+            data[i][26] = p.getNet_pay();               // Net Pay
         }
 
         return data;
@@ -527,40 +528,8 @@ public class PayrollScreen extends JPanel {
             }
         });
 
-        ImageIcon plusIcon = new ImageIcon(
-                new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("plus.png")))
-                        .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
-        );
-
-        RoundedButton addDeduction = new RoundedButton("Add Deduction", 10);
-        addDeduction.setFont(new Font("Arial", Font.BOLD, 18));
-        addDeduction.setPreferredSize(new Dimension(200, 35));
-        addDeduction.setIcon(plusIcon);
-        addDeduction.setIconTextGap(10);
-        addDeduction.setBackground(Color.BLACK);
-        addDeduction.setForeground(Color.WHITE);
-        addDeduction.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        addDeduction.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                addDeduction.setBackground(new Color(40, 40, 40)); // Slightly lighter black
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                addDeduction.setBackground(Color.BLACK);
-            }
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                addDeduction.setBackground(new Color(100, 100, 100)); // Even lighter on click
-            }
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent e) {
-                addDeduction.setBackground(addDeduction.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
-            }
-        });
-
         rightButtons.add(edit);
-        rightButtons.add(addDeduction);
+
 
 // PERIOD GROUP: manual size management
         JPanel periodGroup = new JPanel();
