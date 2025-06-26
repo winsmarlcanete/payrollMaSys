@@ -406,6 +406,39 @@ public class Payroll {
 
     }
 
+    public static Object[][] retrieveTimecards(int employeeId, Date periodStart, Date periodEnd) {
+        List<Object[]> timecards = new ArrayList<>();
+        Connection conn;
+
+        try {
+            String sql = "SELECT employee_id, date, hours_clocked FROM payrollmsdb.timecards WHERE employee_id = ? AND date BETWEEN ? AND ?";
+            conn = JDBC.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, employeeId);
+            stmt.setDate(2, periodStart);
+            stmt.setDate(3, periodEnd);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Date date = rs.getDate("date");
+                double hoursClocked = rs.getDouble("hours_clocked");
+
+                // Add each record as an Object[] to the list
+                timecards.add(new Object[]{employeeId, date, hoursClocked});
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving timecards", e);
+        }
+
+        // Convert the list to a two-dimensional array
+        return timecards.toArray(new Object[0][0]);
+    }
+
     public static void updatePayrollDetails(Date periodStart, Date periodEnd) {
         Connection conn;
         try {

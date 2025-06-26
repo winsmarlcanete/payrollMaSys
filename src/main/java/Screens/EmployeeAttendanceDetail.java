@@ -9,18 +9,18 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.table.TableColumn;
 
 // JCalendar Imports:
+import Module.Payroll.Payroll;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-
 public class EmployeeAttendanceDetail extends JPanel {
 
-    // Declare JDateChooser instances as class members if you need to access them later
     private JDateChooser fromDateChooser;
     private JDateChooser toDateChooser;
-
+    private Object[][] data;
+    private JTable table; // Declare table as a class-level variable
 
     public EmployeeAttendanceDetail(CardLayout cardLayout, JPanel mainContainer, Object[] employeeInfo) {
         setLayout(new BorderLayout());
@@ -78,46 +78,57 @@ public class EmployeeAttendanceDetail extends JPanel {
         fromDateChooser = new JDateChooser(new Date()); // Set initial date to current
         fromDateChooser.setDateFormatString("MMM dd, yyyy"); // Format for display
         styleDateChooser(fromDateChooser); // Apply styling
-        // Add a property change listener to react when the date is changed
         fromDateChooser.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
-                    // Handle date change, e.g., refresh table data
                     System.out.println("From Date changed to: " + fromDateChooser.getDate());
-                    // You would call a method here to update your attendance table based on the new date range
-                    // updateAttendanceTableData(fromDateChooser.getDate(), toDateChooser.getDate());
                 }
             }
         });
-
 
         // Initialize JDateChooser for "To" date
         toDateChooser = new JDateChooser(new Date()); // Set initial date to current
         toDateChooser.setDateFormatString("MMM dd, yyyy"); // Format for display
         styleDateChooser(toDateChooser); // Apply styling
-        // Add a property change listener
         toDateChooser.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("date".equals(evt.getPropertyName())) {
-                    // Handle date change
-                    System.out.println("To Date changed to: " + toDateChooser.getDate());
-                    // updateAttendanceTableData(fromDateChooser.getDate(), toDateChooser.getDate());
+                    Date fromDate = fromDateChooser.getDate();
+                    Date toDate = toDateChooser.getDate();
+
+                    if (fromDate != null && toDate != null) {
+                        java.sql.Date sqlFromDate = new java.sql.Date(fromDate.getTime());
+                        java.sql.Date sqlToDate = new java.sql.Date(toDate.getTime());
+
+                        // Extract employeeId from employeeInfo array
+                        int employeeId = Integer.parseInt(employeeInfo[1].toString());
+                        System.out.println("ETO EMPLOYEE TOL" + employeeId);
+
+                        // Retrieve updated data for the specific employee
+                        Object[][] updatedData = Payroll.retrieveTimecards(employeeId, sqlFromDate, sqlToDate);
+
+                        // Update the table model
+                        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+                        tableModel.setDataVector(updatedData, new String[]{
+                                "Date / Day", "Time In", "Time Out", "Late (mins)",
+                                "Overtime (hours)", "Undertime (hours)", "Absent"
+                        });
+
+                        System.out.println("Attendance table updated for employeeId: " + employeeId + " and period: " + fromDate + " to " + toDate);
+                    }
                 }
             }
         });
-
-
         periodPanel.add(periodLabel);
-        periodPanel.add(fromDateChooser); // Add the JDateChooser
+        periodPanel.add(fromDateChooser);
         periodPanel.add(new JLabel(" - "));
-        periodPanel.add(toDateChooser); // Add the JDateChooser
+        periodPanel.add(toDateChooser);
 
         topSectionPanel.add(periodPanel);
 
         add(topSectionPanel, BorderLayout.NORTH);
-
 
         // --- Table Section ---
         String[] columns = {
@@ -125,18 +136,7 @@ public class EmployeeAttendanceDetail extends JPanel {
                 "Overtime (hours)", "Undertime (hours)", "Absent"
         };
 
-        Object[][] dummyData = {
-                {"Oct 21 Monday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 22 Tuesday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 23 Wednesday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 24 Thursday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 25 Friday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 28 Monday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 29 Tuesday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-                {"Oct 30 Wednesday", "9:00", "17:02", 0.083, 0.033, 0, 0},
-        };
-
-        JTable table = new JTable(new DefaultTableModel(dummyData, columns));
+        table = new JTable(new DefaultTableModel(data, columns)); // Initialize table
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setRowHeight(30);
 
@@ -153,32 +153,17 @@ public class EmployeeAttendanceDetail extends JPanel {
         add(tableContainer, BorderLayout.CENTER);
     }
 
-    // --- Style the JDateChooser to match your buttons
     private void styleDateChooser(JDateChooser dateChooser) {
-        // Set the background and foreground of the text field within the JDateChooser
-        JTextFieldDateEditor dateEditor = (JTextFieldDateEditor)dateChooser.getDateEditor();
+        JTextFieldDateEditor dateEditor = (JTextFieldDateEditor) dateChooser.getDateEditor();
         dateEditor.setBackground(Color.WHITE);
         dateEditor.setForeground(Color.BLACK);
-        dateEditor.setOpaque(true); // Make sure background is painted
-
-        // Style the button next to the text field (the calendar icon button)
-        // This is a bit trickier as it's often a BasicArrowButton
-        // You might need to iterate through components or use UI delegates for full control.
-        // For a simpler approach, let's just make sure the text editor looks good.
-
-        // Also style the border of the entire JDateChooser
-        dateChooser.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15)); // Matches button padding
-        dateEditor.setBorder(null); // Remove default border from internal text field
-
-        // Set the font of the text editor
+        dateEditor.setOpaque(true);
+        dateChooser.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        dateEditor.setBorder(null);
         dateEditor.setFont(new Font("Arial", Font.BOLD, 13));
-
-        // You might want to adjust its preferred size to match your old buttons
-        dateChooser.setPreferredSize(new Dimension(150, 30)); // Adjust width as needed
+        dateChooser.setPreferredSize(new Dimension(150, 30));
     }
 
-
-    // --- Reusable info field
     private JPanel createInfoField(String label, String value) {
         JPanel panel = new JPanel(new BorderLayout(0, 5));
         panel.setBackground(new Color(34, 139, 34));
@@ -198,29 +183,4 @@ public class EmployeeAttendanceDetail extends JPanel {
         panel.add(field, BorderLayout.CENTER);
         return panel;
     }
-
-    // --- Custom date picker popup (OLD - NO LONGER NEEDED WITH JDateChooser)
-    // You can remove this method entirely once you're sure JDateChooser works for you
-    // private void showDatePickerDialog(JButton targetButton) {
-    //     JDialog dialog = new JDialog((Frame) null, "Select Date", true);
-    //     dialog.setLayout(new FlowLayout());
-    //     dialog.setSize(270, 100);
-    //     dialog.setLocationRelativeTo(targetButton);
-
-    //     SpinnerDateModel model = new SpinnerDateModel();
-    //     JSpinner dateSpinner = new JSpinner(model);
-    //     dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMM dd, yyyy"));
-
-    //     JButton okButton = new JButton("OK");
-    //     okButton.addActionListener(e -> {
-    //         Date selectedDate = model.getDate();
-    //         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-    //         targetButton.setText(sdf.format(selectedDate));
-    //         dialog.dispose();
-    //     });
-
-    //     dialog.add(dateSpinner);
-    //     dialog.add(okButton);
-    //     dialog.setVisible(true);
-    // }
 }
