@@ -97,12 +97,12 @@ public class PayrollScreen extends JPanel {
 
         // Update frozenModel1 with the first two columns
         for (Object[] row : tableData) {
-            frozenModel1.addRow(new Object[]{row[0], row[1]});
+            frozenModel1.addRow(new Object[]{row[0]}); // Only the first column (Name) for frozen table
         }
 
         // Update scrollModel1 with the remaining columns
         for (Object[] row : tableData) {
-            scrollModel1.addRow(Arrays.copyOfRange(row, 2, row.length));
+            scrollModel1.addRow(Arrays.copyOfRange(row, 1, row.length)); // Remaining columns for scroll table
         }
 
         // Repaint and revalidate the tables to reflect the updated data
@@ -116,33 +116,32 @@ public class PayrollScreen extends JPanel {
 
         for (int i = 0; i < payrollList.size(); i++) {
             PayrollClass p = payrollList.get(i);
-            data[i][0] = p.getEmployee_name();
-            data[i][1] = p.getEmployee_name();          // Name
-            data[i][2] = p.getPayrate();                // Rate
-            data[i][3] = p.getPay_rate_per_hour();         // Rate Per Hour
-            data[i][4] = p.getDays_present();           // Days Present
-            data[i][5] = p.getOvertime_hours();         // OT In Hours
-            data[i][6] = p.getNd_hours();               // Night Differential In Hours
-            data[i][7] = p.getSholiday_hours();         // Special Holiday In Hours
-            data[i][8] = p.getLholiday_hours();         // Legal Holiday In Hours
-            data[i][9] = p.getLate_minutes();           // Late In Minutes
-            data[i][10] = p.getOvertime_amount();        // Overtime Amount
-            data[i][11] = p.getNd_amount();             // Night Differential Amount
-            data[i][12] = p.getSholiday_amount();       // Special Holiday Amount
-            data[i][13] = p.getLholiday_amount();       // Legal Holiday Amount
-            data[i][14] = p.getLate_amount();           // Late Amount
-            data[i][15] = p.getWage();                  // Wage
-            data[i][16] = p.getPhilhealth_deduction();  // PhilHealth Deduction
-            data[i][17] = p.getSss_deduction();         // SSS Deduction
-            data[i][18] = p.getPagibig_deduction();     // Pag-IBIG Deduction
-            data[i][19] = p.getEfund_deduction();       // E-Fund Deduction
-            data[i][20] = p.getOther_deduction();       // Other Deduction
-            data[i][21] = p.getSalary_adjustment();     // Salary Adjustment
-            data[i][22] = p.getAllowance_adjustment();  // Allowance Adjustment
-            data[i][23] = p.getOther_compensations();   // Other Compensations
-            data[i][24] = p.getTotal_deduction();       // Total Deduction
-            data[i][25] = p.getGross_pay();             // Gross Pay
-            data[i][26] = p.getNet_pay();               // Net Pay
+            data[i][0] = p.getEmployee_name();          // Name (This will be the frozen column)
+            data[i][1] = p.getPayrate();                // Rate
+            data[i][2] = p.getPay_rate_per_hour();         // Rate Per Hour
+            data[i][3] = p.getDays_present();           // Days Present
+            data[i][4] = p.getOvertime_hours();         // OT In Hours
+            data[i][5] = p.getNd_hours();               // Night Differential In Hours
+            data[i][6] = p.getSholiday_hours();         // Special Holiday In Hours
+            data[i][7] = p.getLholiday_hours();         // Legal Holiday In Hours
+            data[i][8] = p.getLate_minutes();           // Late In Minutes
+            data[i][9] = p.getOvertime_amount();        // Overtime Amount
+            data[i][10] = p.getNd_amount();             // Night Differential Amount
+            data[i][11] = p.getSholiday_amount();       // Special Holiday Amount
+            data[i][12] = p.getLholiday_amount();       // Legal Holiday Amount
+            data[i][13] = p.getLate_amount();           // Late Amount
+            data[i][14] = p.getWage();                  // Wage
+            data[i][15] = p.getPhilhealth_deduction();  // PhilHealth Deduction
+            data[i][16] = p.getSss_deduction();         // SSS Deduction
+            data[i][17] = p.getPagibig_deduction();     // Pag-IBIG Deduction
+            data[i][18] = p.getEfund_deduction();       // E-Fund Deduction
+            data[i][19] = p.getOther_deduction();       // Other Deduction
+            data[i][20] = p.getSalary_adjustment();     // Salary Adjustment
+            data[i][21] = p.getAllowance_adjustment();  // Allowance Adjustment
+            data[i][22] = p.getOther_compensations();   // Other Compensations
+            data[i][23] = p.getTotal_deduction();       // Total Deduction
+            data[i][24] = p.getGross_pay();             // Gross Pay
+            data[i][25] = p.getNet_pay();               // Net Pay
         }
 
         return data;
@@ -311,30 +310,30 @@ public class PayrollScreen extends JPanel {
         createPeriodBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-            if (createPeriodBtn.isEnabled()) {
-                createPeriodBtn.setBackground(btnHoverBg);
-            }
+                if (createPeriodBtn.isEnabled()) {
+                    createPeriodBtn.setBackground(btnHoverBg);
+                }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-            createPeriodBtn.setBackground(btnDefaultBg);
+                createPeriodBtn.setBackground(btnDefaultBg);
             }
             @Override
             public void mousePressed(MouseEvent e) {
-            if (createPeriodBtn.isEnabled()) {
-                createPeriodBtn.setBackground(btnPressedBg);
+                if (createPeriodBtn.isEnabled()) {
+                    createPeriodBtn.setBackground(btnPressedBg);
 
 
 
-            }
+                }
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-            if (createPeriodBtn.isEnabled() && createPeriodBtn.getBounds().contains(e.getPoint())) {
-                createPeriodBtn.setBackground(btnHoverBg);
-            } else {
-                createPeriodBtn.setBackground(btnDefaultBg);
-            }
+                if (createPeriodBtn.isEnabled() && createPeriodBtn.getBounds().contains(e.getPoint())) {
+                    createPeriodBtn.setBackground(btnHoverBg);
+                } else {
+                    createPeriodBtn.setBackground(btnDefaultBg);
+                }
             }
         });
 
@@ -434,7 +433,7 @@ public class PayrollScreen extends JPanel {
 
                     String[] dates = selectedPeriod.split(" - ");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
-                     startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+                    startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
                     endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
                     String selectedDepartment = (String) sortCombo.getSelectedItem();
                     // Call refreshPayrollData with the parsed dates
@@ -609,8 +608,7 @@ public class PayrollScreen extends JPanel {
 
         frozenTable1 = new JTable(frozenModel1);
         TableStyler.styleTable(frozenTable1);
-//        frozenTable1.getTableHeader().setReorderingAllowed(false);
-
+        frozenTable1.getTableHeader().setReorderingAllowed(false); // Add this line to prevent reordering
 
         scrollTable1 = new JTable(scrollModel1);
         TableStyler.styleTable(scrollTable1);
@@ -892,7 +890,7 @@ public class PayrollScreen extends JPanel {
 
         JPanel createPeriodPopup = new JPanel();
         createPeriodPopup.setLayout(new GridBagLayout());
-        createPeriodPopup.setBackground(new Color(0, 0, 0)); // Semi-transparent overlay
+        createPeriodPopup.setBackground(new Color(0, 0, 0, 150)); // Semi-transparent overlay
         createPeriodPopup.setVisible(false);
 
         JPanel dateSelector = new JPanel();
@@ -1151,11 +1149,11 @@ public class PayrollScreen extends JPanel {
                 cancelBtn.setBackground(Color.WHITE);
             }
             @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 cancelBtn.setBackground(new Color(240, 240, 240)); // Slightly darker greenish white
             }
             @Override
-            public void mouseReleased(java.awt.event.MouseEvent e) {
+            public void mouseReleased(MouseEvent e) {
                 cancelBtn.setBackground(cancelBtn.getBounds().contains(e.getPoint()) ? new Color(230, 255, 230) : Color.WHITE);
             }
         });
@@ -1285,15 +1283,13 @@ public class PayrollScreen extends JPanel {
                 scrollModel1.setRowCount(0);
                 for (Object[] row : data) {
                     boolean matchFound = false;
-                    for (Object cell : row) {
-                        if (cell != null && cell.toString().toLowerCase().contains(searchText)) {
-                            matchFound = true;
-                            break;
-                        }
+                    // Check against the 'Name' column (index 0 in the original data) for filtering
+                    if (row[0] != null && row[0].toString().toLowerCase().contains(searchText)) {
+                        matchFound = true;
                     }
                     if (matchFound) {
-                        frozenModel1.addRow(new Object[]{row[0], row[1]});
-                        scrollModel1.addRow(Arrays.copyOfRange(row, 2, row.length));
+                        frozenModel1.addRow(new Object[]{row[0]}); // Add only the Name to frozen table
+                        scrollModel1.addRow(Arrays.copyOfRange(row, 1, row.length)); // Add the rest to scroll table
                     }
                 }
                 adjustColumnWidths.run();
