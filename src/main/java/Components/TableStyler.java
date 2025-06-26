@@ -12,14 +12,14 @@ public class TableStyler {
         table.setRowHeight(40);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 
         JTableHeader header = table.getTableHeader();
         header.setBackground(MainWindow.grayColor);
         header.setForeground(Color.BLACK);
         header.setPreferredSize(new Dimension(header.getPreferredSize().width, 40));
         header.setResizingAllowed(false);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        header.setFont(new Font("Segoe UI", Font.BOLD, 18));
         ((DefaultTableCellRenderer) header.getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();

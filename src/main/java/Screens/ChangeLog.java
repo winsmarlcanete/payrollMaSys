@@ -1,5 +1,8 @@
 package Screens;
 
+import Components.TableStyler;
+import org.payroll.MainWindow;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -15,17 +18,18 @@ public class ChangeLog extends JPanel {
     public ChangeLog() {
         // Set up the main panel layout
         setLayout(new BorderLayout());
-        setBackground(new Color(60, 179, 113)); // MediumSeaGreen background for the main panel
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding around the content
+        setBackground(MainWindow.activeColor); // MediumSeaGreen background for the main panel
+//        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding around the content
 
         // Create tabbed pane for Activity Log and Error Log
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT); // Allow tabs to wrap if many
+        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
         // --- Activity Log Tab ---
         JPanel activityLogPanel = new JPanel(new BorderLayout());
         activityLogPanel.setBackground(Color.WHITE); // White background for the activity log content
-        activityLogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Inner padding
+//        activityLogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Inner padding
 
         // Create table model and data for Activity Log
         String[] activityColumnNames = {"Name", "Position", "Date", "Time", "Activity"};
@@ -49,23 +53,14 @@ public class ChangeLog extends JPanel {
 
         JTable activityTable = new JTable(activityTableModel);
         activityTable.setFillsViewportHeight(true); // Table fills the height of its scroll pane
-        activityTable.setRowHeight(30); // Set row height for better spacing
-        activityTable.setFont(new Font("Segoe UI", Font.PLAIN, 14)); // Set font for table data
+        activityTable.setRowHeight(40); // Set row height for better spacing
+        TableStyler.styleTable(activityTable); // Apply custom table styling
         activityTable.setSelectionBackground(new Color(220, 220, 220)); // Light grey selection background
-        activityTable.setSelectionForeground(Color.BLACK); // Black text on selection
-
-        // Customize activity table header
-        JTableHeader activityTableHeader = activityTable.getTableHeader();
-        activityTableHeader.setBackground(new Color(240, 240, 240)); // Light grey background for header
-        activityTableHeader.setForeground(new Color(70, 70, 70)); // Darker grey text for header
-        activityTableHeader.setFont(new Font("Segoe UI", Font.BOLD, 14)); // Bold font for header
-        activityTableHeader.setPreferredSize(new Dimension(activityTableHeader.getWidth(), 40)); // Set header height
-        activityTableHeader.setReorderingAllowed(false); // Prevent columns from being reordered
 
         // Center align activity header text
-        DefaultTableCellRenderer activityHeaderRenderer = new DefaultTableCellRenderer();
-        activityHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
-        activityTableHeader.setDefaultRenderer(activityHeaderRenderer);
+//        DefaultTableCellRenderer activityHeaderRenderer = new DefaultTableCellRenderer();
+//        activityHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
+//        activityTableHeader.setDefaultRenderer(activityHeaderRenderer);
 
         // Wrap the activity table in a JScrollPane
         JScrollPane activityScrollPane = new JScrollPane(activityTable);
@@ -79,7 +74,7 @@ public class ChangeLog extends JPanel {
         // --- Error Log Tab ---
         JPanel errorLogPanel = new JPanel(new BorderLayout());
         errorLogPanel.setBackground(Color.WHITE); // White background for the error log content
-        errorLogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Inner padding
+//        errorLogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Inner padding
 
         // Create table model and data for Error Log
         String[] errorColumnNames = {"Date", "Time", "Error Code", "Error Message", "Activity"};
@@ -100,23 +95,14 @@ public class ChangeLog extends JPanel {
 
         JTable errorTable = new JTable(errorTableModel);
         errorTable.setFillsViewportHeight(true);
-        errorTable.setRowHeight(30);
-        errorTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        errorTable.setRowHeight(40);
+        TableStyler.styleTable(errorTable);
         errorTable.setSelectionBackground(new Color(220, 220, 220));
-        errorTable.setSelectionForeground(Color.BLACK);
-
-        // Customize error table header
-        JTableHeader errorTableHeader = errorTable.getTableHeader();
-        errorTableHeader.setBackground(new Color(240, 240, 240));
-        errorTableHeader.setForeground(new Color(70, 70, 70));
-        errorTableHeader.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        errorTableHeader.setPreferredSize(new Dimension(errorTableHeader.getWidth(), 40));
-        errorTableHeader.setReorderingAllowed(false); // Prevent columns from being reordered
 
         // Center align error header text
-        DefaultTableCellRenderer errorHeaderRenderer = new DefaultTableCellRenderer();
-        errorHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
-        errorTableHeader.setDefaultRenderer(errorHeaderRenderer);
+//        DefaultTableCellRenderer errorHeaderRenderer = new DefaultTableCellRenderer();
+//        errorHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
+//        errorTableHeader.setDefaultRenderer(errorHeaderRenderer);
 
         // Wrap the error table in a JScrollPane
         JScrollPane errorScrollPane = new JScrollPane(errorTable);

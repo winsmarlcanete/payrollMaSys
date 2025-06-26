@@ -927,48 +927,48 @@ public class PayrollScreen extends JPanel {
         panel.add(leftPanel, BorderLayout.WEST);
         panel.add(scrollScroll2, BorderLayout.CENTER);
 
-        // 1. Hide the vertical scrollbar in scrollScroll1
-        scrollScroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-
-// 2. Create a separate vertical scrollbar
-        JScrollBar externalVScrollBar = new JScrollBar(JScrollBar.VERTICAL);
-        externalVScrollBar.setModel(scrollScroll1.getVerticalScrollBar().getModel());
-        externalVScrollBar.setPreferredSize(new Dimension(16, 0)); // Adjust width as needed
-
-        externalVScrollBar.setUI(new BasicScrollBarUI() {
-            @Override
-            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
-            @Override
-            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setMinimumSize(new Dimension(0, 0));
-                button.setMaximumSize(new Dimension(0, 0));
-                button.setVisible(false);
-                return button;
-            }
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = new Color(34, 177, 76);
-                this.trackColor = new Color(220, 255, 220);
-            }
-            @Override
-            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(34, 177, 76));
-                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
-                g2.dispose();
-            }
-            @Override
-            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(new Color(220, 255, 220));
-                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
-                g2.dispose();
-            }
-        });
+//        // 1. Hide the vertical scrollbar in scrollScroll1
+//        scrollScroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//
+//// 2. Create a separate vertical scrollbar
+//        JScrollBar externalVScrollBar = new JScrollBar(JScrollBar.VERTICAL);
+//        externalVScrollBar.setModel(scrollScroll1.getVerticalScrollBar().getModel());
+//        externalVScrollBar.setPreferredSize(new Dimension(16, 0)); // Adjust width as needed
+//
+//        externalVScrollBar.setUI(new BasicScrollBarUI() {
+//            @Override
+//            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+//            @Override
+//            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+//            private JButton createZeroButton() {
+//                JButton button = new JButton();
+//                button.setPreferredSize(new Dimension(0, 0));
+//                button.setMinimumSize(new Dimension(0, 0));
+//                button.setMaximumSize(new Dimension(0, 0));
+//                button.setVisible(false);
+//                return button;
+//            }
+//            @Override
+//            protected void configureScrollBarColors() {
+//                this.thumbColor = new Color(34, 177, 76);
+//                this.trackColor = new Color(220, 255, 220);
+//            }
+//            @Override
+//            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+//                Graphics2D g2 = (Graphics2D) g.create();
+//                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//                g2.setColor(new Color(34, 177, 76));
+//                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+//                g2.dispose();
+//            }
+//            @Override
+//            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+//                Graphics2D g2 = (Graphics2D) g.create();
+//                g2.setColor(new Color(220, 255, 220));
+//                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+//                g2.dispose();
+//            }
+//        });
 
         // Place both tables in a panel
         JPanel tablePanel = new JPanel();
@@ -983,7 +983,7 @@ public class PayrollScreen extends JPanel {
         tablePanel.add(frozenScroll1, BorderLayout.WEST);
         tablePanel.add(scrollScroll1, BorderLayout.CENTER);
 //        tablePanel.add(upperTable, BorderLayout.CENTER);
-        tablePanel.add(externalVScrollBar, BorderLayout.EAST);
+//        tablePanel.add(externalVScrollBar, BorderLayout.EAST);
         tablePanel.add(panel, BorderLayout.SOUTH);
 
         // Place both headers in a panel
