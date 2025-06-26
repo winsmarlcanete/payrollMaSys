@@ -157,8 +157,8 @@ public class EmployeeAttendanceDetail extends JPanel {
     private void styleDateChooser(JDateChooser dateChooser) {
         // Set the background and foreground of the text field within the JDateChooser
         JTextFieldDateEditor dateEditor = (JTextFieldDateEditor)dateChooser.getDateEditor();
-        dateEditor.setBackground(Color.BLACK);
-        dateEditor.setForeground(Color.WHITE);
+        dateEditor.setBackground(Color.WHITE);
+        dateEditor.setForeground(Color.BLACK);
         dateEditor.setOpaque(true); // Make sure background is painted
 
         // Style the button next to the text field (the calendar icon button)
