@@ -6,14 +6,13 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import Module.E201File.E201File;
 import Module.Payroll.Payroll;
 import Screens.*;
-import java.util.concurrent.ExecutorService;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +63,7 @@ public class MainWindow extends JFrame {
         employees.loadEmployeeTabledata();
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
-        LeaveManagement leavemanagement = new LeaveManagement();
+        LeaveManagementScreen leavemanagement = new LeaveManagementScreen();
         PayrollScreen payroll = new PayrollScreen();
         Reports reports = new Reports();
         Help help = new Help();
