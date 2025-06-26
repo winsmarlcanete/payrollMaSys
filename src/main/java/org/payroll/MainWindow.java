@@ -199,9 +199,66 @@ public class MainWindow extends JFrame {
         currentUser.setIcon(userIcon);
         currentUser.setPreferredSize(new Dimension(200, 45));
         currentUser.setMaximumSize(new Dimension(200, 45));
-
         buttonPanel.add(currentUser);
 
+        // Add action listener to currentUser button
+        currentUser.addActionListener(e -> {
+            // Create popup menu
+            JPopupMenu menu = new JPopupMenu();
+            menu.setPreferredSize(new Dimension(200, 80));
+            menu.setBackground(Color.BLACK);
+            menu.setForeground(Color.WHITE);
+            menu.setFont(new Font("Arial", Font.PLAIN, 14));
+
+            // Create menu items
+            JMenuItem signOut = new JMenuItem("Sign Out");
+            JMenuItem cancel = new JMenuItem("Cancel");
+
+            // Style menu items
+            Font menuFont = new Font("Arial", Font.PLAIN, 14);
+            signOut.setFont(menuFont);
+            cancel.setFont(menuFont);
+
+            // Set colors for menu items
+            signOut.setBackground(Color.BLACK);
+            signOut.setForeground(Color.WHITE);
+            cancel.setBackground(Color.BLACK);
+            cancel.setForeground(Color.WHITE);
+
+            // Remove menu item borders
+            signOut.setBorderPainted(false);
+            cancel.setBorderPainted(false);
+
+            // Add action listeners to menu items
+            signOut.addActionListener(event -> {
+                int choice = JOptionPane.showConfirmDialog(
+                        this,
+                        "Are you sure you want to sign out?",
+                        "Sign Out",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    dispose(); // Close current window
+                    // Start new instance of the application
+                    SwingUtilities.invokeLater(() -> {
+                        Login loginScreen = new Login();
+                        loginScreen.setVisible(true);
+                        loginScreen.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    });
+                }
+            });
+
+            cancel.addActionListener(event -> menu.setVisible(false));
+
+            // Add items to menu
+            menu.add(signOut);
+            menu.add(cancel);
+
+            // Show popup menu below the button
+            menu.show(currentUser, 0, currentUser.getHeight());
+        });
 
         // Set the first button as active
         if (!buttonMap.isEmpty()) {
