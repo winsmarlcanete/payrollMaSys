@@ -10,52 +10,82 @@ import java.util.Date;
 public class AttendanceBackup extends JPanel {
 
     public AttendanceBackup(CardLayout cardLayout, JPanel mainContainer) {
-        setLayout(null);
+        // Change to BorderLayout for easier centering of content
+        setLayout(new BorderLayout());
         setBackground(new Color(34, 177, 76));
+
+        // Create a panel to hold the main content (labels, text field, button)
+        // This panel will be centered in the BorderLayout
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false); // Make it transparent so the background color shows through
+        contentPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for flexible centering
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Add some padding around components
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER; // Center components within their grid cells
 
         JLabel titleLabel = new JLabel("Attendance Backup", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(0, 30, 800, 30);
-        add(titleLabel);
+        // Set fill to HORIZONTAL to allow the label to take full width and center text
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        contentPanel.add(titleLabel, gbc);
 
         JLabel dateLabel = new JLabel(new SimpleDateFormat("MMMM d, yyyy").format(new Date()), SwingConstants.CENTER);
         dateLabel.setFont(new Font("Arial", Font.BOLD, 16));
         dateLabel.setForeground(Color.WHITE);
-        dateLabel.setBounds(0, 70, 800, 20);
-        add(dateLabel);
+        gbc.gridy++;
+        contentPanel.add(dateLabel, gbc);
 
         JLabel timeLabel = new JLabel(new SimpleDateFormat("h:mm a").format(new Date()), SwingConstants.CENTER);
         timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
         timeLabel.setForeground(Color.WHITE);
-        timeLabel.setBounds(0, 100, 800, 20);
-        add(timeLabel);
+        gbc.gridy++;
+        contentPanel.add(timeLabel, gbc);
+
+        // Reset fill for subsequent components as they shouldn't stretch horizontally across the whole panel
+        gbc.fill = GridBagConstraints.NONE;
 
         JLabel idLabel = new JLabel("Employee ID");
-        idLabel.setBounds(300, 150, 200, 20);
         idLabel.setForeground(Color.WHITE);
-        add(idLabel);
+        gbc.gridy++;
+        contentPanel.add(idLabel, gbc);
 
         JTextField idField = new JTextField();
-        idField.setBounds(280, 170, 200, 25);
-        add(idField);
+        idField.setPreferredSize(new Dimension(200, 25)); // Set preferred size for the text field
+        idField.setHorizontalAlignment(JTextField.CENTER); // Center text within the field
+        gbc.gridy++;
+        contentPanel.add(idField, gbc);
 
         JButton submitButton = new JButton("Submit");
-        submitButton.setBounds(320, 210, 120, 30);
+        submitButton.setPreferredSize(new Dimension(120, 30)); // Set preferred size for the button
         submitButton.setBackground(Color.BLACK);
         submitButton.setForeground(Color.WHITE);
-        add(submitButton);
+        gbc.gridy++;
+        contentPanel.add(submitButton, gbc);
 
+        // Add the content panel to the CENTER of the main BorderLayout
+        add(contentPanel, BorderLayout.CENTER);
+
+        // Position the back button independently in the NORTHWEST (top-left)
         JButton backButton = new JButton("Back");
-        backButton.setBounds(20, 20, 100, 30);
         backButton.setBackground(Color.BLACK);
         backButton.setForeground(Color.WHITE);
-        add(backButton);
+        // Using FlowLayout for the top-left corner
+        JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        backButtonPanel.setOpaque(false);
+        backButtonPanel.add(backButton);
+        add(backButtonPanel, BorderLayout.NORTH);
+
 
         submitButton.addActionListener(e -> {
             String empID = idField.getText().trim();
 
             try {
+                // IMPORTANT: Replace with your actual database connection details
+                // Make sure your MySQL driver is in the classpath
                 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_db", "root",
                         "password");
                 String sql = "SELECT name FROM employees WHERE id = ?";
@@ -76,13 +106,45 @@ public class AttendanceBackup extends JPanel {
 
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Database error!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         backButton.addActionListener(e -> {
             // Go back to Attendance table view
-            cardLayout.show(mainContainer, "table");
+            if (cardLayout != null && mainContainer != null) {
+                cardLayout.show(mainContainer, "table");
+            } else {
+                // Fallback for standalone testing or if cardLayout/mainContainer are null
+                System.out.println("Back button pressed: cardLayout or mainContainer is null. Cannot switch view.");
+            }
         });
+    }
+
+    public static void main(String[] args) {
+        // For standalone testing of AttendanceBackup
+        JFrame frame = new JFrame("Attendance Backup Test");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600); // Set a reasonable size for the frame
+        frame.setLocationRelativeTo(null); // Center the frame on the screen
+
+        // Create dummy CardLayout and JPanel for testing purposes
+        CardLayout testCardLayout = new CardLayout();
+        JPanel testMainContainer = new JPanel(testCardLayout);
+
+        // Add a dummy "table" panel to switch back to for testing the back button
+        JPanel dummyTablePanel = new JPanel();
+        dummyTablePanel.add(new JLabel("This is the main attendance table view."));
+        testMainContainer.add(dummyTablePanel, "table");
+
+        // Add the AttendanceBackup panel
+        AttendanceBackup attendanceBackupPanel = new AttendanceBackup(testCardLayout, testMainContainer);
+        testMainContainer.add(attendanceBackupPanel, "backup");
+
+        // Show the AttendanceBackup panel initially
+        testCardLayout.show(testMainContainer, "backup");
+
+        frame.add(testMainContainer);
+        frame.setVisible(true);
     }
 }
