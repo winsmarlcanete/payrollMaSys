@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,10 +24,12 @@ import Components.RoundedButton;
 import Components.RoundedComboBox;
 import Components.RoundedTextField;
 import Components.TableStyler;
+import Config.JDBC;
 import Module.E201File.E201File;
 import org.payroll.MainWindow;
+import Module.LeaveManagement.LeaveManagement;
 
-public class LeaveManagement extends JPanel {
+public class LeaveManagementScreen extends JPanel {
     private JTextField searchField;
 
     private static DefaultTableModel employeeTableModel;
@@ -62,7 +68,7 @@ public class LeaveManagement extends JPanel {
         searchField.setText("");
     }
 
-    public LeaveManagement() {
+    public LeaveManagementScreen() {
         setBackground(Color.WHITE);
         setLayout(new BorderLayout());
         getCursor();
@@ -843,9 +849,13 @@ public class LeaveManagement extends JPanel {
             JButton[] dateButtons = {dateField1, dateField2, dateField3, dateField4, dateField5};
             boolean valid = true;
 
+            // Get employee_id from idField
+            int employee_id = Integer.parseInt(idField.getText());
+
             for (int i = 0; i < 5; i++) {
                 if (leaveBoxes[i].getSelectedIndex() > 0) {
                     String dateText = dateButtons[i].getText().trim();
+                    String leaveType = (String) leaveBoxes[i].getSelectedItem();
 
                     if (dateText.equals("Input Date")) {
                         JOptionPane.showMessageDialog(null,
@@ -853,9 +863,48 @@ public class LeaveManagement extends JPanel {
                                 "Missing Date",
                                 JOptionPane.WARNING_MESSAGE);
                         valid = false;
-                        break;  // stop checking further, since saving shouldn't proceed
+                        break;
                     } else {
-                        used++;
+                        try {
+                            // Parse the date
+                            java.util.Date date = new java.text.SimpleDateFormat("MMM dd, yyyy").parse(dateText);
+                            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+                            // Calculate remaining SIL
+                            int remaining_sil = 5 - used;
+
+                            // Check if a leave record exists for this date
+                            String sql = "SELECT leave_id FROM leavemanagement WHERE employee_id = ? AND creation_date = ?";
+                            Connection conn = null;
+                            PreparedStatement stmt = null;
+                            ResultSet rs = null;
+
+                            try {
+                                if (rs.next()) {
+                                    // Update existing record
+                                    int leave_id = rs.getInt("leave_id");
+                                    LeaveManagement.updateLeaveEmployee(leave_id, leaveType, remaining_sil);
+                                } else {
+                                    // Insert new record
+                                    LeaveManagement.insertLeaveEmployee(employee_id, leaveType, remaining_sil);
+                                }
+                                used++;
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                valid = false;
+                            } finally {
+                                try {
+                                    if (rs != null) rs.close();
+                                    if (stmt != null) stmt.close();
+                                    if (conn != null) conn.close();
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        } catch (java.text.ParseException ex) {
+                            ex.printStackTrace();
+                            valid = false;
+                        }
                     }
                 }
             }
@@ -863,6 +912,7 @@ public class LeaveManagement extends JPanel {
             if (valid) {
                 leavesUsedField.setText(String.valueOf(used));
                 remainingSILField.setText((5 - used) + " / 5");
+                JOptionPane.showMessageDialog(null, "Leave records saved successfully!");
             }
         });
 
