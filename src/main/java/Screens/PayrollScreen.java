@@ -867,6 +867,37 @@ public class PayrollScreen extends JPanel {
             matchColumnWidths(scrollTable1, scrollTable2);
         });
 
+        // Add this code after creating frozenTable2 and scrollTable2
+
+// Create the wheel scroll listener
+        MouseWheelListener wheelListener = e -> {
+            // Get the horizontal scrollbar
+            JScrollBar horizontalScrollBar = scrollScroll2.getHorizontalScrollBar();
+
+            // Calculate scroll amount (adjust multiplier as needed)
+            int scrollAmount = e.getUnitsToScroll() * 20;
+
+            // Get current scroll position
+            int currentValue = horizontalScrollBar.getValue();
+
+            // Calculate new position
+            int newValue = currentValue + scrollAmount;
+
+            // Ensure we stay within bounds
+            newValue = Math.max(horizontalScrollBar.getMinimum(),
+                    Math.min(newValue, horizontalScrollBar.getMaximum() - horizontalScrollBar.getVisibleAmount()));
+
+            // Set new position
+            horizontalScrollBar.setValue(newValue);
+        };
+
+// Add the listener to both tables
+        frozenTable2.addMouseWheelListener(wheelListener);
+        scrollTable2.addMouseWheelListener(wheelListener);
+
+// Also add to the scroll panes to ensure it works when hovering over empty areas
+        frozenScroll2.addMouseWheelListener(wheelListener);
+        scrollScroll2.addMouseWheelListener(wheelListener);
 
         // Custom scrollbars
         scrollScroll2.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
