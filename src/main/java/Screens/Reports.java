@@ -2,6 +2,7 @@ package Screens;
 
 import Components.RoundedComboBox;
 import Module.E201File.E201File;
+import org.payroll.MainWindow;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -135,8 +136,7 @@ public class Reports extends javax.swing.JPanel {
 
         searchPanel.add(comboPanel, BorderLayout.EAST);
 
-        setLayout(new BorderLayout());
-        add(searchPanel, BorderLayout.NORTH);
+
 
         CardLayout cardLayout = new CardLayout();
         JPanel cardPanel = new JPanel(cardLayout);
@@ -211,8 +211,16 @@ public class Reports extends javax.swing.JPanel {
         setLayout(new BorderLayout());
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
-        topPanel.add(buttonPanel, BorderLayout.NORTH);
+        topPanel.setOpaque(false);
+        searchPanel.setOpaque(false);
+        topPanel.add(searchPanel, BorderLayout.NORTH);
+        topPanel.add(buttonPanel, BorderLayout.CENTER);
 
+        setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        setLayout(new BorderLayout());
+        add(topPanel, BorderLayout.NORTH);
+        setBackground(MainWindow.activeColor);
+//        setOpaque(false);
         add(topPanel, BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);
 

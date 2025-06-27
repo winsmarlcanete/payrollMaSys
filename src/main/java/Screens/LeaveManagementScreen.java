@@ -233,13 +233,10 @@ public class LeaveManagementScreen extends JPanel {
 // Then initialize filtered indices
         initializeFilteredIndices();
 
-        table.getTableHeader().setReorderingAllowed(false);
         TableStyler.styleTable(table);
+
+        table.getTableHeader().setReorderingAllowed(false);
         JScrollPane tableScrollPane = new JScrollPane(table);
-
-
-        table.setFont(font);
-        table.getTableHeader().setFont(font);
 
         table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override

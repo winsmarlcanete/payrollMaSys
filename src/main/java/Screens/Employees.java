@@ -240,8 +240,7 @@ public class Employees extends JPanel {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        table.getTableHeader().setReorderingAllowed(false);
-        TableStyler.styleTable(table);
+        table.getTableHeader().setReorderingAllowed(false);;
         JScrollPane tableScrollPane = new JScrollPane(table);
 
         // Set table header background to green and foreground to white
@@ -296,12 +295,11 @@ public class Employees extends JPanel {
 
         // Font
 
-        table.setFont(font);
         table.setRowHeight(40);
         table.getTableHeader().setFont(font);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-
+        TableStyler.styleTable(table);
 
 
         // CardLayout for switching views
