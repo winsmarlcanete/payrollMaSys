@@ -4,6 +4,7 @@ import Components.BlackRoundedComboBox;
 import Components.RoundedButton;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.ComboPopup;
 import java.awt.*;
 import java.awt.event.*;
@@ -26,7 +27,7 @@ public class Payslip extends JPanel {
                 // Do nothing: no border for this instance
             }
         };
-        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setPreferredSize(new Dimension(250, 50));
         sortCombo.setFocusable(false);
         sortCombo.setMaximumRowCount(12);
         sortCombo.setFont(new Font("Arial", Font.BOLD, 16));
@@ -110,7 +111,7 @@ public class Payslip extends JPanel {
         comboPanel.setBackground(Color.BLACK);
 
         RoundedButton downloadPdf = new RoundedButton("Download PDF", 10);
-        downloadPdf.setPreferredSize(new Dimension(150, 36));
+        downloadPdf.setPreferredSize(new Dimension(150, 50));
         downloadPdf.setFont(new Font("Arial", Font.BOLD, 16));
         downloadPdf.setForeground(Color.WHITE);
         downloadPdf.setBackground(new Color(0, 0, 0));
@@ -149,11 +150,45 @@ public class Payslip extends JPanel {
 
         JButton viewButton = new JButton("View PDF");
         viewButton.addActionListener(e -> PayslipGenerator.previewPayslip());
+        viewButton.setPreferredSize(new Dimension(150, 50));
+        viewButton.setFont(new Font("Arial", Font.BOLD, 16));
+        viewButton.setForeground(Color.WHITE);
+        viewButton.setBackground(new Color(0, 0, 0));
+        viewButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        viewButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                viewButton.setBackground(new Color(40, 40, 40)); // Slightly lighter black
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                viewButton.setBackground(Color.BLACK);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                viewButton.setBackground(new Color(100, 100, 100)); // Even lighter on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                viewButton.setBackground(viewButton.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+            }
+        });
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(comboPanel, BorderLayout.WEST);
-        topPanel.add(viewButton, BorderLayout.CENTER);
-        topPanel.add(downloadPdf, BorderLayout.EAST);
+//        JPanel topPanel = new JPanel(new BorderLayout());
+//        topPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
+//        topPanel.add(comboPanel, BorderLayout.WEST);
+//        topPanel.add(viewButton, BorderLayout.CENTER);
+//        topPanel.add(downloadPdf, BorderLayout.EAST);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.add(Box.createHorizontalGlue());
+        topPanel.add(comboPanel);
+        topPanel.add(Box.createHorizontalStrut(20)); // space between buttons
+        topPanel.add(viewButton);
+        topPanel.add(Box.createHorizontalStrut(20)); // space between buttons
+        topPanel.add(downloadPdf);
+        topPanel.add(Box.createHorizontalGlue());
 
         add(topPanel, BorderLayout.NORTH);
     }

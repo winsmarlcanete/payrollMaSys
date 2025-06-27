@@ -174,7 +174,7 @@ public class PayrollScreen extends JPanel {
                     g2.setFont(getFont().deriveFont(Font.PLAIN));
                     FontMetrics fm = g2.getFontMetrics();
                     int padding = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                    g2.drawString("Search", 5, padding);
+                    g2.drawString("Search", 15, padding);
                     g2.dispose();
                 }
             }
@@ -207,7 +207,7 @@ public class PayrollScreen extends JPanel {
 
 // Configure the combo box appearance
         departmentDropdown.setFont(new Font("Arial", Font.PLAIN, 18));
-        departmentDropdown.setPreferredSize(new Dimension(250, 36));
+        departmentDropdown.setPreferredSize(new Dimension(250, 50));
         departmentDropdown.setBackground(Color.WHITE);
         departmentDropdown.setFocusable(false);
         departmentDropdown.setMaximumRowCount(12);
@@ -268,11 +268,13 @@ public class PayrollScreen extends JPanel {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (departmentDropdown.isEnabled()) {
                     departmentDropdown.setBackground(comboHoverBg);
+                    departmentDropdown.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 departmentDropdown.setBackground(comboDefaultBg);
+                departmentDropdown.setCursor(Cursor.getDefaultCursor());
             }
         });
 
@@ -318,45 +320,43 @@ public class PayrollScreen extends JPanel {
         logoLabel.setOpaque(true);
 
         // Button
-        JButton createPeriodBtn = new JButton("Create new payroll period");
+        RoundedButton createPeriodBtn = new RoundedButton("Create new payroll period", 20);
+        createPeriodBtn.setPreferredSize(new Dimension(225, 50)); // Adjusted size to match image
+        createPeriodBtn.setBackground(Color.WHITE); // Black background as in image
+        createPeriodBtn.setForeground(Color.BLACK); // White text
         createPeriodBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        createPeriodBtn.setPreferredSize(new Dimension(250, 36));
-        createPeriodBtn.setBackground(Color.WHITE);
-        createPeriodBtn.setFocusable(false);
-        createPeriodBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        createPeriodBtn.setFocusPainted(false);
+        createPeriodBtn.setBorder(BorderFactory.createEmptyBorder()); // No border
+        createPeriodBtn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Indicate it's clickable
+//        createPeriodBtn.setOpaque(true);
+//        createPeriodBtn.setContentAreaFilled(true);
 
-        // Hover and click effect
-        Color btnDefaultBg = Color.WHITE;
-        Color btnHoverBg = new Color(230, 255, 230); // light greenish
-        Color btnPressedBg = new Color(200, 240, 200); // slightly darker green
+        Color defaultBg = Color.WHITE;
+        Color hoverBg = new Color(220, 220, 220);
+        Color clickBg = new Color(180, 180, 180);
+
+        createPeriodBtn.setBackground(defaultBg);
 
         createPeriodBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (createPeriodBtn.isEnabled()) {
-                    createPeriodBtn.setBackground(btnHoverBg);
-                }
+                createPeriodBtn.setBackground(hoverBg);
+                createPeriodBtn.repaint();
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                createPeriodBtn.setBackground(btnDefaultBg);
+                createPeriodBtn.setBackground(defaultBg);
+                createPeriodBtn.repaint();
             }
             @Override
             public void mousePressed(MouseEvent e) {
-                if (createPeriodBtn.isEnabled()) {
-                    createPeriodBtn.setBackground(btnPressedBg);
-
-
-
-                }
+                createPeriodBtn.setBackground(clickBg);
+                createPeriodBtn.repaint();
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (createPeriodBtn.isEnabled() && createPeriodBtn.getBounds().contains(e.getPoint())) {
-                    createPeriodBtn.setBackground(btnHoverBg);
-                } else {
-                    createPeriodBtn.setBackground(btnDefaultBg);
-                }
+                createPeriodBtn.setBackground(hoverBg);
+                createPeriodBtn.repaint();
             }
         });
 
@@ -680,13 +680,13 @@ public class PayrollScreen extends JPanel {
         frozenScroll1.setPreferredSize(new Dimension(300, frozenTable1.getPreferredSize().height));
 //        frozenScroll1.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
 //        frozenScroll1.setOpaque(false);
-        frozenScroll1.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 0));
+        frozenScroll1.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
 
         JScrollPane scrollScroll1 = new JScrollPane(scrollTable1,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 //        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
-        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
+        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 
 
         // Custom scrollbars
@@ -730,8 +730,8 @@ public class PayrollScreen extends JPanel {
 
         String[] columns = {
                 "Frozen",
-                "",
-                "",
+                "Rate",
+                "Rate Per Hour",
                 "Days Present",
                 "OT In Hours",
                 "wehweh",
@@ -758,144 +758,45 @@ public class PayrollScreen extends JPanel {
 
 // Set only 2 rows
         Object[][] data2 = new Object[2][columns.length];
-
-        try {
-            // Calculate department subtotals
-            String selectedDepartment = (String) departmentDropdown.getSelectedItem();
-            double subTotalDaysPresent = Payroll.getTotalDoubleForDepartment("days_present", startDate, endDate, selectedDepartment);
-            double subTotalOvertimeHours = Payroll.getTotalDoubleForDepartment("overtime_hours", startDate, endDate, selectedDepartment);
-            double subTotalNdHours = Payroll.getTotalDoubleForDepartment("nd_hours", startDate, endDate, selectedDepartment);
-            double subTotalSholidayHours = Payroll.getTotalDoubleForDepartment("sholiday_hours", startDate, endDate, selectedDepartment);
-            double subTotalLholidayHours = Payroll.getTotalDoubleForDepartment("lholiday_hours", startDate, endDate, selectedDepartment);
-            double subTotalLateMinutes = Payroll.getTotalDoubleForDepartment("late_minutes", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalOvertimeAmount = Payroll.getTotalForDepartment("overtime_amount", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalNdAmount = Payroll.getTotalForDepartment("nd_amount", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalSholidayAmount = Payroll.getTotalForDepartment("sholiday_amount", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalLholidayAmount = Payroll.getTotalForDepartment("lholiday_amount", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalLateAmount = Payroll.getTotalForDepartment("late_amount", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalWage = Payroll.getTotalForDepartment("wage", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalPhilhealth = Payroll.getTotalForDepartment("philhealth_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalSSS = Payroll.getTotalForDepartment("sss_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalPagibig = Payroll.getTotalForDepartment("pagibig_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalEfund = Payroll.getTotalForDepartment("efund_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalOtherDeduction = Payroll.getTotalForDepartment("other_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalSalaryAdjustment = Payroll.getTotalForDepartment("salary_adjustment", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalAllowanceAdjustment = Payroll.getTotalForDepartment("allowance_adjustment", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalOtherCompensations = Payroll.getTotalForDepartment("other_compensations", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalDeduction = Payroll.getTotalForDepartment("total_deduction", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalGrossPay = Payroll.getTotalForDepartment("gross_pay", startDate, endDate, selectedDepartment);
-            BigDecimal subTotalNetPay = Payroll.getTotalForDepartment("net_pay", startDate, endDate, selectedDepartment);
-
-            // Calculate grand totals for all departments
-            double totalDaysPresent = Payroll.getTotalDoubleForPeriod("days_present", startDate, endDate);
-            double totalOvertimeHours = Payroll.getTotalDoubleForPeriod("overtime_hours", startDate, endDate);
-            double totalNdHours = Payroll.getTotalDoubleForPeriod("nd_hours", startDate, endDate);
-            double totalSholidayHours = Payroll.getTotalDoubleForPeriod("sholiday_hours", startDate, endDate);
-            double totalLholidayHours = Payroll.getTotalDoubleForPeriod("lholiday_hours", startDate, endDate);
-            double totalLateMinutes = Payroll.getTotalDoubleForPeriod("late_minutes", startDate, endDate);
-            BigDecimal totalOvertimeAmount = Payroll.getTotalForPeriod("overtime_amount", startDate, endDate);
-            BigDecimal totalNdAmount = Payroll.getTotalForPeriod("nd_amount", startDate, endDate);
-            BigDecimal totalSholidayAmount = Payroll.getTotalForPeriod("sholiday_amount", startDate, endDate);
-            BigDecimal totalLholidayAmount = Payroll.getTotalForPeriod("lholiday_amount", startDate, endDate);
-            BigDecimal totalLateAmount = Payroll.getTotalForPeriod("late_amount", startDate, endDate);
-            BigDecimal totalWage = Payroll.getTotalForPeriod("wage", startDate, endDate);
-            BigDecimal totalPhilhealth = Payroll.getTotalForPeriod("philhealth_deduction", startDate, endDate);
-            BigDecimal totalSSS = Payroll.getTotalForPeriod("sss_deduction", startDate, endDate);
-            BigDecimal totalPagibig = Payroll.getTotalForPeriod("pagibig_deduction", startDate, endDate);
-            BigDecimal totalEfund = Payroll.getTotalForPeriod("efund_deduction", startDate, endDate);
-            BigDecimal totalOtherDeduction = Payroll.getTotalForPeriod("other_deduction", startDate, endDate);
-            BigDecimal totalSalaryAdjustment = Payroll.getTotalForPeriod("salary_adjustment", startDate, endDate);
-            BigDecimal totalAllowanceAdjustment = Payroll.getTotalForPeriod("allowance_adjustment", startDate, endDate);
-            BigDecimal totalOtherCompensations = Payroll.getTotalForPeriod("other_compensations", startDate, endDate);
-            BigDecimal totalDeduction = Payroll.getTotalForPeriod("total_deduction", startDate, endDate);
-            BigDecimal totalGrossPay = Payroll.getTotalForPeriod("gross_pay", startDate, endDate);
-            BigDecimal totalNetPay = Payroll.getTotalForPeriod("net_pay", startDate, endDate);
-
-            // Add subtotals to first row
-            data2[0][0] = "SUBTOTAL";
-            data2[0][1] = "";       // Empty for pay_rate
-            data2[0][2] = "";       // Empty for pay_rate_per_hour
-            data2[0][3] = subTotalDaysPresent;
-            data2[0][4] = subTotalOvertimeHours;
-            data2[0][5] = subTotalNdHours;
-            data2[0][6] = subTotalSholidayHours;
-            data2[0][7] = subTotalLholidayHours;
-            data2[0][8] = subTotalLateMinutes;
-            data2[0][9] = subTotalOvertimeAmount;
-            data2[0][10] = subTotalNdAmount;
-            data2[0][11] = subTotalSholidayAmount;
-            data2[0][12] = subTotalLholidayAmount;
-            data2[0][13] = subTotalLateAmount;
-            data2[0][14] = subTotalWage;
-            data2[0][15] = subTotalPhilhealth;
-            data2[0][16] = subTotalSSS;
-            data2[0][17] = subTotalPagibig;
-            data2[0][18] = subTotalEfund;
-            data2[0][19] = subTotalOtherDeduction;
-            data2[0][20] = subTotalSalaryAdjustment;
-            data2[0][21] = subTotalAllowanceAdjustment;
-            data2[0][22] = subTotalOtherCompensations;
-            data2[0][23] = subTotalDeduction;
-            data2[0][24] = subTotalGrossPay;
-            data2[0][25] = subTotalNetPay;
-
-            // Add grand totals to second row
-            data2[1][0] = "TOTAL";
-            data2[1][1] = "";       // Empty for pay_rate
-            data2[1][2] = "";       // Empty for pay_rate_per_hour
-            data2[1][3] = totalDaysPresent;
-            data2[1][4] = totalOvertimeHours;
-            data2[1][5] = totalNdHours;
-            data2[1][6] = totalSholidayHours;
-            data2[1][7] = totalLholidayHours;
-            data2[1][8] = totalLateMinutes;
-            data2[1][9] = totalOvertimeAmount;
-            data2[1][10] = totalNdAmount;
-            data2[1][11] = totalSholidayAmount;
-            data2[1][12] = totalLholidayAmount;
-            data2[1][13] = totalLateAmount;
-            data2[1][14] = totalWage;
-            data2[1][15] = totalPhilhealth;
-            data2[1][16] = totalSSS;
-            data2[1][17] = totalPagibig;
-            data2[1][18] = totalEfund;
-            data2[1][19] = totalOtherDeduction;
-            data2[1][20] = totalSalaryAdjustment;
-            data2[1][21] = totalAllowanceAdjustment;
-            data2[1][22] = totalOtherCompensations;
-            data2[1][23] = totalDeduction;
-            data2[1][24] = totalGrossPay;
-            data2[1][25] = totalNetPay;
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < columns.length; j++) {
+                data2[i][j] = columns[j] + " " + (i + 1);
+            }
         }
 
-// Create models with 2 rows
+// Frozen column model (column 0 only)
         Object[][] frozenData2 = new Object[2][1];
-        frozenData2[0][0] = data2[0][0];  // "SUBTOTAL"
-        frozenData2[1][0] = data2[1][0];  // "TOTAL"
-        DefaultTableModel frozenModel2 = new DefaultTableModel(frozenData2, new String[]{""});
+        for (int i = 0; i < 2; i++) {
+            frozenData2[i][0] = data2[i][0];
+        }
+        DefaultTableModel frozenModel2 = new DefaultTableModel(frozenData2, new String[]{columns[0]});
 
+// Scrollable column model (columns 1 to end)
         Object[][] scrollData2 = new Object[2][columns.length - 1];
-        System.arraycopy(data2[0], 1, scrollData2[0], 0, columns.length - 1);
-        System.arraycopy(data2[1], 1, scrollData2[1], 0, columns.length - 1);
-        DefaultTableModel scrollModel2 = new DefaultTableModel(scrollData2, new String[columns.length - 1]);
+        for (int i = 0; i < 2; i++) {
+            System.arraycopy(data2[i], 1, scrollData2[i], 0, columns.length - 1);
+        }
+        DefaultTableModel scrollModel2 = new DefaultTableModel(scrollData2,
+                java.util.Arrays.copyOfRange(columns, 1, columns.length));
 
-// Create tables
         JTable frozenTable2 = new JTable(frozenModel2);
         JTable scrollTable2 = new JTable(scrollModel2);
 
-// Match styling
+        scrollTable2.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable scrollTable2, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(scrollTable2, value, isSelected, hasFocus, row, column);
+                if (c instanceof JComponent jc) {
+                    int bottom = (row < scrollTable2.getRowCount() - 1) ? 8 : 0; // 8px space except last row
+                    jc.setBorder(BorderFactory.createEmptyBorder(0, 0, bottom, 0));
+                }
+                return c;
+            }
+        });
+
         TableStyler.styleTable(frozenTable2);
         TableStyler.styleTable(scrollTable2);
 
-// Match column widths
-        for (int i = 0; i < scrollTable2.getColumnCount(); i++) {
-            scrollTable2.getColumnModel().getColumn(i).setPreferredWidth(
-                    scrollTable1.getColumnModel().getColumn(i).getPreferredWidth()
-            );
-        }
 // Match row heights
         frozenTable2.setRowHeight(40);
         scrollTable2.setRowHeight(40);
