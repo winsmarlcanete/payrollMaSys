@@ -115,9 +115,70 @@ public class AttendanceBackup {
 
     }
 
+    public static String processTimeCard(int employee_id) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String employeeName = "";
+
+        try {
+            conn = JDBC.getConnection();
+
+            // Get employee name
+            String nameQuery = "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM payrollmsdb.employees WHERE employee_id = ?";
+            stmt = conn.prepareStatement(nameQuery);
+            stmt.setInt(1, employee_id);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return "Employee ID does not exist.";
+            }
+
+            employeeName = rs.getString("full_name");
+
+            // Check today's timecard
+            String timecardQuery = "SELECT time_in, time_out FROM payrollmsdb.timecards WHERE employee_id = ? AND date = CURDATE()";
+            stmt = conn.prepareStatement(timecardQuery);
+            stmt.setInt(1, employee_id);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                // No timecard exists - record time in
+                recordTimein(employee_id);
+                return "Welcome " + employeeName + "! Time in recorded.";
+            }
+
+            Time timeIn = rs.getTime("time_in");
+            Time timeOut = rs.getTime("time_out");
+
+            if (timeIn != null && timeOut != null) {
+                // Both time in and out exist
+                return "Timecard already exists for " + employeeName + " today.";
+            }
+
+            if (timeIn != null && timeOut == null) {
+                // Has time in but no time out - record time out
+                recordTimeOut(employee_id);
+                return "Goodbye " + employeeName + "! Time out recorded.";
+            }
+
+            return "Invalid timecard state for " + employeeName;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error processing timecard: " + e.getMessage();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args){
-        int input_employee_id = 1;
-        recordTimeOut(input_employee_id);
 
 
 

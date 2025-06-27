@@ -911,9 +911,11 @@ public class Payroll {
 
     public static double getTotalDoubleForDepartment(String columnName, Date startDate, Date endDate, String department) {
         String sql = "SELECT SUM(p." + columnName + ") FROM payroll p " +
-                "JOIN employee e ON p.employee_id = e.employee_id " +
+                "JOIN employees e ON p.employee_id = e.employee_id " +
                 "WHERE p.period_start = ? AND p.period_end = ? " +
                 "AND e.department = ?";
+        System.out.println("Executing SQL: " + sql);
+        System.out.println("Parameters: columnName=" + columnName + ", startDate=" + startDate + ", endDate=" + endDate + ", department=" + department);
         try (Connection conn = JDBC.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDate(1, startDate);
@@ -921,8 +923,11 @@ public class Payroll {
             pstmt.setString(3, department);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return rs.getDouble(1);
+                double result = rs.getDouble(1);
+                System.out.println("Result: " + result);
+                return result;
             }
+            System.out.println("No data found, returning 0.0");
             return 0.0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -932,9 +937,11 @@ public class Payroll {
 
     public static BigDecimal getTotalForDepartment(String columnName, Date startDate, Date endDate, String department) {
         String sql = "SELECT SUM(p." + columnName + ") FROM payroll p " +
-                "JOIN employee e ON p.employee_id = e.employee_id " +
+                "JOIN employees e ON p.employee_id = e.employee_id " +
                 "WHERE p.period_start = ? AND p.period_end = ? " +
                 "AND e.department = ?";
+        System.out.println("Executing SQL: " + sql);
+        System.out.println("Parameters: columnName=" + columnName + ", startDate=" + startDate + ", endDate=" + endDate + ", department=" + department);
         try (Connection conn = JDBC.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDate(1, startDate);
@@ -942,8 +949,11 @@ public class Payroll {
             pstmt.setString(3, department);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return rs.getBigDecimal(1) != null ? rs.getBigDecimal(1) : BigDecimal.ZERO;
+                BigDecimal result = rs.getBigDecimal(1) != null ? rs.getBigDecimal(1) : BigDecimal.ZERO;
+                System.out.println("Result: " + result);
+                return result;
             }
+            System.out.println("No data found, returning BigDecimal.ZERO");
             return BigDecimal.ZERO;
         } catch (SQLException e) {
             e.printStackTrace();

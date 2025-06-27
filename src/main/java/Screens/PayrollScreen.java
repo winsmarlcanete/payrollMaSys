@@ -734,7 +734,7 @@ public class PayrollScreen extends JPanel {
                 "Rate Per Hour",
                 "Days Present",
                 "OT In Hours",
-                "wehweh",
+                "night differential",
                 "Special Holiday In Hours",
                 "Legal Holiday In Hours",
                 "Late In Minutes",

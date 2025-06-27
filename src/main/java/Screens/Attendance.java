@@ -6,7 +6,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 
 import Components.TableStyler;
@@ -19,7 +18,6 @@ import Module.E201File.E201File;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays; // Needed for Arrays.copyOfRange in filterTable
 
 public class Attendance extends JPanel {
 
@@ -311,9 +309,9 @@ public class Attendance extends JPanel {
         attendanceBackupButton.setFocusPainted(false);
         attendanceBackupButton.setBorder(BorderFactory.createEmptyBorder()); // No border
         attendanceBackupButton.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Indicate it's clickable
-
+        // Add action listener to switch to AttendanceBackupScreen
         attendanceBackupButton.addActionListener(e -> {
-            mainContainer.add(new AttendanceBackup(cardLayout, mainContainer), "backup");
+            mainContainer.add(new AttendanceBackupScreen(cardLayout, mainContainer), "backup");
             cardLayout.show(mainContainer, "backup");
         });
 
