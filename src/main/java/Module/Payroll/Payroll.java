@@ -873,6 +873,84 @@ public class Payroll {
 
     }
 
+    public static double getTotalDoubleForPeriod(String columnName, Date startDate, Date endDate) {
+        String sql = "SELECT SUM(" + columnName + ") FROM payroll " +
+                "WHERE period_start = ? AND period_end = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+            return 0.0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public static BigDecimal getTotalForPeriod(String columnName, Date startDate, Date endDate) {
+        String sql = "SELECT SUM(" + columnName + ") FROM payroll " +
+                "WHERE period_start = ? AND period_end = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal(1) != null ? rs.getBigDecimal(1) : BigDecimal.ZERO;
+            }
+            return BigDecimal.ZERO;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return BigDecimal.ZERO;
+        }
+    }
+
+    public static double getTotalDoubleForDepartment(String columnName, Date startDate, Date endDate, String department) {
+        String sql = "SELECT SUM(p." + columnName + ") FROM payroll p " +
+                "JOIN employee e ON p.employee_id = e.employee_id " +
+                "WHERE p.period_start = ? AND p.period_end = ? " +
+                "AND e.department = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            pstmt.setString(3, department);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+            return 0.0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public static BigDecimal getTotalForDepartment(String columnName, Date startDate, Date endDate, String department) {
+        String sql = "SELECT SUM(p." + columnName + ") FROM payroll p " +
+                "JOIN employee e ON p.employee_id = e.employee_id " +
+                "WHERE p.period_start = ? AND p.period_end = ? " +
+                "AND e.department = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            pstmt.setString(3, department);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal(1) != null ? rs.getBigDecimal(1) : BigDecimal.ZERO;
+            }
+            return BigDecimal.ZERO;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return BigDecimal.ZERO;
+        }
+    }
+
     public static List<Date[]> retrieveAllPeriods() {
         List<Date[]> periods = new ArrayList<>();
         Connection conn;
