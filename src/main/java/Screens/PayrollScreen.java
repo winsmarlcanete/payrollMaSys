@@ -516,32 +516,32 @@ public class PayrollScreen extends JPanel {
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightButtons.setOpaque(false);
 
-        RoundedButton edit = new RoundedButton("Edit", 10);
-        edit.setFont(new Font("Arial", Font.BOLD, 18));
-        edit.setPreferredSize(new Dimension(100, 35));
-        edit.setBackground(Color.BLACK);
-        edit.setForeground(Color.WHITE);
-        edit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        edit.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                edit.setBackground(new Color(40, 40, 40)); // Slightly lighter black
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                edit.setBackground(Color.BLACK);
-            }
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                edit.setBackground(new Color(100, 100, 100)); // Even lighter on click
-            }
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent e) {
-                edit.setBackground(edit.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
-            }
-        });
-
-        rightButtons.add(edit);
+//        RoundedButton edit = new RoundedButton("Edit", 10);
+//        edit.setFont(new Font("Arial", Font.BOLD, 18));
+//        edit.setPreferredSize(new Dimension(100, 35));
+//        edit.setBackground(Color.BLACK);
+//        edit.setForeground(Color.WHITE);
+//        edit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//        edit.addMouseListener(new java.awt.event.MouseAdapter() {
+//            @Override
+//            public void mouseEntered(java.awt.event.MouseEvent e) {
+//                edit.setBackground(new Color(40, 40, 40)); // Slightly lighter black
+//            }
+//            @Override
+//            public void mouseExited(java.awt.event.MouseEvent e) {
+//                edit.setBackground(Color.BLACK);
+//            }
+//            @Override
+//            public void mousePressed(java.awt.event.MouseEvent e) {
+//                edit.setBackground(new Color(100, 100, 100)); // Even lighter on click
+//            }
+//            @Override
+//            public void mouseReleased(java.awt.event.MouseEvent e) {
+//                edit.setBackground(edit.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+//            }
+//        });
+//
+//        rightButtons.add(edit);
 
 
 // PERIOD GROUP: manual size management
@@ -678,6 +678,7 @@ public class PayrollScreen extends JPanel {
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 //        scrollScroll1.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
         scrollScroll1.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
+
 
         // Custom scrollbars
         scrollScroll1.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
