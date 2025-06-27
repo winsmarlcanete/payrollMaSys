@@ -147,24 +147,12 @@ public class Payslip extends JPanel {
             }
         });
 
-        JTable topLeftTable = new JTable(new Object[][] {
-                {"Employee Name: Supan, Marc Laurence\n" +
-                        "Emp. ID: 123\n" +
-                        "Rate: P 123\n" +
-                        "TIN: 123-123-123-13"},
-                {"Phil. Health No.: 233-658-708\n" +
-                        "SSS No.: 123-456-789\n" +
-                        "Pag-ibig No.: 123-456-789"}
-        }, new String[] {""}) {  // Empty header
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        topLeftTable.getTableHeader().setVisible(false);
+        JButton viewButton = new JButton("View PDF");
+        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip());
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(comboPanel, BorderLayout.WEST);
+        topPanel.add(viewButton, BorderLayout.CENTER);
         topPanel.add(downloadPdf, BorderLayout.EAST);
 
         add(topPanel, BorderLayout.NORTH);
