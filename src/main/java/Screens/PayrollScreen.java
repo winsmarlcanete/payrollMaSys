@@ -31,6 +31,7 @@ import Components.TableStyler;
 import Components.RoundedComboBox;
 import Entity.Employee;
 import Entity.PayrollClass;
+import Module.E201File.E201File;
 import Module.Payroll.Payroll;
 import org.payroll.MainWindow;
 
@@ -48,6 +49,7 @@ public class PayrollScreen extends JPanel {
     private String[] scrollColumns1;
     private Date startDate;
     private Date endDate;
+    private RoundedComboBox<String> departmentDropdown;
 
     private String[] loadPeriod() {
         try {
@@ -192,27 +194,34 @@ public class PayrollScreen extends JPanel {
         //searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Dropdown
-        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
-                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
-        }) {
+        departmentDropdown= new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
             @Override
             protected void paintBorder(Graphics g) {
-                // Do nothing: no border for this instance
+                // No border
             }
         };
-        sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
-        sortCombo.setPreferredSize(new Dimension(250, 36));
-        sortCombo.setBackground(Color.WHITE);
-        sortCombo.setFocusable(false);
-        sortCombo.setMaximumRowCount(12);
-        ((JLabel)sortCombo.getRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
 
-        // Custom renderer for hover effect in dropdown list
-        sortCombo.setRenderer(new DefaultListCellRenderer() {
+// Add "All Departments" as the first item (only once)
+        departmentDropdown.insertItemAt("All Departments", 0);
+        departmentDropdown.setSelectedIndex(0);
+
+// Configure the combo box appearance
+        departmentDropdown.setFont(new Font("Arial", Font.PLAIN, 18));
+        departmentDropdown.setPreferredSize(new Dimension(250, 36));
+        departmentDropdown.setBackground(Color.WHITE);
+        departmentDropdown.setFocusable(false);
+        departmentDropdown.setMaximumRowCount(12);
+        ((JLabel) departmentDropdown.getRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
+
+// Populate the dropdown with departments from E201File
+
+
+
+        departmentDropdown.setRenderer(new DefaultListCellRenderer() {
             private int hoveredIndex = -1;
             {
                 // Add mouse motion listener to popup list for hover effect
-                sortCombo.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                departmentDropdown.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
                     @Override
                     public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
                         JList<?> list = getPopupList();
@@ -236,7 +245,7 @@ public class PayrollScreen extends JPanel {
                     @Override public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {}
                     @Override public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {}
                     private JList<?> getPopupList() {
-                        ComboPopup popup = (ComboPopup) sortCombo.getUI().getAccessibleChild(sortCombo, 0);
+                        ComboPopup popup = (ComboPopup) departmentDropdown.getUI().getAccessibleChild(departmentDropdown, 0);
                         return popup != null ? popup.getList() : null;
                     }
                 });
@@ -254,16 +263,16 @@ public class PayrollScreen extends JPanel {
         // Add hover effect (like LeaveManagement)
         Color comboDefaultBg = Color.WHITE;
         Color comboHoverBg = new Color(230, 255, 230); // light greenish
-        sortCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+        departmentDropdown.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                if (sortCombo.isEnabled()) {
-                    sortCombo.setBackground(comboHoverBg);
+                if (departmentDropdown.isEnabled()) {
+                    departmentDropdown.setBackground(comboHoverBg);
                 }
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
-                sortCombo.setBackground(comboDefaultBg);
+                departmentDropdown.setBackground(comboDefaultBg);
             }
         });
 
@@ -280,7 +289,7 @@ public class PayrollScreen extends JPanel {
         comboPanel.add(sortLabel, gbcCombo);
 
         gbcCombo.gridx = 1;
-        comboPanel.add(sortCombo, gbcCombo);
+        comboPanel.add(departmentDropdown, gbcCombo);
         comboPanel.setOpaque(true);
         comboPanel.setBackground(Color.WHITE);
 
@@ -381,7 +390,7 @@ public class PayrollScreen extends JPanel {
         rightPanel.add(btnPanel, gbc);
 
         // Make rightPanel match the height of logoAndButtonPanel
-        int topGroupHeight = Math.max(targetHeight, Math.max(sortCombo.getPreferredSize().height, createPeriodBtn.getPreferredSize().height)) + 8;
+        int topGroupHeight = Math.max(targetHeight, Math.max(departmentDropdown.getPreferredSize().height, createPeriodBtn.getPreferredSize().height)) + 8;
         comboPanel.setPreferredSize(new Dimension(comboPanel.getPreferredSize().width, topGroupHeight));
         comboPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, topGroupHeight));
         comboPanel.setMinimumSize(new Dimension(0, topGroupHeight));
@@ -404,7 +413,7 @@ public class PayrollScreen extends JPanel {
         topGroupPanel.add(logoAndButtonPanel);
 
         // Set minimum and maximum height to preferred height to prevent stretching
-        int prefHeight = Math.max(targetHeight, Math.max(sortCombo.getPreferredSize().height, createPeriodBtn.getPreferredSize().height));
+        int prefHeight = Math.max(targetHeight, Math.max(departmentDropdown.getPreferredSize().height, createPeriodBtn.getPreferredSize().height));
         logoAndButtonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, prefHeight + 8));
         logoAndButtonPanel.setPreferredSize(new Dimension(logoAndButtonPanel.getPreferredSize().width, prefHeight + 8));
 
@@ -449,7 +458,7 @@ public class PayrollScreen extends JPanel {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
                     startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
                     endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
-                    String selectedDepartment = (String) sortCombo.getSelectedItem();
+                    String selectedDepartment = (String) departmentDropdown.getSelectedItem();
                     // Call refreshPayrollData with the parsed dates
 
                     refreshPayrollData(startDate, endDate,selectedDepartment);
@@ -499,10 +508,10 @@ public class PayrollScreen extends JPanel {
         adminLabel.setForeground(Color.WHITE);
         adminLabel.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
 
-        sortCombo.addActionListener(e -> {
-            String selected = (String) sortCombo.getSelectedItem();
+        departmentDropdown.addActionListener(e -> {
+            String selected = (String) departmentDropdown.getSelectedItem();
             adminLabel.setText(selected);
-            String selectedDepartment = (String) sortCombo.getSelectedItem();
+            String selectedDepartment = (String) departmentDropdown.getSelectedItem();
             // Call refreshPayrollData with the parsed dates
             refreshPayrollData(startDate, endDate,selectedDepartment);
         });

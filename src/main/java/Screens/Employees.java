@@ -20,6 +20,7 @@ import Module.E201File.E201File;
 import jdk.swing.interop.DispatcherWrapper;
 import org.payroll.MainWindow;
 
+
 public class Employees extends JPanel {
 
     private static DefaultTableModel employeeTableModel;
@@ -37,6 +38,7 @@ public class Employees extends JPanel {
     private static Object[][] detailsViewData;
     private JTable table;
     private JTextField searchField;
+    private RoundedComboBox<String> sortCombo;
 
     public static void loadEmployeeTabledata() {
         Object[][] rawData = E201File.getEmployeeTableData(); // Query your source
@@ -68,6 +70,7 @@ public class Employees extends JPanel {
             filteredToOriginalIndex.put(i, i);
         }
     }
+
 
 
 
@@ -116,14 +119,13 @@ public class Employees extends JPanel {
         //searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Dropdown
-        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
-                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
-        }) {
+        sortCombo = new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
             @Override
             protected void paintBorder(Graphics g) {
                 // Do nothing: no border for this instance
             }
         };
+
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
         sortCombo.setPreferredSize(new Dimension(250, 36));
         sortCombo.setBackground(Color.WHITE);
@@ -177,12 +179,28 @@ public class Employees extends JPanel {
 
         sortCombo.addActionListener(e -> {
             String selected = (String) sortCombo.getSelectedItem();
-            TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(table.getModel());
-            table.setRowSorter(rowSorter);
-            if (selected != null && selected.equals("All Departments")) {
-                rowSorter.setRowFilter(null);
-            } else if (selected != null) {
-                rowSorter.setRowFilter(RowFilter.regexFilter("^" + Pattern.quote(selected) + "$", 2));
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
+            filteredToOriginalIndex.clear();
+
+            if (selected == null || selected.equals("All Departments")) {
+                // Show all departments
+                for (int i = 0; i < tableViewData.length; i++) {
+                    model.addRow(tableViewData[i]);
+                    filteredToOriginalIndex.put(i, i);
+                }
+            } else {
+                // Filter by selected department
+                int filteredIndex = 0;
+                for (int i = 0; i < tableViewData.length; i++) {
+                    Object[] row = tableViewData[i];
+                    String department = row[2].toString(); // Department column
+                    if (department.equals(selected)) {
+                        model.addRow(row);
+                        filteredToOriginalIndex.put(filteredIndex, i);
+                        filteredIndex++;
+                    }
+                }
             }
         });
 

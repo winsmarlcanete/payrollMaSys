@@ -28,6 +28,7 @@ import Config.JDBC;
 import Module.E201File.E201File;
 import org.payroll.MainWindow;
 import Module.LeaveManagement.LeaveManagement;
+import java.util.Date;
 
 public class LeaveManagementScreen extends JPanel {
     private JTextField searchField;
@@ -40,6 +41,56 @@ public class LeaveManagementScreen extends JPanel {
     private static Object[][] detailsViewData;
     private TableRowSorter<DefaultTableModel> rowSorter;
     private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
+    private RoundedComboBox<String> sortCombo;
+    private CardLayout cardLayout;  // Add this
+
+    // Add fields for the components used in debugging
+    private JTextField employeeIdField;
+    private JComboBox<String> leaveTypeCombo;
+    private JButton startDatePicker;
+    private JButton endDatePicker;
+    private JComboBox<String> statusCombo;
+
+    private void debugSaveOperation(String employeeId, String leaveType, Date startDate, Date endDate, String status) {
+        System.out.println("=== Leave Save Operation Debug ===");
+        System.out.println("Employee ID: " + employeeId);
+        System.out.println("Leave Type: " + leaveType);
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
+        System.out.println("Status: " + status);
+
+        try {
+            // Validate data
+            if (employeeId == null || employeeId.trim().isEmpty()) {
+                System.out.println("ERROR: Invalid Employee ID");
+                return;
+            }
+
+            // Check date validity
+            if (startDate == null || endDate == null) {
+                System.out.println("ERROR: Invalid dates");
+                return;
+            }
+
+            if (endDate.before(startDate)) {
+                System.out.println("ERROR: End date is before start date");
+                return;
+            }
+
+            // Log database operation attempt
+            System.out.println("Attempting database save operation...");
+
+            // After save operation
+            System.out.println("Save operation completed successfully");
+
+        } catch (Exception e) {
+            System.out.println("ERROR during save operation: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            System.out.println("=== Debug End ===");
+        }
+    }
+
     public static void loadEmployeeTabledata() {
         Object[][] rawData = E201File.getEmployeeTableData(); // Query your source
 
@@ -116,12 +167,10 @@ public class LeaveManagementScreen extends JPanel {
         searchPanel.add(searchField, BorderLayout.CENTER);
         //searchPanel.add(searchButton, BorderLayout.WEST);
 
-        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
-                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
-        }) {
+        sortCombo = new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
             @Override
             protected void paintBorder(Graphics g) {
-                // Do nothing: no border for this instance
+                // No border
             }
         };
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -177,12 +226,28 @@ public class LeaveManagementScreen extends JPanel {
 
         sortCombo.addActionListener(e -> {
             String selected = (String) sortCombo.getSelectedItem();
-            TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(table.getModel());
-            table.setRowSorter(rowSorter);
-            if (selected != null && selected.equals("All Departments")) {
-                rowSorter.setRowFilter(null);
-            } else if (selected != null) {
-                rowSorter.setRowFilter(RowFilter.regexFilter("^" + Pattern.quote(selected) + "$", 2));
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
+            filteredToOriginalIndex.clear();
+
+            if (selected == null || selected.equals("All Departments")) {
+                // Show all departments
+                for (int i = 0; i < tableViewData.length; i++) {
+                    model.addRow(tableViewData[i]);
+                    filteredToOriginalIndex.put(i, i);
+                }
+            } else {
+                // Filter by selected department
+                int filteredIndex = 0;
+                for (int i = 0; i < tableViewData.length; i++) {
+                    Object[] row = tableViewData[i];
+                    String department = row[2].toString(); // Department column
+                    if (department.equals(selected)) {
+                        model.addRow(row);
+                        filteredToOriginalIndex.put(filteredIndex, i);
+                        filteredIndex++;
+                    }
+                }
             }
         });
 
@@ -841,75 +906,115 @@ public class LeaveManagementScreen extends JPanel {
 
         // --- Save button logic ---
         saveButton.addActionListener(e -> {
-            int used = 0;
-            JComboBox<?>[] leaveBoxes = {typeOfLeave1, typeOfLeave2, typeOfLeave3, typeOfLeave4, typeOfLeave5};
-            JButton[] dateButtons = {dateField1, dateField2, dateField3, dateField4, dateField5};
-            boolean valid = true;
+            try {
+                int employeeId = Integer.parseInt(idField.getText());
+                String selectedYear = yearCombo.getSelectedItem().toString();
+                boolean hasValidEntry = false;
+                boolean hasError = false;
 
-            // Get employee_id from idField
-            int employee_id = Integer.parseInt(idField.getText());
+                // Array of leave components
+                JComboBox<?>[] leaveBoxes = {typeOfLeave1, typeOfLeave2, typeOfLeave3, typeOfLeave4, typeOfLeave5};
+                Date[] dates = {field1Date[0], field2Date[0], field3Date[0], field4Date[0], field5Date[0]};
 
-            for (int i = 0; i < 5; i++) {
-                if (leaveBoxes[i].getSelectedIndex() > 0) {
-                    String dateText = dateButtons[i].getText().trim();
-                    String leaveType = (String) leaveBoxes[i].getSelectedItem();
+                // Count used leaves
+                int usedLeaves = 0;
 
-                    if (dateText.equals("Input Date")) {
-                        JOptionPane.showMessageDialog(null,
-                                "Please input date for leave #" + (i + 1),
-                                "Missing Date",
-                                JOptionPane.WARNING_MESSAGE);
-                        valid = false;
-                        break;
-                    } else {
+                // Process each leave entry
+                for (int i = 0; i < leaveBoxes.length; i++) {
+                    if (leaveBoxes[i].isEnabled() && leaveBoxes[i].getSelectedIndex() > 0) {
+                        String leaveType = leaveBoxes[i].getSelectedItem().toString();
+                        Date selectedDate = dates[i];
+
+                        if (selectedDate == null) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Please select a date for leave #" + (i + 1),
+                                    "Missing Date",
+                                    JOptionPane.WARNING_MESSAGE);
+                            hasError = true;
+                            break;
+                        }
+
+                        // Call debug method before saving
+                        debugSaveOperation(
+                                String.valueOf(employeeId),
+                                leaveType,
+                                selectedDate,
+                                selectedDate,
+                                "Pending"
+                        );
+
+                        // Insert or update leave record
                         try {
-                            // Parse the date
-                            java.util.Date date = new java.text.SimpleDateFormat("MMM dd, yyyy").parse(dateText);
-                            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-
                             // Calculate remaining SIL
-                            int remaining_sil = 5 - used;
+                            usedLeaves++;
+                            int remainingSil = 5 - usedLeaves;
 
-                            // Check if a leave record exists for this date
-                            String sql = "SELECT leave_id FROM leavemanagement WHERE employee_id = ? AND creation_date = ?";
-                            Connection conn = null;
-                            PreparedStatement stmt = null;
-                            ResultSet rs = null;
+                            // Convert util.Date to sql.Date
+                            java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime());
 
-                            try {
-                                if (rs.next()) {
-                                    // Update existing record
-                                    int leave_id = rs.getInt("leave_id");
-                                    LeaveManagement.updateLeaveEmployee(leave_id, leaveType, remaining_sil);
-                                } else {
-                                    // Insert new record
-                                    LeaveManagement.insertLeaveEmployee(employee_id, leaveType, remaining_sil);
-                                }
-                                used++;
-                            } catch (SQLException ex) {
-                                ex.printStackTrace();
-                                valid = false;
-                            } finally {
-                                try {
-                                    if (rs != null) rs.close();
-                                    if (stmt != null) stmt.close();
-                                    if (conn != null) conn.close();
-                                } catch (SQLException ex) {
-                                    ex.printStackTrace();
+                            // Check if leave record exists
+                            String checkSql = "SELECT leave_id FROM leavemanagement WHERE employee_id = ? AND creation_date = ?";
+                            try (Connection conn = JDBC.getConnection();
+                                 PreparedStatement stmt = conn.prepareStatement(checkSql)) {
+
+                                stmt.setInt(1, employeeId);
+                                stmt.setDate(2, sqlDate);
+
+                                try (ResultSet rs = stmt.executeQuery()) {
+                                    if (rs.next()) {
+                                        // Update existing record
+                                        int leaveId = rs.getInt("leave_id");
+                                        LeaveManagement.updateLeaveEmployee(leaveId, leaveType, remainingSil);
+                                    } else {
+                                        // Insert new record
+                                        LeaveManagement.insertLeaveEmployee(employeeId, leaveType, remainingSil);
+                                    }
                                 }
                             }
-                        } catch (java.text.ParseException ex) {
-                            ex.printStackTrace();
-                            valid = false;
+
+                            hasValidEntry = true;
+                        } catch (SQLException ex) {
+                            System.err.println("Database error: " + ex.getMessage());
+                            hasError = true;
+                            break;
                         }
                     }
                 }
-            }
 
-            if (valid) {
-                leavesUsedField.setText(String.valueOf(used));
-                remainingSILField.setText((5 - used) + " / 5");
-                JOptionPane.showMessageDialog(null, "Leave records saved successfully!");
+                if (!hasValidEntry && !hasError) {
+                    JOptionPane.showMessageDialog(null,
+                            "Please select at least one leave type and date",
+                            "No Data",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (!hasError) {
+                    // Update displayed counts
+                    leavesUsedField.setText(String.valueOf(usedLeaves));
+                    remainingSILField.setText((5 - usedLeaves) + " / 5");
+
+                    // Show success message
+                    JOptionPane.showMessageDialog(null,
+                            "Leave applications saved successfully!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                    // Return to table view
+                    cardLayout.show(contentPanel, "TableView");
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null,
+                        "Invalid employee ID format",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                System.err.println("Error in save operation: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null,
+                        "Error saving leave applications: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -954,5 +1059,7 @@ public class LeaveManagementScreen extends JPanel {
                 }
             }
         });
+
+
     }
 }

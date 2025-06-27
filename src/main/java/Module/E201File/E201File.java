@@ -177,6 +177,26 @@ public class E201File {
         }
     }
 
+    public static String[] retrieveAllDepartments() {
+        ArrayList<String> departments = new ArrayList<>();
+        String sql = "SELECT DISTINCT department FROM employees ORDER BY department";
+
+        try (Connection conn = JDBC.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                departments.add(rs.getString("department"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving departments:");
+            e.printStackTrace();
+        }
+
+        return departments.toArray(new String[0]);
+    }
+
 
     public static void main(String[] args){
         displayEmployeeGeneral();

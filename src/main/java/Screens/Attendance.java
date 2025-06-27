@@ -33,13 +33,13 @@ public class Attendance extends JPanel {
     private JTable table;
     private TableRowSorter<DefaultTableModel> rowSorter;
     // Declare these at the class level for access within listeners
-    private JComboBox<String> departmentDropdown; // This will now be the "sortCombo"
+ // This will now be the "sortCombo"
     private JTextField searchField;
     // Store original raw data for filtering (as in PayrollScreen's approach)
     private Object[][] rawEmployeeData;
 
     private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
-
+    private RoundedComboBox<String> departmentDropdown;
 
     /**
      * Loads employee data from E201File and populates the table model.
@@ -165,14 +165,10 @@ public class Attendance extends JPanel {
         sortFilterContainerPanel.add(sortLabel); // Add the label to the container
 
         // Dropdown (as specified by user, now named departmentDropdown)
-        departmentDropdown = new RoundedComboBox<>(new String[] {
-                "All Departments", // First item as requested by user
-                "Human Resource", "Administration", "Accounting", "Sales",
-                "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
-        }) {
+        departmentDropdown= new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
             @Override
             protected void paintBorder(Graphics g) {
-                // Do nothing: no border for this instance
+                // No border
             }
         };
         departmentDropdown.setFont(new Font("Arial", Font.BOLD, 16)); // Keep bold font for consistency
@@ -363,15 +359,30 @@ public class Attendance extends JPanel {
         // Listener for the department dropdown to filter table rows by department
         departmentDropdown.addActionListener(e -> {
             String selected = (String) departmentDropdown.getSelectedItem();
-            // Now, "All Departments" is the default item that clears the filter
-            if (selected != null && selected.equals("All Departments")) {
-                rowSorter.setRowFilter(null); // Clear the filter
-            } else if (selected != null) {
-                // Apply filter to the "Department" column (index 2)
-                rowSorter.setRowFilter(RowFilter.regexFilter("^" + Pattern.quote(selected) + "$", 2));
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
+            filteredToOriginalIndex.clear();
+
+            if (selected == null || selected.equals("All Departments")) {
+                // Show all departments
+                for (int i = 0; i < tableViewData.length; i++) {
+                    model.addRow(tableViewData[i]);
+                    filteredToOriginalIndex.put(i, i);
+                }
+            } else {
+                // Filter by selected department
+                int filteredIndex = 0;
+                for (int i = 0; i < tableViewData.length; i++) {
+                    Object[] row = tableViewData[i];
+                    String department = row[2].toString(); // Department column
+                    if (department.equals(selected)) {
+                        model.addRow(row);
+                        filteredToOriginalIndex.put(filteredIndex, i);
+                        filteredIndex++;
+                    }
+                }
             }
         });
-
 
         // Mouse motion listener for row highlighting on hover
         table.addMouseMotionListener(new MouseMotionAdapter() {
