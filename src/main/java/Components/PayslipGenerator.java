@@ -3,10 +3,13 @@ package Components;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.FileOutputStream;
 
 public class PayslipGenerator {
 
+    // Main generation method
     public static void generatePayslip(String filePath) {
         try {
             Document document = new Document(PageSize.LETTER.rotate(), 36, 36, 36, 36);
@@ -19,7 +22,6 @@ public class PayslipGenerator {
             // Header Table
             PdfPTable header = new PdfPTable(3);
             header.setWidthPercentage(100);
-
             header.addCell(new PdfPCell(new Phrase("Department: Sales")));
             PdfPCell col2Cell = new PdfPCell(new Phrase("Pay Period:\nOctober 21 - November 5, 2024"));
             col2Cell.setRowspan(2);
@@ -33,7 +35,6 @@ public class PayslipGenerator {
             PdfPTable topTable = new PdfPTable(8);
             topTable.setWidthPercentage(100);
             topTable.setWidths(new float[]{2, 1, 1, 2, 2, 2, 2, 2});
-
             topTable.addCell(createCell("Employee Name:\nSupan, Marc Laurence", normal));
             topTable.addCell(createCell("Emp. ID:\n123", normal));
             topTable.addCell(createCell("Rate:\nP 123", normal));
@@ -129,6 +130,24 @@ public class PayslipGenerator {
             document.close();
 
             System.out.println("Payslip generated: " + filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // New method to generate and preview the PDF
+    public static void previewPayslip() {
+        try {
+            // Create or overwrite a fixed temporary file
+            String tempFilePath = System.getProperty("java.io.tmpdir") + "payslip_preview.pdf";
+            generatePayslip(tempFilePath);
+
+            File pdfFile = new File(tempFilePath);
+            if (pdfFile.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(pdfFile);
+            } else {
+                System.err.println("Preview not supported or file not found.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
