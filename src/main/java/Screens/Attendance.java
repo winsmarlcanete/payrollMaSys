@@ -30,7 +30,7 @@ public class Attendance extends JPanel {
     private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
     private static Object[][] tableViewData;
     private static Object[][] detailsViewData;
-    private JTable table;
+    private static JTable table;
     private TableRowSorter<DefaultTableModel> rowSorter;
     // Declare these at the class level for access within listeners
  // This will now be the "sortCombo"
@@ -62,8 +62,17 @@ public class Attendance extends JPanel {
         // This is crucial: Set the model *before* any filtering is attempted on it.
         if (employeeTableModel != null) {
             employeeTableModel.setDataVector(tableViewData, tableViewHeaders);
+            centerTableCells(table);
         }
         detailsViewData = rawData; // Store raw data directly for details view (if needed later)
+    }
+
+    private static void centerTableCells(JTable table) {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
     }
 
     private void initializeFilteredIndices() {
@@ -86,6 +95,7 @@ public class Attendance extends JPanel {
         // --- Table Panel (Main content panel with green background) ---
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(new Color(34, 139, 34)); // Original dark green background
+        tablePanel.setBorder(new EmptyBorder(0, 10, 10, 10)); // Original padding around the panel
 
         // --- Header Area (Container for top and bottom bars) ---
         JPanel headerArea = new JPanel();
@@ -95,7 +105,7 @@ public class Attendance extends JPanel {
         // --- Top Bar: Search, Sort By Department ---
         JPanel topBar = new JPanel(new GridBagLayout()); // Using GridBagLayout for precise control
         topBar.setBackground(new Color(34, 139, 34)); // Original green
-        topBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding for the bar itself
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Padding for the bar itself
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH; // Allow components to fill their display area
@@ -115,7 +125,7 @@ public class Attendance extends JPanel {
                     g2.setFont(getFont().deriveFont(Font.PLAIN));
                     FontMetrics fm = g2.getFontMetrics();
                     int padding = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                    g2.drawString("Search", 5, padding);
+                    g2.drawString("Search", 15, padding);
                     g2.dispose();
                 }
             }
@@ -161,7 +171,7 @@ public class Attendance extends JPanel {
         sortLabel.setOpaque(true); // Make the label opaque so background is painted
         // Removed right padding from the border to eliminate gap
         // Adjusted top/bottom padding slightly to help with vertical alignment for a 45px height
-        sortLabel.setBorder(BorderFactory.createEmptyBorder(15, 10, 16, 15));
+        sortLabel.setBorder(BorderFactory.createEmptyBorder(15, 10, 16, 5));
         sortFilterContainerPanel.add(sortLabel); // Add the label to the container
 
         // Dropdown (as specified by user, now named departmentDropdown)
@@ -172,7 +182,7 @@ public class Attendance extends JPanel {
             }
         };
         departmentDropdown.setFont(new Font("Arial", Font.BOLD, 16)); // Keep bold font for consistency
-        departmentDropdown.setPreferredSize(new Dimension(220, 50)); // Adjust width, maintain height
+        departmentDropdown.setPreferredSize(new Dimension(250, 50)); // Adjust width, maintain height
         departmentDropdown.setBackground(Color.WHITE);
         departmentDropdown.setFocusable(false);
         departmentDropdown.setMaximumRowCount(12);
@@ -221,6 +231,17 @@ public class Attendance extends JPanel {
             }
         });
 
+        departmentDropdown.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                departmentDropdown.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                departmentDropdown.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
         // Add hover effect
         Color comboDefaultBg = Color.WHITE;
         Color comboHoverBg = new Color(230, 255, 230); // light greenish
@@ -251,7 +272,7 @@ public class Attendance extends JPanel {
         // --- Bottom Bar: Logo and Attendance Backup Button ---
         JPanel bottomBar = new JPanel(new BorderLayout()); // Use BorderLayout for the logo and backup button
         bottomBar.setBackground(new Color(34, 139, 34)); // Original green
-        bottomBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10)); // Padding around elements
+        bottomBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Padding around elements
 
         // Logo Wrapper (Original styling, on the left)
         JPanel logoArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)); // Use FlowLayout for precise left alignment
@@ -271,9 +292,10 @@ public class Attendance extends JPanel {
 
         JPanel logoWrapper = new JPanel(new BorderLayout());
         logoWrapper.setBackground(Color.WHITE); // Original white background
-        logoWrapper.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Original padding
+        logoWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Original padding
         logoWrapper.add(logoAndTextLabel, BorderLayout.CENTER); // Add the combined label
         logoArea.add(logoWrapper);
+        bottomBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         bottomBar.add(logoArea, BorderLayout.WEST); // Add to the left of the bottom bar
 
 
@@ -281,7 +303,7 @@ public class Attendance extends JPanel {
         JPanel backupButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0)); // FlowLayout for precise right alignment
         backupButtonPanel.setOpaque(false); // Transparent background
 
-        JButton attendanceBackupButton = new JButton("Attendance Backup"); // Text as in image
+        RoundedButton attendanceBackupButton = new RoundedButton("Attendance Backup", 20); // Text as in image
         attendanceBackupButton.setPreferredSize(new Dimension(225, 50)); // Adjusted size to match image
         attendanceBackupButton.setBackground(Color.WHITE); // Black background as in image
         attendanceBackupButton.setForeground(Color.BLACK); // White text
@@ -294,6 +316,38 @@ public class Attendance extends JPanel {
             mainContainer.add(new AttendanceBackup(cardLayout, mainContainer), "backup");
             cardLayout.show(mainContainer, "backup");
         });
+
+        // Define the colors
+        Color defaultBg = Color.WHITE;
+        Color hoverBg = new Color(220, 220, 220); // Light gray
+        Color clickBg = new Color(180, 180, 180); // Gray
+
+        attendanceBackupButton.setBackground(defaultBg);
+
+        attendanceBackupButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                attendanceBackupButton.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                attendanceBackupButton.setBackground(defaultBg);
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                attendanceBackupButton.setBackground(clickBg);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                // Restore hover or default depending on mouse position
+                if (attendanceBackupButton.getBounds().contains(e.getPoint())) {
+                    attendanceBackupButton.setBackground(hoverBg);
+                } else {
+                    attendanceBackupButton.setBackground(defaultBg);
+                }
+            }
+        });
+
         backupButtonPanel.add(attendanceBackupButton);
         bottomBar.add(backupButtonPanel, BorderLayout.EAST); // Add to the right of the bottom bar
 
@@ -310,11 +364,13 @@ public class Attendance extends JPanel {
             }
         };
         table = new JTable(employeeTableModel);
+        centerTableCells(table);
+        TableStyler.styleTable(table);
         loadEmployeeTabledata();
 // Then initialize filtered indices
         initializeFilteredIndices();
         table.getTableHeader().setReorderingAllowed(false); // Prevent column reordering
-        TableStyler.styleTable(table); // Apply custom styling
+         // Apply custom styling
 
         // Initialize row sorter for filtering and sorting
         rowSorter = new TableRowSorter<>(employeeTableModel);
@@ -421,7 +477,8 @@ public class Attendance extends JPanel {
 
         // Wrap the table in a JScrollPane for scrollability
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Original padding
+//        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10)); // Original padding
+//        scrollPane.setOpaque(false);
 
         // --- Apply Green Scroll Bar Styling ---
         // Apply custom scrollbar UI for the vertical scroll bar

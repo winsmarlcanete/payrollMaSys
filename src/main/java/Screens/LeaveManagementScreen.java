@@ -12,9 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -36,7 +37,7 @@ public class LeaveManagementScreen extends JPanel {
     private static DefaultTableModel employeeTableModel;
     private static String[] columnHeaders = { "Name", "ID", "Department", "Employment Status" };
     private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
-    private JTable table;
+    private static JTable table;
     private static Object[][] tableViewData;
     private static Object[][] detailsViewData;
     private TableRowSorter<DefaultTableModel> rowSorter;
@@ -50,6 +51,14 @@ public class LeaveManagementScreen extends JPanel {
     private JButton startDatePicker;
     private JButton endDatePicker;
     private JComboBox<String> statusCombo;
+
+    private static void centerTableCells(JTable table) {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+    }
 
     private void debugSaveOperation(String employeeId, String leaveType, Date startDate, Date endDate, String status) {
         System.out.println("=== Leave Save Operation Debug ===");
@@ -106,6 +115,7 @@ public class LeaveManagementScreen extends JPanel {
         // Map data for details view
         detailsViewData = rawData; // Use rawData directly for details view
         employeeTableModel.setDataVector(tableViewData, tableViewHeaders);
+        centerTableCells(table);
     }
 
     private void initializeFilteredIndices() {
@@ -148,7 +158,7 @@ public class LeaveManagementScreen extends JPanel {
                     g2.setFont(getFont().deriveFont(Font.PLAIN));
                     FontMetrics fm = g2.getFontMetrics();
                     int padding = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                    g2.drawString("Search", 5, padding);
+                    g2.drawString("Search", 15, padding);
                     g2.dispose();
                 }
             }
@@ -174,7 +184,7 @@ public class LeaveManagementScreen extends JPanel {
             }
         };
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
-        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setPreferredSize(new Dimension(250, 50));
         sortCombo.setBackground(Color.WHITE);
         sortCombo.setFocusable(false);
         sortCombo.setMaximumRowCount(12);
@@ -251,6 +261,17 @@ public class LeaveManagementScreen extends JPanel {
             }
         });
 
+        sortCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                sortCombo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                sortCombo.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
         // Add hover effect (like LeaveManagement)
         Color comboDefaultBg = Color.WHITE;
         Color comboHoverBg = new Color(230, 255, 230); // light greenish
@@ -295,6 +316,7 @@ public class LeaveManagementScreen extends JPanel {
         };
         table = new JTable(employeeTableModel);
         loadEmployeeTabledata();
+        centerTableCells(table);
 // Then initialize filtered indices
         initializeFilteredIndices();
 
@@ -312,6 +334,78 @@ public class LeaveManagementScreen extends JPanel {
                 } else {
                     table.clearSelection();
                 }
+            }
+        });
+
+        tableScrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(34, 139, 34); // Green thumb
+                this.trackColor = new Color(100, 180, 100); // Lighter green track
+            }
+            // Optional: Override paintThumb and paintTrack for custom shapes/rounding
+            @Override
+            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+            @Override
+            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                button.setVisible(false);
+                return button;
+            }
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(thumbColor);
+                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+                g2.dispose();
+            }
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(trackColor);
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                g2.dispose();
+            }
+        });
+
+        // Apply custom scrollbar UI for the horizontal scroll bar (if applicable)
+        tableScrollPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(34, 139, 34); // Green thumb
+                this.trackColor = new Color(100, 180, 100); // Lighter green track
+            }
+            @Override
+            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+            @Override
+            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                button.setVisible(false);
+                return button;
+            }
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(thumbColor);
+                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+                g2.dispose();
+            }
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(trackColor);
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                g2.dispose();
             }
         });
 

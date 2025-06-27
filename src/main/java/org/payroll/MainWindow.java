@@ -87,8 +87,26 @@ public class MainWindow extends JFrame {
 
                 // Custom button panel
                 JPanel buttonPanel = new JPanel();
-                buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-                buttonPanel.setBackground(Color.WHITE);
+                buttonPanel.setLayout(new GridBagLayout());
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.fill = GridBagConstraints.BOTH;
+                gbc.gridy = 0;
+
+        // Calculate total label width
+                int totalLabelWidth = 0;
+                Map<String, Integer> labelWidths = new LinkedHashMap<>();
+                Font buttonFont = new Font("Arial", Font.PLAIN, 16);
+                for (String name : panelMap.keySet()) {
+                    JButton tempBtn = new JButton(name);
+                    tempBtn.setFont(buttonFont);
+                    FontMetrics metrics = tempBtn.getFontMetrics(buttonFont);
+                    int width = metrics.stringWidth(name) + 10; // 15px padding each side
+                    labelWidths.put(name, width);
+                    totalLabelWidth += width;
+                }
+
+        // Add buttons with proportional weightx
+                int i = 0;
 
                 Color activeColor = new Color(0, 158, 0);
                 Color defaultColor = UIManager.getColor("Button.background");
@@ -98,16 +116,16 @@ public class MainWindow extends JFrame {
 
                 for (String name : panelMap.keySet()) {
                     JButton btn = new JButton(name);
-                    btn.setFont(new Font("Arial", Font.PLAIN, 16));
+                    btn.setFont(buttonFont);
                     btn.setFocusPainted(false);
-//                    btn.setPreferredSize(new Dimension(btn.getPreferredSize().width, 35));
-//                    btn.setMaximumSize(new Dimension(btn.getPreferredSize().width, 35));
-                    btn.setPreferredSize(new Dimension(0, 45));
-                    btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
                     btn.setBackground(new Color(217, 217, 217));
-                    btn.setBorderPainted(false); // Hide border, keep padding
-                    buttonPanel.add(btn);
-                    buttonPanel.add(Box.createRigidArea(new Dimension(1, 0)));
+                    btn.setBorderPainted(false);
+
+                    gbc.gridx = i++;
+                    gbc.weightx = (double) labelWidths.get(name) / totalLabelWidth;
+                    gbc.insets = new Insets(0, 0, 0, 1); // 1px gap between buttons
+
+                    buttonPanel.add(btn, gbc);
                     buttonMap.put(name, btn);
 
                     btn.addActionListener(e -> {

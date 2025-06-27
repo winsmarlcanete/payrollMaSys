@@ -52,7 +52,7 @@ public class Reports extends javax.swing.JPanel {
             }
         };
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
-        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setPreferredSize(new Dimension(250, 50));
         sortCombo.setBackground(Color.WHITE);
         sortCombo.setFocusable(false);
         sortCombo.setMaximumRowCount(12);
@@ -110,11 +110,13 @@ public class Reports extends javax.swing.JPanel {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (sortCombo.isEnabled()) {
                     sortCombo.setBackground(comboHoverBg);
+                    sortCombo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 sortCombo.setBackground(comboDefaultBg);
+                sortCombo.setCursor(Cursor.getDefaultCursor());
             }
         });
 

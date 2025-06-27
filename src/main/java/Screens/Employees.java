@@ -26,6 +26,13 @@ public class Employees extends JPanel {
     private static DefaultTableModel employeeTableModel;
     private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
 
+    private static void centerTableCells(JTable table) {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+    }
 
     private static String[] tableViewHeaders = { "Name", "ID", "Department", "Employment Status" };
     private static String[] detailsViewHeaders = {
@@ -36,7 +43,7 @@ public class Employees extends JPanel {
     };
     private static Object[][] tableViewData;
     private static Object[][] detailsViewData;
-    private JTable table;
+    private static JTable table;
     private JTextField searchField;
     private RoundedComboBox<String> sortCombo;
 
@@ -55,7 +62,7 @@ public class Employees extends JPanel {
         // Map data for details view
         detailsViewData = rawData; // Use rawData directly for details view
         employeeTableModel.setDataVector(tableViewData, tableViewHeaders);
-
+        centerTableCells(table);
     }
 
 
@@ -97,7 +104,7 @@ public class Employees extends JPanel {
                     g2.setFont(getFont().deriveFont(Font.PLAIN));
                     FontMetrics fm = g2.getFontMetrics();
                     int padding = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                    g2.drawString("Search", 5, padding);
+                    g2.drawString("Search", 15, padding);
                     g2.dispose();
                 }
             }
@@ -127,7 +134,7 @@ public class Employees extends JPanel {
         };
 
         sortCombo.setFont(new Font("Arial", Font.PLAIN, 18));
-        sortCombo.setPreferredSize(new Dimension(250, 36));
+        sortCombo.setPreferredSize(new Dimension(250, 50));
         sortCombo.setBackground(Color.WHITE);
         sortCombo.setFocusable(false);
         sortCombo.setMaximumRowCount(12);
@@ -201,6 +208,17 @@ public class Employees extends JPanel {
                         filteredIndex++;
                     }
                 }
+            }
+        });
+
+        sortCombo.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                sortCombo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                sortCombo.setCursor(Cursor.getDefaultCursor());
             }
         });
 
