@@ -37,6 +37,7 @@ public class PayrollClass {
     private BigDecimal net_pay;
     private BigDecimal sub_total;
     private BigDecimal grand_total;
+    private BigDecimal total_compensations;
 
     // Constructor
 
@@ -231,7 +232,9 @@ public class PayrollClass {
     public String getEmployee_name() {
         return employee_name;
     }
-
+    public BigDecimal getTotal_compensations() {
+        return total_compensations;
+    }
 
 
     //Setters

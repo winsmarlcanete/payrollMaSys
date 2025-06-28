@@ -73,6 +73,7 @@ public class PayrollScreen extends JPanel {
         }
     }
 
+
     public void refreshPayrollData(java.sql.Date startDate, java.sql.Date endDate, String department) {
         // Retrieve all payrolls using the retrieveAllPayrolls function
         List<PayrollClass> allPayrolls = Payroll.retrieveAllPayrolls(startDate, endDate);

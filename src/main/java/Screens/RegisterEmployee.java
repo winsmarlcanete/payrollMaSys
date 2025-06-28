@@ -223,32 +223,20 @@ public class RegisterEmployee extends JPanel {
                 Time shiftStart = new Time(shiftStartUtilDate.getTime());
                 Time shiftEnd = new Time(shiftEndUtilDate.getTime());
 
-                // Debugging values
-                System.out.println("First Name: " + firstName);
-                System.out.println("Middle Name: " + middleName);
-                System.out.println("Last Name: " + lastName);
-                System.out.println("Department: " + department);
-                System.out.println("Employment Status: " + employmentStatus);
-                System.out.println("Rate: " + rate);
-                System.out.println("TIN: " + tin);
-                System.out.println("PhilHealth Number: " + philhealth);
-                System.out.println("PhilHealth Percentage: " + philhealthPercentage);
-                System.out.println("Pag-Ibig Number: " + pagibig);
-                System.out.println("Pag-Ibig Percentage: " + pagibigPercentage);
-                System.out.println("SSS Number: " + sss);
-                System.out.println("SSS Percentage: " + sssPercentage);
-                System.out.println("E-Fund Amount: " + efundAmount);
-                System.out.println("Other Deductions: " + otherDeductions);
-                System.out.println("Salary Adjustment Percentage: " + salaryAdjPercentage);
-                System.out.println("Allowance Amount: " + allowanceAmount);
-                System.out.println("Other Compensation Amount: " + otherCompAmount);
-                System.out.println("Shift Start: " + shiftStart);
-                System.out.println("Shift End: " + shiftEnd);
+                // Check if fingerprint is enrolled
+                if (enrolled == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Fingerprint is not registered. Please scan the fingerprint.",
+                            "Missing Fingerprint",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
+                // Create Employee object with fingerprint
                 Employee emp = new Employee(firstName, lastName, middleName, department,
                         employmentStatus, rate, tin, philhealth, philhealthPercentage, pagibig, pagibigPercentage,
                         sss, sssPercentage, efundAmount, otherDeductions, salaryAdjPercentage, allowanceAmount,
-                        otherCompAmount, shiftStart, shiftEnd);
+                        otherCompAmount, shiftStart, shiftEnd, enrolled);
 
                 EmployeeRegistration.registerEmployee(emp);
 
@@ -266,6 +254,7 @@ public class RegisterEmployee extends JPanel {
                         "An error occurred during registration. Please try again.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                System.out.println("Error during registration: " + ex.getMessage());
             }
         });
 

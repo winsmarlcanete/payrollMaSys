@@ -4,15 +4,16 @@ import Config.JDBC;
 import Entity.Employee;
 import Entity.PayrollClass;
 import Entity.Formula;
+import Entity.Payslip;
+
 import java.math.BigDecimal;
 import java.sql.*;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -986,5 +987,100 @@ public class Payroll {
         }
 
         return periods;
+    }
+
+    public static Payslip retrievePayslip(int employeeId, Date periodStart, Date periodEnd) {
+        Connection conn;
+        try {
+            String sql = """
+            SELECT p.*, e.first_name, e.last_name, e.middle_name, e.department, 
+                   e.employment_status, e.pay_rate, e.tin_number, e.philhealth_number, 
+                   e.sss_number, e.pagibig_number
+            FROM payrollmsdb.payroll p
+            JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id
+            WHERE p.employee_id = ? AND p.period_start = ? AND p.period_end = ?
+            """;
+
+            conn = JDBC.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, employeeId);
+            stmt.setDate(2, periodStart);
+            stmt.setDate(3, periodEnd);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Construct employee name
+                String employeeName = rs.getString("last_name") + ", " +
+                        rs.getString("first_name") + " " +
+                        rs.getString("middle_name");
+
+                // Create Payslip object with all retrieved data
+                Payslip payslip = new Payslip(
+                        // Employee Details
+                        employeeName,
+                        String.valueOf(rs.getInt("employee_id")),
+                        rs.getBigDecimal("pay_rate"),
+                        rs.getString("tin_number"),
+                        rs.getString("philhealth_number"),
+                        rs.getString("sss_number"),
+                        rs.getString("pagibig_number"),
+                        rs.getString("department"),
+                        rs.getString("employment_status"),
+
+                        // Pay Period Details
+                        getPeriodString(rs.getDate("period_start"), rs.getDate("period_end")),
+                        rs.getDate("period_end"),
+
+                        // Work Details
+                        rs.getBigDecimal("days_present"),
+                        rs.getBigDecimal("late_amount"),
+                        rs.getBigDecimal("wage"),
+                        rs.getBigDecimal("nd_amount"),
+                        rs.getBigDecimal("sholiday_amount"),
+                        rs.getBigDecimal("lholiday_amount"),
+                        rs.getBigDecimal("overtime_amount"),
+
+                        // Deductions
+                        rs.getBigDecimal("sss_deduction"),
+                        rs.getBigDecimal("philhealth_deduction"),
+                        rs.getBigDecimal("pagibig_deduction"),
+                        rs.getBigDecimal("efund_deduction"),
+                        rs.getBigDecimal("other_deduction"),
+
+                        // Adjustments and Compensations
+                        rs.getBigDecimal("salary_adjustment"),
+                        rs.getBigDecimal("allowance_adjustment"),
+                        rs.getBigDecimal("other_compensations"),
+
+                        // Totals
+                        rs.getBigDecimal("gross_pay"),
+                        rs.getBigDecimal("total_deduction"),
+                        rs.getBigDecimal("other_compensations"),
+                        rs.getBigDecimal("net_pay")
+                );
+
+                rs.close();
+                stmt.close();
+                conn.close();
+
+                return payslip;
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+            return null;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving payslip: " + e.getMessage(), e);
+        }
+    }
+
+    // Helper method to format pay period string
+    private static String getPeriodString(Date start, Date end) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd - ", Locale.US);
+        SimpleDateFormat endFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
+        return dateFormat.format(start) + endFormat.format(end);
     }
 }

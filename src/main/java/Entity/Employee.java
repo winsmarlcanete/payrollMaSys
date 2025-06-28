@@ -158,6 +158,35 @@ public class Employee {
         this.other_comp_amount = other_comp_amount;
     }
 
+    public Employee(String firstName, String lastName, String middleName, String department,
+                    String employmentStatus, BigDecimal rate, String tin, String philhealth,
+                    BigDecimal philhealthPercentage, String pagibig, BigDecimal pagibigPercentage,
+                    String sss, BigDecimal sssPercentage, BigDecimal efundAmount, BigDecimal otherDeductions,
+                    BigDecimal salaryAdjPercentage, BigDecimal allowanceAmount, BigDecimal otherCompAmount,
+                    Time shiftStart, Time shiftEnd, ZkFinger.FingerprintTemplate fingerprint) {
+        this.first_name = firstName;
+        this.last_name = lastName;
+        this.middle_name = middleName;
+        this.department = department;
+        this.employment_status = employmentStatus;
+        this.pay_rate = rate;
+        this.tin_number = tin;
+        this.philhealth_number = philhealth;
+        this.philhealth_percentage = philhealthPercentage;
+        this.pagibig_number = pagibig;
+        this.pagibig_percentage = pagibigPercentage;
+        this.sss_number = sss;
+        this.sss_percentage = sssPercentage;
+        this.efund_amount = efundAmount;
+        this.other_deductions = otherDeductions;
+        this.salary_adj_percentage = salaryAdjPercentage;
+        this.allowance_amount = allowanceAmount;
+        this.other_comp_amount = otherCompAmount;
+        this.shift_start = shiftStart;
+        this.shift_end = shiftEnd;
+        this.fingerprint = fingerprint;
+    }
+
 
 
 

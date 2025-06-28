@@ -1,7 +1,6 @@
 package Screens;
 
 import Components.RoundedComboBox;
-import Module.E201File.E201File;
 import org.payroll.MainWindow;
 
 import javax.swing.*;
@@ -145,7 +144,7 @@ public class Reports extends javax.swing.JPanel {
 
         AttendanceReport attendanceReport = new AttendanceReport();
         LeaveReport leaveReport = new LeaveReport();
-        Payslip payslip = new Payslip();
+        PayslipScreen payslip = new PayslipScreen();
         ChangeLog changeLog = new ChangeLog();
 
         // Map for button names and panels
