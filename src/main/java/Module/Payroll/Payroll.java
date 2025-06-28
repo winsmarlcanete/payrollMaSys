@@ -989,27 +989,28 @@ public class Payroll {
         return periods;
     }
 
-    public static Payslip retrievePayslip(int employeeId, Date periodStart, Date periodEnd) {
+    public static List<Payslip> retrieveAllPayslip(String department, Date periodStart, Date periodEnd) {
+        List<Payslip> payslips = new ArrayList<>();
         Connection conn;
         try {
             String sql = """
-            SELECT p.*, e.first_name, e.last_name, e.middle_name, e.department, 
-                   e.employment_status, e.pay_rate, e.tin_number, e.philhealth_number, 
+            SELECT p.*, e.first_name, e.last_name, e.middle_name, e.department,
+                   e.employment_status, e.pay_rate, e.tin_number, e.philhealth_number,
                    e.sss_number, e.pagibig_number
             FROM payrollmsdb.payroll p
             JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id
-            WHERE p.employee_id = ? AND p.period_start = ? AND p.period_end = ?
+            WHERE e.department = ? AND p.period_start = ? AND p.period_end = ?
             """;
 
             conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, employeeId);
+            stmt.setString(1, department);
             stmt.setDate(2, periodStart);
             stmt.setDate(3, periodEnd);
 
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 // Construct employee name
                 String employeeName = rs.getString("last_name") + ", " +
                         rs.getString("first_name") + " " +
@@ -1060,20 +1061,17 @@ public class Payroll {
                         rs.getBigDecimal("net_pay")
                 );
 
-                rs.close();
-                stmt.close();
-                conn.close();
-
-                return payslip;
+                payslips.add(payslip);
             }
 
             rs.close();
             stmt.close();
             conn.close();
-            return null;
+
+            return payslips;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving payslip: " + e.getMessage(), e);
+            throw new RuntimeException("Error retrieving payslips: " + e.getMessage(), e);
         }
     }
 

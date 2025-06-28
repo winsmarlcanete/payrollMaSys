@@ -17,6 +17,7 @@ import Module.E201File.E201File;
 import Module.Payroll.Payroll;
 
 public class PayslipScreen extends JPanel {
+    private BlackRoundedComboBox<String> sortCombo;
 
     public PayslipScreen() {
         setLayout(new BorderLayout());
@@ -28,7 +29,7 @@ public class PayslipScreen extends JPanel {
         String[] departmentsArray = departmentsList.toArray(new String[0]);
 
         // Dropdown
-        BlackRoundedComboBox<String> sortCombo = new BlackRoundedComboBox<>(departmentsArray) {
+         sortCombo = new BlackRoundedComboBox<>(departmentsArray) {
             @Override
             protected void paintBorder(Graphics g) {
                 // Do nothing: no border for this instance
@@ -87,15 +88,15 @@ public class PayslipScreen extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String filePath = "payslip.pdf";
 
-                Payslip payslip = Payroll.retrievePayslip( 253, Date.valueOf("2025-05-01"), Date.valueOf("2025-05-15"));
-                PayslipGenerator.generatePayslip(filePath, payslip);
+                List<Payslip> payslipList = Payroll.retrieveAllPayslip( sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
+                PayslipGenerator.generatePayslip(filePath, payslipList);
                 JOptionPane.showMessageDialog(PayslipScreen.this, "Payslip generated: " + filePath);
             }
         });
 
         JButton viewButton = new JButton("View PDF");
-        Payslip payslip = Payroll.retrievePayslip( 253, Date.valueOf("2025-05-01"), Date.valueOf("2025-05-15"));
-        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip(payslip));
+        List<Payslip> payslipList = Payroll.retrieveAllPayslip(sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
+        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip(payslipList));
         viewButton.setPreferredSize(new Dimension(150, 50));
         viewButton.setFont(new Font("Arial", Font.BOLD, 16));
         viewButton.setForeground(Color.WHITE);
