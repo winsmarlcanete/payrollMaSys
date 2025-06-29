@@ -1,6 +1,7 @@
 package Screens;
 
 import Components.RoundedComboBox;
+import Module.E201File.E201File;
 import org.payroll.MainWindow;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class Reports extends javax.swing.JPanel {
 
     private AttendanceReport attendanceReport;
     private LeaveReport leaveReport;
+    private E201File Payroll;
 
     public Reports() {
         // Search bar
@@ -45,9 +47,7 @@ public class Reports extends javax.swing.JPanel {
         searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Dropdown
-        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(new String[] {
-                "All Departments", "Human Resource", "Administration", "Accounting", "Sales",  "Production", "Production (Pre-Press)", "Production (Press)", "Production (Post-Press)", "Production (Quality Control)"
-        }) {
+        RoundedComboBox<String> sortCombo = new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
             @Override
             protected void paintBorder(Graphics g) {
                 // Do nothing: no border for this instance
@@ -235,5 +235,6 @@ public class Reports extends javax.swing.JPanel {
         add(cardPanel, BorderLayout.CENTER);
 
     }
+
     
 }
