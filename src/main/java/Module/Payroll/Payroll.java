@@ -1291,4 +1291,140 @@ public class Payroll {
         return grandTotals;
     }
 
+    public static Object[][] getPayrollTotal(Date period_start, Date period_end, String department) {
+        Object[][] totals = new Object[2][23]; // Adjusted for 23 columns
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = JDBC.getConnection();
+
+            // Check if the department exists in the employees table
+            String checkDepartmentQuery = "SELECT COUNT(*) FROM payrollmsdb.employees WHERE department = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkDepartmentQuery)) {
+                checkStmt.setString(1, department);
+                ResultSet checkRs = checkStmt.executeQuery();
+                if (checkRs.next() && checkRs.getInt(1) == 0) {
+                    // Department does not exist, set department to null
+                    department = null;
+                    System.out.println("Department not found. Retrieving totals for all employees.");
+                }
+            }
+
+            // Query for subtotal (specific department or all employees if department is null)
+            String subtotalQuery = """
+            SELECT
+                SUM(days_present) AS total_days_present,
+                SUM(overtime_hours) AS total_overtime_hours,
+                SUM(nd_hours) AS total_nd_hours,
+                SUM(sholiday_hours) AS total_sholiday_hours,
+                SUM(lholiday_hours) AS total_lholiday_hours,
+                SUM(late_minutes) AS total_late_minutes,
+                SUM(overtime_amount) AS total_overtime_amount,
+                SUM(nd_amount) AS total_nd_amount,
+                SUM(sholiday_amount) AS total_sholiday_amount,
+                SUM(lholiday_amount) AS total_lholiday_amount,
+                SUM(late_amount) AS total_late_amount,
+                SUM(wage) AS total_wage,
+                SUM(philhealth_deduction) AS total_philhealth_deduction,
+                SUM(sss_deduction) AS total_sss_deduction,
+                SUM(pagibig_deduction) AS total_pagibig_deduction,
+                SUM(efund_deduction) AS total_efund_deduction,
+                SUM(other_deduction) AS total_other_deduction,
+                SUM(salary_adjustment) AS total_salary_adjustment,
+                SUM(allowance_adjustment) AS total_allowance_adjustment,
+                SUM(other_compensations) AS total_other_compensations,
+                SUM(total_deduction) AS total_total_deduction,
+                SUM(gross_pay) AS total_gross_pay,
+                SUM(net_pay) AS total_net_pay
+            FROM payrollmsdb.payroll p
+            JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id
+            WHERE p.period_start = ? AND p.period_end = ?
+            """ + (department != null ? " AND e.department = ?" : "");
+
+            stmt = conn.prepareStatement(subtotalQuery);
+            stmt.setDate(1, period_start);
+            stmt.setDate(2, period_end);
+            if (department != null) {
+                stmt.setString(3, department);
+            }
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                totals[0][0] = null; // Set first column to null
+                totals[0][1] = null; // Set second column to null
+                for (int i = 2; i < totals[0].length; i++) {
+                    totals[0][i] = rs.getObject(i - 1); // Store subtotal starting from the third column
+                }
+                // Debugging: Print gross_pay and net_pay for subtotal
+                System.out.println("Subtotal Gross Pay: " + rs.getBigDecimal("total_gross_pay"));
+                System.out.println("Subtotal Net Pay: " + rs.getBigDecimal("total_net_pay"));
+            }
+
+            rs.close();
+            stmt.close();
+
+            // Query for grand total (all employees)
+            String grandTotalQuery = """
+            SELECT
+                SUM(days_present) AS total_days_present,
+                SUM(overtime_hours) AS total_overtime_hours,
+                SUM(nd_hours) AS total_nd_hours,
+                SUM(sholiday_hours) AS total_sholiday_hours,
+                SUM(lholiday_hours) AS total_lholiday_hours,
+                SUM(late_minutes) AS total_late_minutes,
+                SUM(overtime_amount) AS total_overtime_amount,
+                SUM(nd_amount) AS total_nd_amount,
+                SUM(sholiday_amount) AS total_sholiday_amount,
+                SUM(lholiday_amount) AS total_lholiday_amount,
+                SUM(late_amount) AS total_late_amount,
+                SUM(wage) AS total_wage,
+                SUM(philhealth_deduction) AS total_philhealth_deduction,
+                SUM(sss_deduction) AS total_sss_deduction,
+                SUM(pagibig_deduction) AS total_pagibig_deduction,
+                SUM(efund_deduction) AS total_efund_deduction,
+                SUM(other_deduction) AS total_other_deduction,
+                SUM(salary_adjustment) AS total_salary_adjustment,
+                SUM(allowance_adjustment) AS total_allowance_adjustment,
+                SUM(other_compensations) AS total_other_compensations,
+                SUM(total_deduction) AS total_total_deduction,
+                SUM(gross_pay) AS total_gross_pay,
+                SUM(net_pay) AS total_net_pay
+            FROM payrollmsdb.payroll
+            WHERE period_start = ? AND period_end = ?
+        """;
+
+            stmt = conn.prepareStatement(grandTotalQuery);
+            stmt.setDate(1, period_start);
+            stmt.setDate(2, period_end);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                totals[1][0] = null; // Set first column to null
+                totals[1][1] = null; // Set second column to null
+                for (int i = 2; i < totals[1].length; i++) {
+                    totals[1][i] = rs.getObject(i - 1); // Store grand total starting from the third column
+                }
+                // Debugging: Print gross_pay and net_pay for grand total
+                System.out.println("Grand Total Gross Pay: " + rs.getBigDecimal("total_gross_pay"));
+                System.out.println("Grand Total Net Pay: " + rs.getBigDecimal("total_net_pay"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving payroll totals", e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return totals;
+    }
+
 }

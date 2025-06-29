@@ -39,9 +39,13 @@ public class PayrollScreen extends JPanel {
     private JTextField searchField;
 
     private DefaultTableModel frozenModel1;
+    private DefaultTableModel frozenModel2;
+
     private DefaultTableModel scrollModel1;
+    private DefaultTableModel scrollModel2;
     private JTable frozenTable1;
     private JTable scrollTable1;
+    private JTable scrollTable2;
 
     private Object[][] frozenData1;
     private Object[][] scrollData1;
@@ -463,6 +467,7 @@ public class PayrollScreen extends JPanel {
                     // Call refreshPayrollData with the parsed dates
 
                     refreshPayrollData(startDate, endDate,selectedDepartment);
+                    populateScrollModel2(startDate, endDate, departmentDropdown.getSelectedItem().toString());
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
@@ -515,6 +520,7 @@ public class PayrollScreen extends JPanel {
             String selectedDepartment = (String) departmentDropdown.getSelectedItem();
             // Call refreshPayrollData with the parsed dates
             refreshPayrollData(startDate, endDate,selectedDepartment);
+            populateScrollModel2(startDate, endDate, selectedDepartment);
         });
 
         periodPanel.add(periodLabel);
@@ -770,18 +776,18 @@ public class PayrollScreen extends JPanel {
         for (int i = 0; i < 2; i++) {
             frozenData2[i][0] = data2[i][0];
         }
-        DefaultTableModel frozenModel2 = new DefaultTableModel(frozenData2, new String[]{columns[0]});
+         frozenModel2 = new DefaultTableModel(frozenData2, new String[]{columns[0]});
 
 // Scrollable column model (columns 1 to end)
         Object[][] scrollData2 = new Object[2][columns.length - 1];
         for (int i = 0; i < 2; i++) {
             System.arraycopy(data2[i], 1, scrollData2[i], 0, columns.length - 1);
         }
-        DefaultTableModel scrollModel2 = new DefaultTableModel(scrollData2,
+         scrollModel2 = new DefaultTableModel(scrollData2,
                 java.util.Arrays.copyOfRange(columns, 1, columns.length));
 
         JTable frozenTable2 = new JTable(frozenModel2);
-        JTable scrollTable2 = new JTable(scrollModel2);
+        scrollTable2 = new JTable(scrollModel2);
 
         TableStyler.styleTable(frozenTable2);
         TableStyler.styleTable(scrollTable2);
@@ -1564,6 +1570,27 @@ public class PayrollScreen extends JPanel {
         }
         targetTable.revalidate();
         targetTable.repaint();
+    }
+
+    public void populateScrollModel2(Date startDate, Date endDate, String department) {
+        // Retrieve payroll totals using the getPayrollTotal function
+        Object[][] payrollTotals = Payroll.getPayrollTotal(startDate, endDate, department);
+
+        // Ensure scrollModel2 has at least two rows
+        while (scrollModel2.getRowCount() < 2) {
+            scrollModel2.addRow(new Object[]{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null});
+        }
+
+        // Populate scrollModel2 with the retrieved data
+        for (int row = 0; row < payrollTotals.length; row++) {
+            for (int col = 0; col < payrollTotals[row].length; col++) {
+                scrollModel2.setValueAt(payrollTotals[row][col], row, col);
+            }
+        }
+
+        // Repaint and revalidate the table to reflect the updated data
+        scrollTable2.repaint();
+        scrollTable2.revalidate();
     }
 
     public DefaultTableModel getFrozenModel() {
