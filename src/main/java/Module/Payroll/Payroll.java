@@ -1083,13 +1083,13 @@ public class Payroll {
         return dateFormat.format(start) + endFormat.format(end);
     }
 
-    public static List<Map<String, Object>> retrieveAttendanceData(Date start, Date end) {
+    public static List<Map<String, Object>> retrieveAttendanceData(Date start, Date end, String department) {
         List<Map<String, Object>> attendanceData = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        System.out.println("Attempting to retrieve attendance data for period: " + start + " to " + end);
+        System.out.println("Attempting to retrieve attendance data for period: " + start + " to " + end + " and department: " + department);
 
         String query = "SELECT e.first_name, e.last_name, " +
                 "p.days_present as days_worked, " +
@@ -1100,7 +1100,7 @@ public class Payroll {
                 "p.late_minutes as late " +
                 "FROM payrollmsdb.employees e " +
                 "JOIN payrollmsdb.payroll p ON e.employee_id = p.employee_id " +
-                "WHERE p.period_start = ? AND p.period_end = ?";
+                "WHERE p.period_start = ? AND p.period_end = ? AND e.department = ?";
 
         System.out.println("Executing query: " + query);
 
@@ -1110,7 +1110,8 @@ public class Payroll {
 
             stmt.setDate(1, start);
             stmt.setDate(2, end);
-            System.out.println("Query parameters: period_start=" + start + ", period_end=" + end);
+            stmt.setString(3, department);
+            System.out.println("Query parameters: period_start=" + start + ", period_end=" + end + ", department=" + department);
 
             rs = stmt.executeQuery();
             System.out.println("Query executed successfully");

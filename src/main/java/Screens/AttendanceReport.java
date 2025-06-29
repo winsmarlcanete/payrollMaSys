@@ -403,7 +403,7 @@ public class AttendanceReport extends JPanel {
             System.out.println("" + payrollPeriod.getSelectedItem() + " selected from combo box BURAT");
             String selectedPeriod = (String) payrollPeriod.getSelectedItem();
             if (selectedPeriod != null && !selectedPeriod.isEmpty()) {
-                populateTableData(selectedPeriod);
+                populateTableData(selectedPeriod, adminLabel.getText());
             } else {
                 System.err.println("No period selected or invalid selection.");
             }
@@ -439,7 +439,7 @@ public class AttendanceReport extends JPanel {
         }
     }
 
-    private void populateTableData(String selectedPeriod) {
+    private void populateTableData(String selectedPeriod, String department) {
         try {
             System.out.println("Selected Period: " + selectedPeriod);
 
@@ -453,7 +453,7 @@ public class AttendanceReport extends JPanel {
             System.out.println("Start Date: " + startDate + ", End Date: " + endDate);
 
             // Retrieve attendance data using the start and end dates
-            List<Map<String, Object>> attendanceData = Payroll.retrieveAttendanceData(startDate, endDate);
+            List<Map<String, Object>> attendanceData = Payroll.retrieveAttendanceData(startDate, endDate, department);
             System.out.println("Retrieved attendance data size: " + attendanceData.size());
 
             // Clear existing data
@@ -488,14 +488,7 @@ public class AttendanceReport extends JPanel {
         }
     }
 
-    private void setupPeriodComboBox() {
-        payrollPeriod.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                String selectedPeriod = (String) e.getItem();
-                populateTableData(selectedPeriod);
-            }
-        });
-    }
+
 
 
 }
