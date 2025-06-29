@@ -5,6 +5,7 @@ import Module.Registration.UserRegistration.UserRegistration;
 import Algorithms.sha256;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.Arrays; // Import Arrays for comparing char arrays
 
@@ -37,16 +38,46 @@ public class Register extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add some padding
 
         // Logo
-        JLabel logoLabel = new JLabel("SynergyGrafixCorp.");
-        logoLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoLabel.setForeground(new Color(0, 153, 0)); // Greenish
+        JPanel logoPanel = new JPanel();
+        logoPanel.setOpaque(false);
+
+        int targetHeight = 30; // Original height from PayrollScreen snippet
+        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+
+        ImageIcon scaledLogoIcon = new ImageIcon(scaledLogo);
+        JLabel logoLabel = new JLabel(scaledLogoIcon);
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setBorder(new EmptyBorder(25, 0, 0, 0));
+        logoPanel.add(logoLabel);
 
         JLabel systemLabel = new JLabel("User Registration");
         systemLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
         systemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        mainPanel.add(logoLabel);
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setOpaque(false);
+
+        JButton backButton = new JButton("<html>&#x2190;</html>"); // Unicode left arrow
+        backButton.setFont(new Font("Arial", Font.BOLD, 24));
+        backButton.setBorderPainted(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Indicate clickable
+        backButton.addActionListener(e -> {
+            dispose();
+            // Navigate back to the LoginScreen
+            // Assuming Login.java has a main method to start it
+            Login.main(null); // This call assumes your external Login.java exists and can be invoked
+        });
+        headerPanel.add(backButton);
+
+        mainPanel.add(headerPanel);
+        mainPanel.add(logoPanel);
         mainPanel.add(systemLabel);
         mainPanel.add(Box.createVerticalStrut(20)); // Spacing after title
 
@@ -76,6 +107,8 @@ public class Register extends JFrame {
         // Position Radio Buttons
         hrButton = new JRadioButton("HR");
         accountantButton = new JRadioButton("Accountant");
+        hrButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        accountantButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         ButtonGroup positionGroup = new ButtonGroup();
         positionGroup.add(hrButton);
@@ -209,6 +242,7 @@ public class Register extends JFrame {
         securityQuestionComboBox.setMaximumSize(new Dimension(400, 40)); // Increased width for full visibility
         securityQuestionComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         securityQuestionComboBox.setBorder(BorderFactory.createTitledBorder("Security Question"));
+        securityQuestionComboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
         ((JLabel)securityQuestionComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER); // Center text in combobox
 
         // =============== Security Answer Field ===============
@@ -240,6 +274,7 @@ public class Register extends JFrame {
         regButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         regButton.setBackground(new Color(0, 153, 0));
         regButton.setForeground(Color.WHITE);
+        regButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         regButton.setFocusPainted(false); // Remove focus border from button
         regButton.setFont(new Font("SansSerif", Font.BOLD, 16)); // Make button text a bit bigger
 
@@ -260,9 +295,21 @@ public class Register extends JFrame {
                 return;
             }
 
+            // Name validation
+            if (!first_name.matches("^[a-zA-Z\\s]*$") || first_name.length() < 2) {
+                JOptionPane.showMessageDialog(this, "First name must be at least 2 characters and contain only letters and spaces.",
+                        "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!last_name.matches("^[a-zA-Z\\s]*$") || last_name.length() < 2) {
+                JOptionPane.showMessageDialog(this, "Last name must be at least 2 characters and contain only letters and spaces.",
+                        "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             if (!Arrays.equals(passwordChar, cpasswordChar)) {
                 JOptionPane.showMessageDialog(this, "Passwords do not match.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                // Clear password fields for security
                 passwordField.setText("");
                 cpasswordField.setText("");
                 return;
@@ -273,13 +320,11 @@ public class Register extends JFrame {
                 return;
             }
 
-            // Basic email format validation (can be more robust with regex)
             if (!email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")) {
                 JOptionPane.showMessageDialog(this, "Invalid email format.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Basic password strength check (e.g., minimum 8 characters)
             if (passwordChar.length < 8) {
                 JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 passwordField.setText("");
@@ -339,6 +384,60 @@ public class Register extends JFrame {
         wrapper.add(mainPanel);
 
         add(wrapper);
+    }
+
+    private void addNameFieldValidation(JTextField field, String fieldName) {
+        field.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                validateField();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                validateField();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                validateField();
+            }
+
+            private void validateField() {
+                String text = field.getText();
+                // Check if text contains anything other than letters and spaces
+                if (!text.matches("^[a-zA-Z\\s]*$")) {
+                    field.setBackground(new Color(255, 221, 221)); // Light red for invalid input
+                    JOptionPane.showMessageDialog(null,
+                            fieldName + " can only contain letters and spaces.",
+                            "Invalid Input",
+                            JOptionPane.WARNING_MESSAGE);
+                    // Remove invalid characters
+                    SwingUtilities.invokeLater(() -> {
+                        field.setText(text.replaceAll("[^a-zA-Z\\s]", ""));
+                        field.setBackground(Color.WHITE);
+                    });
+                } else {
+                    field.setBackground(Color.WHITE); // Reset to white for valid input
+                }
+            }
+        });
+
+        // Add FocusListener to validate minimum length when field loses focus
+        field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                String text = field.getText().trim();
+                if (text.length() < 2) {
+                    field.setBackground(new Color(255, 221, 221));
+                    JOptionPane.showMessageDialog(null,
+                            fieldName + " must be at least 2 characters long.",
+                            "Invalid Input",
+                            JOptionPane.WARNING_MESSAGE);
+                    field.requestFocus();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {

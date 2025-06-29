@@ -7,6 +7,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage; // Added this import just in case for logo fallback
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,10 @@ import Module.Security.UserAuthenticator;
 
 
 public class ResetPassword {
+
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public static String userEmail; // To carry the email across screens
 
@@ -121,10 +127,13 @@ public class ResetPassword {
         sendCodeButton.setForeground(Color.WHITE);
         sendCodeButton.setMaximumSize(new Dimension(350, 30));
         sendCodeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sendCodeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         sendCodeButton.addActionListener(e -> {
             String email = emailField.getText();
             if (email.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter your email.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!email.matches(EMAIL_PATTERN)) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid email address.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 userEmail = email; // Store email for the next screen
                 String otp = OTPGenerator.generateOTP(); // Generate OTP
@@ -135,6 +144,25 @@ public class ResetPassword {
                 EnterCodeScreen.showEnterCodeScreen(); // Open the new Enter Code screen
             }
         });
+        sendCodeButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                sendCodeButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                sendCodeButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                sendCodeButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                sendCodeButton.setBackground(new Color(39, 174, 96)); // Back to hover color
+            }
+        });
+
         panel.add(sendCodeButton);
 
         panel.add(Box.createRigidArea(new Dimension(0, 10))); // Space between buttons
@@ -152,16 +180,38 @@ public class ResetPassword {
         answerSecurityQuestionButton.setForeground(Color.WHITE);
         answerSecurityQuestionButton.setMaximumSize(new Dimension(350, 30));
         answerSecurityQuestionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        answerSecurityQuestionButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         answerSecurityQuestionButton.addActionListener(e -> {
             String email = emailField.getText();
             if (email.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter your email to answer security question.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!email.matches(EMAIL_PATTERN)) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid email address.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 userEmail = email; // Store email for the next screen
                 frame.dispose(); // Close current frame
                 SecurityQuestionScreen.showSecurityQuestionScreen(); // Open the new Security Question screen
             }
         });
+        answerSecurityQuestionButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                answerSecurityQuestionButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                answerSecurityQuestionButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                answerSecurityQuestionButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                answerSecurityQuestionButton.setBackground(new Color(39, 174, 96)); // Back to hover color
+            }
+        });
+
         panel.add(answerSecurityQuestionButton);
         // --- End New Buttons ---
 
@@ -258,6 +308,7 @@ class EnterCodeScreen {
         verifyButton.setForeground(Color.WHITE);
         verifyButton.setMaximumSize(new Dimension(350, 30));
         verifyButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        verifyButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         verifyButton.addActionListener(e -> {
             String enteredCode = codeField.getText();
             if (enteredCode.isEmpty()) {
@@ -272,6 +323,25 @@ class EnterCodeScreen {
                 }
             }
         });
+        verifyButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                verifyButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                verifyButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                verifyButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                verifyButton.setBackground(new Color(39, 174, 96)); // Back to hover color
+            }
+        });
+
         panel.add(verifyButton);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -372,6 +442,7 @@ class SecurityQuestionScreen {
         submitAnswerButton.setForeground(Color.WHITE);
         submitAnswerButton.setMaximumSize(new Dimension(350, 30));
         submitAnswerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        submitAnswerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         submitAnswerButton.addActionListener(e -> {
             String selectedQuestion = (String) securityQuestionDropdown.getSelectedItem();
             String enteredAnswer = answerField.getText();
@@ -389,6 +460,25 @@ class SecurityQuestionScreen {
                 }
             }
         });
+        submitAnswerButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                submitAnswerButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                submitAnswerButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                submitAnswerButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                submitAnswerButton.setBackground(new Color(39, 174, 96)); // Back to hover color
+            }
+        });
+
         panel.add(submitAnswerButton);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -558,6 +648,7 @@ class NewPasswordScreen {
         savePasswordButton.setForeground(Color.WHITE);
         savePasswordButton.setMaximumSize(new Dimension(350, 30));
         savePasswordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        savePasswordButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         savePasswordButton.addActionListener(e -> {
             String newPass = new String(newPasswordField.getPassword());
             String confirmPass = new String(confirmPasswordField.getPassword());
@@ -579,6 +670,24 @@ class NewPasswordScreen {
                 } else {
                     JOptionPane.showMessageDialog(frame, "Failed to update password. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+        });
+        savePasswordButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                savePasswordButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                savePasswordButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                savePasswordButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                savePasswordButton.setBackground(new Color(39, 174, 96)); // Back to hover color
             }
         });
         panel.add(savePasswordButton);
@@ -780,10 +889,29 @@ class PasswordChangedScreen {
         continueButton.setForeground(Color.WHITE);
         continueButton.setMaximumSize(new Dimension(350, 30));
         continueButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         continueButton.addActionListener(e -> {
             frame.dispose();
             // Assuming Login.java exists externally for navigation back to login
             Login.main(null);
+        });
+        continueButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                continueButton.setBackground(new Color(39, 174, 96)); // Darker green on hover
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                continueButton.setBackground(new Color(46, 204, 113)); // Original green
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                continueButton.setBackground(new Color(33, 148, 82)); // Even darker when pressed
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                continueButton.setBackground(new Color(39, 174, 96)); // Back to hover color
+            }
         });
         panel.add(continueButton);
 
