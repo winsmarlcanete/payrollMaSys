@@ -1292,7 +1292,7 @@ public class Payroll {
     }
 
     public static Object[][] getPayrollTotal(Date period_start, Date period_end, String department) {
-        Object[][] totals = new Object[2][23]; // Adjusted for 23 columns
+        Object[][] totals = new Object[2][25]; // Adjusted for 23 columns
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1409,6 +1409,12 @@ public class Payroll {
                 // Debugging: Print gross_pay and net_pay for grand total
                 System.out.println("Grand Total Gross Pay: " + rs.getBigDecimal("total_gross_pay"));
                 System.out.println("Grand Total Net Pay: " + rs.getBigDecimal("total_net_pay"));
+
+                // Debugging: Print all set columns in totals[1]
+                System.out.println("All columns in totals[1]:");
+                for (int i = 0; i < totals[1].length; i++) {
+                    System.out.println("Column " + i + ": " + totals[1][i]);
+                }
             }
 
         } catch (SQLException e) {

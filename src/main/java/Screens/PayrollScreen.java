@@ -776,6 +776,13 @@ public class PayrollScreen extends JPanel {
         for (int i = 0; i < 2; i++) {
             frozenData2[i][0] = data2[i][0];
         }
+
+        // Set the first row of the frozen column to "Sub total"
+        frozenData2[0][0] = "Sub total";
+
+// Set the second row of the frozen column to "Grand total"
+        frozenData2[1][0] = "Grand total";
+
          frozenModel2 = new DefaultTableModel(frozenData2, new String[]{columns[0]});
 
 // Scrollable column model (columns 1 to end)
