@@ -7,9 +7,12 @@ import Entity.Employee;
 import Entity.PayrollClass;
 import Module.Payroll.Payroll;
 import org.icepdf.ri.common.views.annotations.ScalableJScrollPane;
+import org.payroll.MainWindow;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -18,6 +21,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.sql.Date;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +33,9 @@ public class AttendanceReport extends JPanel {
     private JLabel adminLabel;
 
     private JTable frozenTable1;
+    private JTable frozenTable2;
     private JTable scrollTable1;
+    private JTable scrollTable2;
     private JPanel tablePanel;
 
     private void setupTables() {
@@ -49,6 +55,26 @@ public class AttendanceReport extends JPanel {
                 return false;
             }
         };
+
+        DefaultTableModel frozenModel2 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        DefaultTableModel scrollModel2 = new DefaultTableModel(
+                new String[]{"Basic Pay", "Overtime", "Holiday Pay", "13th Month", "Gross Pay", "Net Pay"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        // Add 2 rows of data
+        frozenModel2.addRow(new Object[]{"Total"});
+        frozenModel2.addRow(new Object[]{"Grand Total"});
 
         // Add sample data
         String[] sampleNames = {
@@ -102,16 +128,40 @@ public class AttendanceReport extends JPanel {
                 "Susan Lewis",
         };
 
-        // Add rows to both tables with sample data
+        // Random number generator
+        java.util.Random rand = new java.util.Random();
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+
+        // Add rows to both tables with random data
         for (String name : sampleNames) {
             frozenModel1.addRow(new Object[]{name});
+
+            // Generate random values for each column
+            double basicPay = 30000 + rand.nextDouble() * 40000; // Range: 30,000 - 70,000
+            double overtime = rand.nextDouble() * 5000;          // Range: 0 - 5,000
+            double holidayPay = rand.nextDouble() * 3000;       // Range: 0 - 3,000
+            double thirteenthMonth = basicPay / 12;             // 1/12 of basic pay
+            double grossPay = basicPay + overtime + holidayPay + thirteenthMonth;
+            double netPay = grossPay * 0.9;                     // Assuming 10% deductions
+
             scrollModel1.addRow(new Object[]{
-                    "50000.00",
-                    "2500.00",
-                    "1000.00",
-                    "4166.67",
-                    "57666.67",
-                    "51900.00"
+                    df.format(basicPay),
+                    df.format(overtime),
+                    df.format(holidayPay),
+                    df.format(thirteenthMonth),
+                    df.format(grossPay),
+                    df.format(netPay)
+            });
+        }
+
+        for (int i = 0; i < 2; i++) {
+            scrollModel2.addRow(new Object[]{
+                    "0.00",
+                    "0.00",
+                    "0.00",
+                    "0.00",
+                    "0.00",
+                    "0.00"
             });
         }
 
@@ -129,6 +179,72 @@ public class AttendanceReport extends JPanel {
         scrollTable1.getTableHeader().setReorderingAllowed(false);
         scrollTable1.getTableHeader().setResizingAllowed(false);
 
+        frozenTable2 = new JTable(frozenModel2);
+        TableStyler.styleTable(frozenTable2);
+        frozenTable2.setShowGrid(false);
+        frozenTable2.setTableHeader(null); // Hide header since it's a summary table
+
+        scrollTable2 = new JTable(scrollModel2);
+        TableStyler.styleTable(scrollTable2);
+        scrollTable2.setShowGrid(false);
+        scrollTable2.setTableHeader(null);
+
+        scrollTable2.setBackground(MainWindow.grayColor);
+        frozenTable2.setBackground(MainWindow.grayColor);
+
+        Color lightGray = new Color(240, 240, 240);
+
+        frozenTable2.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(lightGray);
+                }
+                return c;
+            }
+        });
+
+        scrollTable2.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(lightGray);
+                }
+                return c;
+            }
+        });
+
+        // Synchronize row selection
+        ListSelectionModel selectionModel = frozenTable1.getSelectionModel();
+        scrollTable1.setSelectionModel(selectionModel);
+
+        // Highlight row on mouse hover (like Employees.java)
+        frozenTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = frozenTable1.rowAtPoint(e.getPoint());
+                if (row != -1) {
+                    frozenTable1.setRowSelectionInterval(row, row);
+                } else {
+                    frozenTable1.clearSelection();
+                }
+            }
+        });
+        scrollTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = scrollTable1.rowAtPoint(e.getPoint());
+                if (row != -1) {
+                    scrollTable1.setRowSelectionInterval(row, row);
+                } else {
+                    scrollTable1.clearSelection();
+                }
+            }
+        });
+
+
         // Configure column width
         TableColumnModel frozenColumnModel = frozenTable1.getColumnModel();
         TableColumn frozenColumn = frozenColumnModel.getColumn(0);
@@ -140,15 +256,78 @@ public class AttendanceReport extends JPanel {
             column.setPreferredWidth(150);
         }
 
+        // Configure column width
+        TableColumnModel frozenColumnModel2 = frozenTable2.getColumnModel();
+        TableColumn frozenColumn2 = frozenColumnModel2.getColumn(0);
+        frozenColumn2.setPreferredWidth(200);
+
+        TableColumnModel scrollColumnModel2 = scrollTable2.getColumnModel();
+        for (int i = 0; i < scrollColumnModel2.getColumnCount(); i++) {
+            TableColumn column = scrollColumnModel2.getColumn(i);
+            column.setPreferredWidth(150);
+        }
+
         // Create scroll pane for the table
         JScrollPane frozenScrollPane1 = new JScrollPane(frozenTable1);
         frozenScrollPane1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        frozenScrollPane1.setBorder(BorderFactory.createEmptyBorder());
 
-        JScrollPane scrollScrollPane1 = new JScrollPane(scrollTable1);
+        JScrollPane scrollScrollPane1 = new JScrollPane(scrollTable1,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollScrollPane1.setBorder(BorderFactory.createEmptyBorder());
+
+
+        // Create scroll pane for frozenTable2
+        JScrollPane frozenScrollPane2 = new JScrollPane(frozenTable2);
+        frozenScrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        frozenScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        frozenScrollPane2.setBorder(BorderFactory.createEmptyBorder());
+
+        JScrollPane scrollScrollPane2 = new JScrollPane(scrollTable2);
+        scrollScrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollScrollPane2.setBorder(BorderFactory.createEmptyBorder());
 
         // Synchronize vertical scrolling
         scrollScrollPane1.getVerticalScrollBar().addAdjustmentListener(e -> {
             frozenScrollPane1.getVerticalScrollBar().setValue(e.getValue());
+        });
+
+        // Custom scrollbars
+        scrollScrollPane1.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+            @Override
+            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                button.setVisible(false);
+                return button;
+            }
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(34, 177, 76);
+                this.trackColor = new Color(220, 255, 220);
+            }
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(34, 177, 76));
+                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+                g2.dispose();
+            }
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(new Color(220, 255, 220));
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                g2.dispose();
+            }
         });
 
         frozenScrollPane1.addMouseWheelListener(e -> {
@@ -157,10 +336,21 @@ public class AttendanceReport extends JPanel {
             );
         });
 
+        JPanel leftBottomTable = new JPanel(new BorderLayout());
+        leftBottomTable.add(frozenScrollPane2, BorderLayout.CENTER);
+
+        JPanel centerBottomTable = new JPanel(new BorderLayout());
+        centerBottomTable.add(leftBottomTable, BorderLayout.WEST);
+        centerBottomTable.add(scrollScrollPane2, BorderLayout.CENTER);
+
+        int bottomTableHeight = (frozenTable2.getRowHeight() * 2) + 2; // 2 rows height + small buffer
+        centerBottomTable.setPreferredSize(new Dimension(centerBottomTable.getPreferredSize().width, bottomTableHeight));
+
         // Create and configure tablePanel
         tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(frozenScrollPane1, BorderLayout.WEST);
         tablePanel.add(scrollScrollPane1, BorderLayout.CENTER);
+        tablePanel.add(centerBottomTable, BorderLayout.SOUTH);
     }
 
     public AttendanceReport() {
