@@ -8,6 +8,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +17,10 @@ import java.util.List;
 //import Components.PayslipGenerator;
 //import Entity.Payslip;
 import Components.RoundedPanel;
+import Entity.Payslip;
 import Module.E201File.E201File;
 import Module.Payroll.Payroll;
+import Components.PayslipGenerator;
 
 public class PayslipScreen extends JPanel {
     private BlackRoundedComboBox<String> deptCombo;
@@ -24,20 +28,24 @@ public class PayslipScreen extends JPanel {
     private RoundedButton viewButton;
     private RoundedButton downloadPdf;
     private RoundedPanel deptComboPanel;
+    private Date startDate;
+    private Date endDate;
 
     private String[] generatePayrollPeriods() {
         List<String> periods = new ArrayList<>();
         periods.add("Select payroll period"); // Add default option
-        String[] months = {"Oct", "Nov", "Dec", "Jan", "Feb", "Mar"};
-        int year = 2025;
 
-        for (String month : months) {
-            periods.add(String.format("%s 1, %d - %s 15, %d", month, year, month, year));
-            periods.add(String.format("%s 16, %d - %s 30, %d", month, year, month, year));
+        // Retrieve all periods from Payroll.java
+        List<Date[]> retrievedPeriods = Payroll.retrieveAllPeriods();
 
-            if (month.equals("Dec")) {
-                year = 2026;
-            }
+        // Define the date format
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
+
+        // Format and add each period to the list
+        for (Date[] period : retrievedPeriods) {
+            String formattedStartDate = formatter.format(period[0]);
+            String formattedEndDate = formatter.format(period[1]);
+            periods.add(formattedStartDate + " - " + formattedEndDate);
         }
 
         return periods.toArray(new String[0]);
@@ -95,7 +103,7 @@ public class PayslipScreen extends JPanel {
         String[] departmentsArray = departmentsList.toArray(new String[0]);
 
         String[] payrollPeriods = generatePayrollPeriods();
-        periodCombo = new BlackRoundedComboBox<>(payrollPeriods) {  // Changed from departmentsArray to payrollPeriods
+        periodCombo = new BlackRoundedComboBox<>(payrollPeriods) {
             @Override
             protected void paintBorder(Graphics g) {
                 // Do nothing: no border for this instance
@@ -256,20 +264,53 @@ public class PayslipScreen extends JPanel {
         downloadPdf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String filePath = "payslip.pdf";
+                try {
+                    String filePath = "payslip.pdf";
+                    String selectedPeriod = (String) periodCombo.getSelectedItem();
+                    String[] dates = selectedPeriod.split(" - ");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
-//                List<Payslip> payslipList = Payroll.retrieveAllPayslip( sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
-//                PayslipGenerator.generatePayslip(filePath, payslipList);
-                JOptionPane.showMessageDialog(PayslipScreen.this, "Payslip generated: " + filePath);
-                periodCombo.setSelectedItem("Select payroll period");
-                deptCombo.setSelectedItem("Choose a department");
-                updateComponentStates();
+                    // Parse the start and end dates
+                     startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+                    endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
+
+                    // Retrieve payslips and generate PDF
+                    List<Payslip> payslipList = Payroll.retrieveAllPayslip(deptCombo.getSelectedItem().toString(), startDate, endDate);
+                    PayslipGenerator.generatePayslip(filePath, payslipList);
+                    JOptionPane.showMessageDialog(PayslipScreen.this, "Payslip generated: " + filePath);
+
+                    // Reset selections
+                    periodCombo.setSelectedItem("Select payroll period");
+                    deptCombo.setSelectedItem("Choose a department");
+                    updateComponentStates();
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(PayslipScreen.this, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         viewButton = new RoundedButton("View PDF", 10);
-//        List<Payslip> payslipList = Payroll.retrieveAllPayslip(sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
-//        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip(payslipList));
+
+        viewButton.addActionListener(e -> {
+            try {
+                String selectedPeriod = (String) periodCombo.getSelectedItem();
+                String[] dates = selectedPeriod.split(" - ");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+
+                // Parse the start and end dates
+                startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+                endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
+
+                // Retrieve payslips and preview PDF
+                List<Payslip> payslipList = Payroll.retrieveAllPayslip(deptCombo.getSelectedItem().toString(), startDate, endDate);
+                PayslipGenerator.previewPayslip(payslipList);
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(PayslipScreen.this, "Invalid date format selected.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         viewButton.setPreferredSize(new Dimension(150, 50));
         viewButton.setFont(new Font("Arial", Font.BOLD, 16));
         viewButton.setForeground(Color.WHITE);

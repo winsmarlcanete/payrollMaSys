@@ -93,7 +93,7 @@ public class MainWindow extends JFrame {
         // Map for button names and panels
         Map<String, JPanel> panelMap = new LinkedHashMap<>();
         panelMap.put("Employees", employees);
-        panelMap.put("Register", regemployee);
+        panelMap.put("Register Employee", regemployee);
         panelMap.put("Attendance", attendance);
         panelMap.put("Leave Management", leavemanagement);
         panelMap.put("Payroll", payroll);
