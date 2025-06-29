@@ -38,6 +38,8 @@ public class AttendanceReport extends JPanel {
     private JTable scrollTable2;
     private JPanel tablePanel;
 
+    private BlackRoundedComboBox<String> payrollPeriod;
+
     private void setupTables() {
         // Create table model with 1 column
         DefaultTableModel frozenModel1 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
@@ -48,7 +50,7 @@ public class AttendanceReport extends JPanel {
         };
 
         DefaultTableModel scrollModel1 = new DefaultTableModel(
-                new String[]{"Basic Pay", "Overtime", "Holiday Pay", "13th Month", "Gross Pay", "Net Pay"}, 0
+                new String[]{"Days Worked", "Overtime (Hours)", "Night Differential (Hours)", "Special Holiday / Sunday (Hours)", "Legal Holiday (Hours)", "Late (Minutes)"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -64,7 +66,7 @@ public class AttendanceReport extends JPanel {
         };
 
         DefaultTableModel scrollModel2 = new DefaultTableModel(
-                new String[]{"Basic Pay", "Overtime", "Holiday Pay", "13th Month", "Gross Pay", "Net Pay"}, 0
+                new String[]{"Days Worked", "Overtime (Hours)", "Night Differential (Hours)", "Special Holiday / Sunday (Hours)", "Legal Holiday (Hours)", "Late (Minutes)"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -353,16 +355,30 @@ public class AttendanceReport extends JPanel {
         tablePanel.add(centerBottomTable, BorderLayout.SOUTH);
     }
 
+    public static String[] getPeriods() {
+        try {
+            List<Date[]> periods = Payroll.retrieveAllPeriods();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+            String[] formattedPeriods = new String[periods.size()];
+
+            for (int i = 0; i < periods.size(); i++) {
+                Date[] period = periods.get(i);
+                formattedPeriods[i] = dateFormat.format(period[0]) + " - " + dateFormat.format(period[1]);
+            }
+
+            return formattedPeriods;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new String[]{"Error retrieving periods"};
+        }
+    }
     public AttendanceReport() {
 
         setupTables();
 
-        // Sample data for combobox
-        String[] periods = {
-                "Jan 01, 2024 - Jan 15, 2024",
-                "Jan 16, 2024 - Jan 31, 2024",
-                "Feb 01, 2024 - Feb 15, 2024"
-        };
+
+
+        String[] periods = getPeriods();
 
         // Create and configure panel
 
