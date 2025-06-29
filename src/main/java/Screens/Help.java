@@ -1,6 +1,9 @@
 package Screens;
 
+import org.payroll.MainWindow;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -17,9 +20,19 @@ public class Help extends JPanel {
         contentPanel.setBackground(Color.WHITE);
 
         // Add the logo and title
-        JLabel logoLabel = new JLabel("SynergyGrafixCorp.", JLabel.CENTER);
-        logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        logoLabel.setForeground(new Color(0, 128, 0));
+        int targetHeight = 50; // Original height from PayrollScreen snippet
+        // Load and scale the logo image
+        ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+
+        ImageIcon scaledLogoIcon = new ImageIcon(scaledLogo);
+        JLabel logoLabel = new JLabel(scaledLogoIcon);
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setBorder(new EmptyBorder(30, 0, 0, 0));
+
         contentPanel.add(logoLabel, BorderLayout.NORTH);
 
         // Add the instructional guide link
@@ -46,24 +59,42 @@ public class Help extends JPanel {
             }
         });
 
-        contentPanel.add(guideLabel, BorderLayout.CENTER);
-
         // Add the developer contacts
-        JPanel contactPanel = new JPanel();
-        contactPanel.setLayout(new GridLayout(3, 1));
-        contactPanel.setBackground(Color.WHITE);
+//        JPanel contactPanel = new JPanel();
+//        contactPanel.setLayout(new GridLayout(3, 1));
+//        contactPanel.setBackground(Color.WHITE);
 
         JLabel contact1 = new JLabel("wins@gmail.com", JLabel.CENTER);
         JLabel contact2 = new JLabel("jer@gmail.com", JLabel.CENTER);
         JLabel contact3 = new JLabel("ml@gmail.com", JLabel.CENTER);
 
-        contactPanel.add(contact1);
-        contactPanel.add(contact2);
-        contactPanel.add(contact3);
+//        contactPanel.add(contact1);
+//        contactPanel.add(contact2);
+//        contactPanel.add(contact3);
 
-        contentPanel.add(contactPanel, BorderLayout.SOUTH);
+        guideLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contact1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contact2.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contact3.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Add the content panel to this JPanel
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.add(guideLabel);
+        centerPanel.add(Box.createVerticalStrut(20)); // Add some space
+        centerPanel.add(contact1);
+        centerPanel.add(contact2);
+        centerPanel.add(contact3);
+
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(Color.WHITE);
+        wrapperPanel.add(centerPanel);
+        contentPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(MainWindow.activeColor, 10),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        contentPanel.add(wrapperPanel, BorderLayout.CENTER);
+
         add(contentPanel, BorderLayout.CENTER);
     }
 }
