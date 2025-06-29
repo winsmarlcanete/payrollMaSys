@@ -46,8 +46,8 @@ public class Login extends JFrame {
         // Main Panel for Content (this will be the white background card)
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setPreferredSize(new Dimension(550, 500));
-        centerPanel.setMaximumSize(new Dimension(550, 500));
+        centerPanel.setPreferredSize(new Dimension(550, 400));
+        centerPanel.setMaximumSize(new Dimension(550, 400));
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
@@ -72,13 +72,27 @@ public class Login extends JFrame {
         systemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Email field
+        JPanel emailPanel = new JPanel();
+        emailPanel.setLayout(new BoxLayout(emailPanel, BoxLayout.X_AXIS));
+        emailPanel.setPreferredSize(new Dimension(350, 50));
+        emailPanel.setMaximumSize(new Dimension(350, 50));
+        emailPanel.setBorder(BorderFactory.createTitledBorder("Email"));
+        emailPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emailPanel.setBackground(Color.WHITE);
+
         emailField = new RoundedTextField(20);
+        emailField.setPreferredSize(new Dimension(350, 30));
         emailField.setMaximumSize(new Dimension(350, 30));
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emailField.setBorder(BorderFactory.createEmptyBorder());
+        emailField.setBackground(Color.WHITE);
+
+        emailPanel.add(emailField);
 
         // =============== Password field ===============
         JPanel passwordPanel = new JPanel();
         passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.X_AXIS));
+        passwordPanel.setPreferredSize(new Dimension(350, 50));
         passwordPanel.setMaximumSize(new Dimension(350, 50));
         passwordPanel.setBorder(BorderFactory.createTitledBorder("Password"));
         passwordPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -86,10 +100,12 @@ public class Login extends JFrame {
 
         // Password field
         passwordField = new RoundedPasswordField(20);
+        passwordField.setPreferredSize(new Dimension(300, 30));
         passwordField.setMaximumSize(new Dimension(300, 30));
         passwordField.setEchoChar('•');
-        passwordField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        passwordField.setOpaque(false);
+//        passwordField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        passwordField.setBorder(BorderFactory.createEmptyBorder());
+        passwordField.setBackground(Color.WHITE);
 
         // Eye button
         JButton toggleButton = new JButton("👁");
@@ -148,9 +164,19 @@ public class Login extends JFrame {
         RoundedButton forgotPasswordButton = new RoundedButton("Forgot Password", 20);
 
         Dimension buttonSize = new Dimension(350, 30);
+
+        loginButton.setPreferredSize(buttonSize);
+        createAccountButton.setPreferredSize(buttonSize);
+        forgotPasswordButton.setPreferredSize(buttonSize);
+
         loginButton.setMaximumSize(buttonSize);
         createAccountButton.setMaximumSize(buttonSize);
         forgotPasswordButton.setMaximumSize(buttonSize);
+
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        createAccountButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        forgotPasswordButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        toggleButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createAccountButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -234,7 +260,7 @@ public class Login extends JFrame {
         centerPanel.add(logoLabel);
         centerPanel.add(systemLabel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        centerPanel.add(emailField);
+        centerPanel.add(emailPanel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(passwordPanel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 5)));
