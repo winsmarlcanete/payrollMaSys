@@ -1,6 +1,9 @@
 package Screens;
 
+import org.payroll.MainWindow;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class About extends JPanel {
@@ -10,36 +13,24 @@ public class About extends JPanel {
 
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 153, 0), 8)); // green border
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         // Logo and Title
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground(Color.WHITE);
-        JLabel logoLabel = new JLabel();
+
+        int targetHeight = 50; // Original height from PayrollScreen snippet
         ImageIcon logoIcon = new ImageIcon(getClass().getClassLoader().getResource("whole_logo.png"));
+        int origWidth = logoIcon.getIconWidth();
+        int origHeight = logoIcon.getIconHeight();
+        int targetWidth = (int) ((double) origWidth / origHeight * targetHeight);
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 
-        Image scaledLogo = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-        logoLabel.setIcon(new ImageIcon(scaledLogo));
-
-        JLabel titleLabel = new JLabel();
-        titleLabel.setText("<html><span style='color:#009900;font-weight:bold;'>Synergy</span><i>GrafixCorp.</i></html>");
-        titleLabel.setFont(new Font("SansSerif", Font.PLAIN, 24));
-
+        ImageIcon scaledLogoIcon = new ImageIcon(scaledLogo);
+        JLabel logoLabel = new JLabel(scaledLogoIcon);
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setBorder(new EmptyBorder(25, 0, 0, 0));
         logoPanel.add(logoLabel);
-        logoPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        logoPanel.add(titleLabel);
-
-        mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(logoPanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-
-        // "About" Title
-        JLabel aboutTitle = new JLabel("About");
-        aboutTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
-        aboutTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(aboutTitle);
-        mainPanel.add(Box.createVerticalStrut(10));
 
         // Description paragraph
         JTextArea description = new JTextArea(
@@ -50,8 +41,6 @@ public class About extends JPanel {
                         "part of their final project for CS 301 - Software Engineering 1, this system aims to enhance efficiency,\n"
                         +
                         "accuracy, and transparency in payroll operations.");
-        styleTextArea(description);
-        mainPanel.add(description);
 
         // Key Features
         JTextArea features = new JTextArea(
@@ -69,17 +58,11 @@ public class About extends JPanel {
                         +
                         "• User-Friendly Interface:\n" +
                         "   • Intuitive and user-friendly design for easy navigation and data entry.");
-        styleTextArea(features);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(features);
 
         // Final paragraph
         JTextArea closing = new JTextArea(
                 "By leveraging the power of technology, our Payroll Management System empowers Synergy Grafix\n" +
                         "Corporation to optimize its payroll processes and focus on core business activities.");
-        styleTextArea(closing);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(closing);
 
         // Developer section
         JTextArea devs = new JTextArea(
@@ -87,11 +70,47 @@ public class About extends JPanel {
                         "• Cañete, Winsmarl P.\n" +
                         "• Serrano, Jerwin Paul C.\n" +
                         "• Supan, Marc Laurence W.");
+
+        styleTextArea(description);
+        styleTextArea(features);
+        styleTextArea(closing);
         styleTextArea(devs);
+
+        int textAreaWidth = 780; // Reduced width
+        description.setMaximumSize(new Dimension(textAreaWidth, Integer.MAX_VALUE));
+        features.setMaximumSize(new Dimension(textAreaWidth, Integer.MAX_VALUE));
+        closing.setMaximumSize(new Dimension(textAreaWidth, Integer.MAX_VALUE));
+        devs.setMaximumSize(new Dimension(textAreaWidth, Integer.MAX_VALUE));
+
+        // Add components to mainPanel
+        mainPanel.add(description);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(features);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(closing);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(devs);
+        mainPanel.setBorder(BorderFactory.createLineBorder(MainWindow.activeColor, 10));
 
-        add(mainPanel, BorderLayout.CENTER);
+//        GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.weightx = 1.0;
+//        gbc.weighty = 1.0;
+//        gbc.fill = GridBagConstraints.NONE; // Don't stretch the mainPanel
+//        gbc.anchor = GridBagConstraints.CENTER;
+
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper.add(mainPanel);
+
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(MainWindow.activeColor, 10),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+
+        add(logoPanel, BorderLayout.NORTH);
+        add(centerWrapper, BorderLayout.CENTER);
     }
 
     private void styleTextArea(JTextArea area) {
@@ -100,5 +119,15 @@ public class About extends JPanel {
         area.setBackground(Color.WHITE);
         area.setFont(new Font("SansSerif", Font.PLAIN, 14));
         area.setMargin(new Insets(5, 20, 5, 20));
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Make the text area wrap words
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        // Set both preferred and maximum size
+        int textAreaWidth = 780;
+        area.setMaximumSize(new Dimension(textAreaWidth, Integer.MAX_VALUE));
+        area.setPreferredSize(new Dimension(textAreaWidth, area.getPreferredSize().height));
     }
 }

@@ -25,7 +25,28 @@ public class MainWindow extends JFrame {
     private Object[][] employeeTableData;
     public MainWindow() {
         setTitle("Synergy Grafix Corporation PMS");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                int choice = JOptionPane.showConfirmDialog(
+                        MainWindow.this,
+                        "Are you sure you want to sign out?",
+                        "Sign Out",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    dispose();
+                    SwingUtilities.invokeLater(() -> {
+                        Login loginScreen = new Login();
+                        loginScreen.setVisible(true);
+                        loginScreen.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    });
+                }
+            }
+        });
         setMinimumSize(new Dimension(1020, 600));
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
         ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
@@ -120,6 +141,23 @@ public class MainWindow extends JFrame {
                     btn.setFocusPainted(false);
                     btn.setBackground(new Color(217, 217, 217));
                     btn.setBorderPainted(false);
+                    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                    btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override
+                        public void mouseEntered(java.awt.event.MouseEvent evt) {
+                            if (btn.getBackground() != activeColor) {
+                                btn.setBackground(new Color(200, 200, 200));
+                            }
+                        }
+
+                        @Override
+                        public void mouseExited(java.awt.event.MouseEvent evt) {
+                            if (btn.getBackground() != activeColor) {
+                                btn.setBackground(new Color(217, 217, 217));
+                            }
+                        }
+                    });
 
                     gbc.gridx = i++;
                     gbc.weightx = (double) labelWidths.get(name) / totalLabelWidth;
@@ -216,6 +254,7 @@ public class MainWindow extends JFrame {
         currentUser.setIcon(userIcon);
         currentUser.setPreferredSize(new Dimension(200, 45));
         currentUser.setMaximumSize(new Dimension(200, 45));
+        currentUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
         buttonPanel.add(currentUser);
 
         // Add action listener to currentUser button
@@ -275,6 +314,18 @@ public class MainWindow extends JFrame {
 
             // Show popup menu below the button
             menu.show(currentUser, 0, currentUser.getHeight());
+        });
+
+        currentUser.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                currentUser.setBackground(new Color(40, 40, 40)); // Slightly lighter black
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                currentUser.setBackground(Color.BLACK);
+            }
         });
 
         // Set the first button as active
