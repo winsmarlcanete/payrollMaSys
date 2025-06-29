@@ -1233,4 +1233,62 @@ public class Payroll {
         return totals;
     }
 
+    public static Map<String, Object> retrieveAttendanceDataGrandTotal(Date start, Date end) {
+        Map<String, Object> grandTotals = new HashMap<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        System.out.println("Attempting to retrieve grand total attendance data for period: " + start + " to " + end);
+
+        try {
+            conn = JDBC.getConnection();
+
+            // Query to retrieve grand totals
+            String query = """
+            SELECT 
+                SUM(days_present) AS total_days_worked,
+                SUM(overtime_hours) AS total_overtime,
+                SUM(nd_hours) AS total_night_diff,
+                SUM(sholiday_hours) AS total_special_holiday,
+                SUM(lholiday_hours) AS total_legal_holiday,
+                SUM(late_minutes) AS total_late
+            FROM payrollmsdb.payroll
+            WHERE period_start = ? AND period_end = ?
+        """;
+
+            stmt = conn.prepareStatement(query);
+            stmt.setDate(1, start);
+            stmt.setDate(2, end);
+
+            System.out.println("Executing query: " + query);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                grandTotals.put("total_days_worked", rs.getDouble("total_days_worked"));
+                grandTotals.put("total_overtime", rs.getDouble("total_overtime"));
+                grandTotals.put("total_night_diff", rs.getDouble("total_night_diff"));
+                grandTotals.put("total_special_holiday", rs.getDouble("total_special_holiday"));
+                grandTotals.put("total_legal_holiday", rs.getDouble("total_legal_holiday"));
+                grandTotals.put("total_late", rs.getDouble("total_late"));
+            }
+
+            System.out.println("Retrieved grand totals: " + grandTotals);
+
+        } catch (SQLException e) {
+            System.err.println("SQL Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return grandTotals;
+    }
+
 }

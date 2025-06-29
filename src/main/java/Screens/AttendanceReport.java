@@ -81,59 +81,12 @@ public class AttendanceReport extends JPanel {
         };
 
         // Add 2 rows of data
-        frozenModel2.addRow(new Object[]{"Total"});
+        frozenModel2.addRow(new Object[]{"Sub Total"});
         frozenModel2.addRow(new Object[]{"Grand Total"});
 
         // Add sample data
         String[] sampleNames = {
-                "John Smith",
-                "Mary Johnson",
-                "Robert Brown",
-                "Patricia Davis",
-                "Michael Wilson",
-                "Linda Anderson",
-                "James Taylor",
-                "Elizabeth Thomas",
-                "William Martinez",
-                "Jennifer Robinson",
-                "David Clark",
-                "Susan Lewis",
-                "John Smith",
-                "Mary Johnson",
-                "Robert Brown",
-                "Patricia Davis",
-                "Michael Wilson",
-                "Linda Anderson",
-                "James Taylor",
-                "Elizabeth Thomas",
-                "William Martinez",
-                "Jennifer Robinson",
-                "David Clark",
-                "Susan Lewis",
-                "John Smith",
-                "Mary Johnson",
-                "Robert Brown",
-                "Patricia Davis",
-                "Michael Wilson",
-                "Linda Anderson",
-                "James Taylor",
-                "Elizabeth Thomas",
-                "William Martinez",
-                "Jennifer Robinson",
-                "David Clark",
-                "Susan Lewis",
-                "John Smith",
-                "Mary Johnson",
-                "Robert Brown",
-                "Patricia Davis",
-                "Michael Wilson",
-                "Linda Anderson",
-                "James Taylor",
-                "Elizabeth Thomas",
-                "William Martinez",
-                "Jennifer Robinson",
-                "David Clark",
-                "Susan Lewis",
+
         };
 
         // Random number generator
@@ -434,9 +387,15 @@ public class AttendanceReport extends JPanel {
 
     }
 
-    public void updateDepartmentLabel(String department) {
+    void updateDepartmentLabel(String department) {
         if (adminLabel != null) {
             adminLabel.setText(department);
+            String selectedPeriod = (String) payrollPeriod.getSelectedItem();
+            if (selectedPeriod != null && !selectedPeriod.isEmpty()) {
+                populateTableData(selectedPeriod, department);
+            } else {
+                System.err.println("No period selected or invalid selection.");
+            }
         }
     }
 
@@ -461,6 +420,10 @@ public class AttendanceReport extends JPanel {
             Map<String, Object> totals = Payroll.retrieveAttendanceDataTotal(startDate, endDate, department);
             System.out.println("Retrieved totals: " + totals);
 
+            // Retrieve grand totals using the start and end dates
+            Map<String, Object> grandTotals = Payroll.retrieveAttendanceDataGrandTotal(startDate, endDate);
+            System.out.println("Retrieved grand totals: " + grandTotals);
+
             // Clear existing data
             frozenModel1.setRowCount(0);
             scrollModel1.setRowCount(0);
@@ -481,18 +444,26 @@ public class AttendanceReport extends JPanel {
                 });
             }
 
-            // Ensure scrollModel2 has at least one row
-            scrollModel2.setRowCount(0);
-            scrollModel2.addRow(new Object[]{"0.00", "0.00", "0.00", "0.00", "0.00", "0.00"}); // Total
-            scrollModel2.addRow(new Object[]{"0.00", "0.00", "0.00", "0.00", "0.00", "0.00"});
+            // Ensure scrollModel2 has at least two rows
+            while (scrollModel2.getRowCount() < 2) {
+                scrollModel2.addRow(new Object[]{null, null, null, null, null, null});
+            }
 
-            // Populate scrollModel2 with totals
+            // Populate scrollModel2 with totals in the first row
             scrollModel2.setValueAt(totals.get("total_days_worked"), 0, 0);
             scrollModel2.setValueAt(totals.get("total_overtime"), 0, 1);
             scrollModel2.setValueAt(totals.get("total_night_diff"), 0, 2);
             scrollModel2.setValueAt(totals.get("total_special_holiday"), 0, 3);
             scrollModel2.setValueAt(totals.get("total_legal_holiday"), 0, 4);
             scrollModel2.setValueAt(totals.get("total_late"), 0, 5);
+
+            // Populate scrollModel2 with grand totals in the second row
+            scrollModel2.setValueAt(grandTotals.get("total_days_worked"), 1, 0);
+            scrollModel2.setValueAt(grandTotals.get("total_overtime"), 1, 1);
+            scrollModel2.setValueAt(grandTotals.get("total_night_diff"), 1, 2);
+            scrollModel2.setValueAt(grandTotals.get("total_special_holiday"), 1, 3);
+            scrollModel2.setValueAt(grandTotals.get("total_legal_holiday"), 1, 4);
+            scrollModel2.setValueAt(grandTotals.get("total_late"), 1, 5);
 
             System.out.println("Final row count - frozenModel1: " + frozenModel1.getRowCount());
             System.out.println("Final row count - scrollModel1: " + scrollModel1.getRowCount());
