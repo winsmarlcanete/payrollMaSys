@@ -1082,4 +1082,68 @@ public class Payroll {
         SimpleDateFormat endFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
         return dateFormat.format(start) + endFormat.format(end);
     }
+
+    public static List<Map<String, Object>> retrieveAttendanceData(Date start, Date end) {
+        List<Map<String, Object>> attendanceData = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        System.out.println("Attempting to retrieve attendance data for period: " + start + " to " + end);
+
+        String query = "SELECT e.first_name, e.last_name, " +
+                "p.days_present as days_worked, " +
+                "p.overtime_hours as overtime, " +
+                "p.nd_hours as night_diff, " +
+                "p.sholiday_hours as special_holiday, " +
+                "p.lholiday_hours as legal_holiday, " +
+                "p.late_minutes as late " +
+                "FROM payrollmsdb.employees e " +
+                "JOIN payrollmsdb.payroll p ON e.employee_id = p.employee_id " +
+                "WHERE p.period_start = ? AND p.period_end = ?";
+
+        System.out.println("Executing query: " + query);
+
+        try {
+            conn = JDBC.getConnection();
+            stmt = conn.prepareStatement(query);
+
+            stmt.setDate(1, start);
+            stmt.setDate(2, end);
+            System.out.println("Query parameters: period_start=" + start + ", period_end=" + end);
+
+            rs = stmt.executeQuery();
+            System.out.println("Query executed successfully");
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("name", rs.getString("last_name") + ", " + rs.getString("first_name"));
+                row.put("days_worked", rs.getDouble("days_worked"));
+                row.put("overtime", rs.getDouble("overtime"));
+                row.put("night_diff", rs.getDouble("night_diff"));
+                row.put("special_holiday", rs.getDouble("special_holiday"));
+                row.put("legal_holiday", rs.getDouble("legal_holiday"));
+                row.put("late", rs.getDouble("late"));
+                attendanceData.add(row);
+                System.out.println("Added row: " + row);
+            }
+
+            System.out.println("Total rows retrieved: " + attendanceData.size());
+
+        } catch (SQLException e) {
+            System.err.println("SQL Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return attendanceData;
+    }
+
 }

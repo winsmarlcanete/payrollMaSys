@@ -37,19 +37,24 @@ public class AttendanceReport extends JPanel {
     private JTable scrollTable1;
     private JTable scrollTable2;
     private JPanel tablePanel;
+    private DefaultTableModel frozenModel1;
+    private DefaultTableModel frozenModel2;
+    private DefaultTableModel scrollModel1;
 
     private BlackRoundedComboBox<String> payrollPeriod;
+    private Date startDate;
+    private Date endDate;
 
     private void setupTables() {
         // Create table model with 1 column
-        DefaultTableModel frozenModel1 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
+         frozenModel1 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        DefaultTableModel scrollModel1 = new DefaultTableModel(
+         scrollModel1 = new DefaultTableModel(
                 new String[]{"Days Worked", "Overtime (Hours)", "Night Differential (Hours)", "Special Holiday / Sunday (Hours)", "Legal Holiday (Hours)", "Late (Minutes)"}, 0
         ) {
             @Override
@@ -58,7 +63,7 @@ public class AttendanceReport extends JPanel {
             }
         };
 
-        DefaultTableModel frozenModel2 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
+         frozenModel2 = new DefaultTableModel(new String[]{"Employee Name"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -373,22 +378,17 @@ public class AttendanceReport extends JPanel {
         }
     }
     public AttendanceReport() {
-
         setupTables();
 
-
-
         String[] periods = getPeriods();
-
-        // Create and configure panel
 
         // Create and configure label
         JLabel periodLabel = new JLabel("Period:");
         periodLabel.setFont(new Font("Arial", Font.BOLD, 22));
         periodLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
-        // Create and configure combobox
-        BlackRoundedComboBox<String> payrollPeriod = new BlackRoundedComboBox<>(periods);
+        // Initialize the class field instead of creating a local variable
+        this.payrollPeriod = new BlackRoundedComboBox<>(periods); // Use this.payrollPeriod
         payrollPeriod.setName("payrollPeriod");
         payrollPeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         payrollPeriod.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
@@ -399,6 +399,17 @@ public class AttendanceReport extends JPanel {
         payrollPeriod.setOpaque(false);
         payrollPeriod.setEditable(false);
 
+        payrollPeriod.addActionListener(e -> {
+            System.out.println("" + payrollPeriod.getSelectedItem() + " selected from combo box BURAT");
+            String selectedPeriod = (String) payrollPeriod.getSelectedItem();
+            if (selectedPeriod != null && !selectedPeriod.isEmpty()) {
+                populateTableData(selectedPeriod);
+            } else {
+                System.err.println("No period selected or invalid selection.");
+            }
+        });
+
+        // Rest of the constructor code remains the same
         adminLabel = new JLabel("All Departments");
         adminLabel.setFont(new Font("Arial", Font.BOLD, 18));
         adminLabel.setOpaque(true);
@@ -406,7 +417,6 @@ public class AttendanceReport extends JPanel {
         adminLabel.setForeground(Color.WHITE);
         adminLabel.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
 
-        // Add components to panel
         JPanel periodPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         periodPanel.setOpaque(false);
         periodPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
@@ -416,11 +426,11 @@ public class AttendanceReport extends JPanel {
         periodPanel.add(adminLabel);
         periodPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-
-
         setLayout(new BorderLayout());
         add(periodPanel, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
+
+
     }
 
     public void updateDepartmentLabel(String department) {
@@ -428,4 +438,64 @@ public class AttendanceReport extends JPanel {
             adminLabel.setText(department);
         }
     }
+
+    private void populateTableData(String selectedPeriod) {
+        try {
+            System.out.println("Selected Period: " + selectedPeriod);
+
+            String[] dates = selectedPeriod.split(" - ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+
+            // Parse the start and end dates
+            startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
+            endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
+
+            System.out.println("Start Date: " + startDate + ", End Date: " + endDate);
+
+            // Retrieve attendance data using the start and end dates
+            List<Map<String, Object>> attendanceData = Payroll.retrieveAttendanceData(startDate, endDate);
+            System.out.println("Retrieved attendance data size: " + attendanceData.size());
+
+            // Clear existing data
+            frozenModel1.setRowCount(0);
+            scrollModel1.setRowCount(0);
+
+            // Populate tables with new data
+            for (Map<String, Object> row : attendanceData) {
+                System.out.println("Processing row: " + row);
+
+                frozenModel1.addRow(new Object[]{
+                        row.get("name")
+                });
+
+                scrollModel1.addRow(new Object[]{
+                        row.get("days_worked"),
+                        row.get("overtime"),
+                        row.get("night_diff"),
+                        row.get("special_holiday"),
+                        row.get("legal_holiday"),
+                        row.get("late")
+                });
+            }
+
+            System.out.println("Final row count - frozenModel1: " + frozenModel1.getRowCount());
+            System.out.println("Final row count - scrollModel1: " + scrollModel1.getRowCount());
+
+        } catch (Exception e) {
+            System.err.println("Error in populateTableData: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load attendance data", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void setupPeriodComboBox() {
+        payrollPeriod.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String selectedPeriod = (String) e.getItem();
+                populateTableData(selectedPeriod);
+            }
+        });
+    }
+
+
 }
