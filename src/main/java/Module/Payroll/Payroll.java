@@ -1091,30 +1091,43 @@ public class Payroll {
 
         System.out.println("Attempting to retrieve attendance data for period: " + start + " to " + end + " and department: " + department);
 
-        String query = "SELECT e.first_name, e.last_name, " +
-                "p.days_present as days_worked, " +
-                "p.overtime_hours as overtime, " +
-                "p.nd_hours as night_diff, " +
-                "p.sholiday_hours as special_holiday, " +
-                "p.lholiday_hours as legal_holiday, " +
-                "p.late_minutes as late " +
-                "FROM payrollmsdb.employees e " +
-                "JOIN payrollmsdb.payroll p ON e.employee_id = p.employee_id " +
-                "WHERE p.period_start = ? AND p.period_end = ? AND e.department = ?";
-
-        System.out.println("Executing query: " + query);
-
         try {
             conn = JDBC.getConnection();
-            stmt = conn.prepareStatement(query);
 
+            // Check if the department exists in the payroll table
+            String checkDepartmentQuery = "SELECT COUNT(*) FROM payrollmsdb.employees WHERE department = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkDepartmentQuery)) {
+                checkStmt.setString(1, department);
+                ResultSet checkRs = checkStmt.executeQuery();
+                if (checkRs.next() && checkRs.getInt(1) == 0) {
+                    // Department does not exist, set department to null
+                    department = null;
+                    System.out.println("Department not found. Retrieving attendance for all employees.");
+                }
+            }
+
+            // Query to retrieve attendance data
+            String query = "SELECT e.first_name, e.last_name, " +
+                    "p.days_present AS days_worked, " +
+                    "p.overtime_hours AS overtime, " +
+                    "p.nd_hours AS night_diff, " +
+                    "p.sholiday_hours AS special_holiday, " +
+                    "p.lholiday_hours AS legal_holiday, " +
+                    "p.late_minutes AS late " +
+                    "FROM payrollmsdb.employees e " +
+                    "JOIN payrollmsdb.payroll p ON e.employee_id = p.employee_id " +
+                    "WHERE p.period_start = ? AND p.period_end = ? " +
+                    (department != null ? "AND e.department = ?" : "");
+
+            stmt = conn.prepareStatement(query);
             stmt.setDate(1, start);
             stmt.setDate(2, end);
-            stmt.setString(3, department);
-            System.out.println("Query parameters: period_start=" + start + ", period_end=" + end + ", department=" + department);
+            if (department != null) {
+                stmt.setString(3, department);
+            }
 
+            System.out.println("Executing query: " + query);
             rs = stmt.executeQuery();
-            System.out.println("Query executed successfully");
 
             while (rs.next()) {
                 Map<String, Object> row = new HashMap<>();
@@ -1145,6 +1158,79 @@ public class Payroll {
         }
 
         return attendanceData;
+    }
+
+    public static Map<String, Object> retrieveAttendanceDataTotal(Date start, Date end, String department) {
+        Map<String, Object> totals = new HashMap<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        System.out.println("Attempting to retrieve total attendance data for period: " + start + " to " + end + " and department: " + department);
+
+        try {
+            conn = JDBC.getConnection();
+
+            // Check if the department exists in the payroll table
+            String checkDepartmentQuery = "SELECT COUNT(*) FROM payrollmsdb.employees WHERE department = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkDepartmentQuery)) {
+                checkStmt.setString(1, department);
+                ResultSet checkRs = checkStmt.executeQuery();
+                if (checkRs.next() && checkRs.getInt(1) == 0) {
+                    // Department does not exist, set department to null
+                    department = null;
+                    System.out.println("Department not found. Retrieving totals for all employees.");
+                }
+            }
+
+            // Query to retrieve attendance totals
+            String query = "SELECT " +
+                    "SUM(p.days_present) AS total_days_worked, " +
+                    "SUM(p.overtime_hours) AS total_overtime, " +
+                    "SUM(p.nd_hours) AS total_night_diff, " +
+                    "SUM(p.sholiday_hours) AS total_special_holiday, " +
+                    "SUM(p.lholiday_hours) AS total_legal_holiday, " +
+                    "SUM(p.late_minutes) AS total_late " +
+                    "FROM payrollmsdb.employees e " +
+                    "JOIN payrollmsdb.payroll p ON e.employee_id = p.employee_id " +
+                    "WHERE p.period_start = ? AND p.period_end = ? " +
+                    (department != null ? "AND e.department = ?" : "");
+
+            stmt = conn.prepareStatement(query);
+            stmt.setDate(1, start);
+            stmt.setDate(2, end);
+            if (department != null) {
+                stmt.setString(3, department);
+            }
+
+            System.out.println("Executing query: " + query);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                totals.put("total_days_worked", rs.getDouble("total_days_worked"));
+                totals.put("total_overtime", rs.getDouble("total_overtime"));
+                totals.put("total_night_diff", rs.getDouble("total_night_diff"));
+                totals.put("total_special_holiday", rs.getDouble("total_special_holiday"));
+                totals.put("total_legal_holiday", rs.getDouble("total_legal_holiday"));
+                totals.put("total_late", rs.getDouble("total_late"));
+            }
+
+            System.out.println("Retrieved totals: " + totals);
+
+        } catch (SQLException e) {
+            System.err.println("SQL Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return totals;
     }
 
 }

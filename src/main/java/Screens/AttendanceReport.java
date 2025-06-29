@@ -40,6 +40,7 @@ public class AttendanceReport extends JPanel {
     private DefaultTableModel frozenModel1;
     private DefaultTableModel frozenModel2;
     private DefaultTableModel scrollModel1;
+    private DefaultTableModel scrollModel2;
 
     private BlackRoundedComboBox<String> payrollPeriod;
     private Date startDate;
@@ -70,7 +71,7 @@ public class AttendanceReport extends JPanel {
             }
         };
 
-        DefaultTableModel scrollModel2 = new DefaultTableModel(
+        scrollModel2 = new DefaultTableModel(
                 new String[]{"Days Worked", "Overtime (Hours)", "Night Differential (Hours)", "Special Holiday / Sunday (Hours)", "Legal Holiday (Hours)", "Late (Minutes)"}, 0
         ) {
             @Override
@@ -456,14 +457,16 @@ public class AttendanceReport extends JPanel {
             List<Map<String, Object>> attendanceData = Payroll.retrieveAttendanceData(startDate, endDate, department);
             System.out.println("Retrieved attendance data size: " + attendanceData.size());
 
+            // Retrieve totals using the start and end dates
+            Map<String, Object> totals = Payroll.retrieveAttendanceDataTotal(startDate, endDate, department);
+            System.out.println("Retrieved totals: " + totals);
+
             // Clear existing data
             frozenModel1.setRowCount(0);
             scrollModel1.setRowCount(0);
 
             // Populate tables with new data
             for (Map<String, Object> row : attendanceData) {
-                System.out.println("Processing row: " + row);
-
                 frozenModel1.addRow(new Object[]{
                         row.get("name")
                 });
@@ -477,6 +480,19 @@ public class AttendanceReport extends JPanel {
                         row.get("late")
                 });
             }
+
+            // Ensure scrollModel2 has at least one row
+            scrollModel2.setRowCount(0);
+            scrollModel2.addRow(new Object[]{"0.00", "0.00", "0.00", "0.00", "0.00", "0.00"}); // Total
+            scrollModel2.addRow(new Object[]{"0.00", "0.00", "0.00", "0.00", "0.00", "0.00"});
+
+            // Populate scrollModel2 with totals
+            scrollModel2.setValueAt(totals.get("total_days_worked"), 0, 0);
+            scrollModel2.setValueAt(totals.get("total_overtime"), 0, 1);
+            scrollModel2.setValueAt(totals.get("total_night_diff"), 0, 2);
+            scrollModel2.setValueAt(totals.get("total_special_holiday"), 0, 3);
+            scrollModel2.setValueAt(totals.get("total_legal_holiday"), 0, 4);
+            scrollModel2.setValueAt(totals.get("total_late"), 0, 5);
 
             System.out.println("Final row count - frozenModel1: " + frozenModel1.getRowCount());
             System.out.println("Final row count - scrollModel1: " + scrollModel1.getRowCount());
