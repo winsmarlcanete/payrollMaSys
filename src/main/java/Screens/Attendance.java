@@ -169,7 +169,7 @@ public class Attendance extends JPanel {
         sortLabel.setOpaque(true); // Make the label opaque so background is painted
         // Removed right padding from the border to eliminate gap
         // Adjusted top/bottom padding slightly to help with vertical alignment for a 45px height
-        sortLabel.setBorder(BorderFactory.createEmptyBorder(15, 10, 16, 5));
+        sortLabel.setBorder(BorderFactory.createEmptyBorder(15, 10, 16, 0));
         sortFilterContainerPanel.add(sortLabel); // Add the label to the container
 
         // Dropdown (as specified by user, now named departmentDropdown)
@@ -179,7 +179,7 @@ public class Attendance extends JPanel {
                 // No border
             }
         };
-        departmentDropdown.setFont(new Font("Arial", Font.BOLD, 16)); // Keep bold font for consistency
+        departmentDropdown.setFont(new Font("Arial", Font.PLAIN, 18)); // Keep bold font for consistency
         departmentDropdown.setPreferredSize(new Dimension(250, 50)); // Adjust width, maintain height
         departmentDropdown.setBackground(Color.WHITE);
         departmentDropdown.setFocusable(false);

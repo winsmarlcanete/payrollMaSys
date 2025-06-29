@@ -3,7 +3,7 @@ package Screens;
 import Components.BlackRoundedComboBox;
 import Components.RoundedComboBox;
 import Components.TableStyler;
-import javafx.scene.shape.Box;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.ComboPopup;
@@ -17,6 +17,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.regex.Pattern;
 
 public class LeaveReport extends JPanel {
+    private JLabel adminLabel;
     private JTable rightTable;
     private JTable leftTable;
     private void selectGroupInRightTable(int row) {
@@ -347,13 +348,29 @@ public class LeaveReport extends JPanel {
         comboPanel.setOpaque(true);
         comboPanel.setBackground(Color.BLACK);
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(comboPanel, BorderLayout.WEST);
+        adminLabel = new JLabel("All Departments");
+        adminLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        adminLabel.setOpaque(true);
+        adminLabel.setBackground(Color.BLACK);
+        adminLabel.setForeground(Color.WHITE);
+        adminLabel.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 10, 0));
+        topPanel.add(comboPanel);
+        topPanel.add(Box.createHorizontalStrut(10));
+        topPanel.add(adminLabel);
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10));
         add(topPanel, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
+    }
+
+    public void updateDepartmentLabel(String department) {
+        if (adminLabel != null) {
+            adminLabel.setText(department);
+        }
     }
 }
