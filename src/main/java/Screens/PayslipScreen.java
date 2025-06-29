@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import Components.PayslipGenerator;
-import Entity.Payslip;
+//import Components.PayslipGenerator;
+//import Entity.Payslip;
 import Module.E201File.E201File;
 import Module.Payroll.Payroll;
 
@@ -88,15 +88,15 @@ public class PayslipScreen extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String filePath = "payslip.pdf";
 
-                List<Payslip> payslipList = Payroll.retrieveAllPayslip( sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
-                PayslipGenerator.generatePayslip(filePath, payslipList);
+//                List<Payslip> payslipList = Payroll.retrieveAllPayslip( sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
+//                PayslipGenerator.generatePayslip(filePath, payslipList);
                 JOptionPane.showMessageDialog(PayslipScreen.this, "Payslip generated: " + filePath);
             }
         });
 
         JButton viewButton = new JButton("View PDF");
-        List<Payslip> payslipList = Payroll.retrieveAllPayslip(sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
-        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip(payslipList));
+//        List<Payslip> payslipList = Payroll.retrieveAllPayslip(sortCombo.getSelectedItem().toString(), Date.valueOf("2025-06-06"), Date.valueOf("2025-06-20"));
+//        viewButton.addActionListener(e -> PayslipGenerator.previewPayslip(payslipList));
         viewButton.setPreferredSize(new Dimension(150, 50));
         viewButton.setFont(new Font("Arial", Font.BOLD, 16));
         viewButton.setForeground(Color.WHITE);

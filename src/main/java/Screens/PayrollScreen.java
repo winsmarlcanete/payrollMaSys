@@ -433,7 +433,7 @@ public class PayrollScreen extends JPanel {
         payrollPeriod.setName("payrollPeriod");
         payrollPeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         payrollPeriod.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        payrollPeriod.setPreferredSize(new Dimension(290, 34));
+        payrollPeriod.setPreferredSize(new Dimension(320, 34));
         payrollPeriod.setBackground(Color.BLACK); // Background of the combobox itself
         payrollPeriod.setForeground(Color.WHITE); // Initial selected item text
         payrollPeriod.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -783,20 +783,25 @@ public class PayrollScreen extends JPanel {
         JTable frozenTable2 = new JTable(frozenModel2);
         JTable scrollTable2 = new JTable(scrollModel2);
 
+        TableStyler.styleTable(frozenTable2);
+        TableStyler.styleTable(scrollTable2);
+
         scrollTable2.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable scrollTable2, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(scrollTable2, value, isSelected, hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (c instanceof JComponent jc) {
-                    int bottom = (row < scrollTable2.getRowCount() - 1) ? 8 : 0; // 8px space except last row
-                    jc.setBorder(BorderFactory.createEmptyBorder(0, 0, bottom, 0));
+                    // Add a 2px white bottom border except for the last row
+                    if (row < table.getRowCount() - 1) {
+                        jc.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
+                    } else {
+                        jc.setBorder(BorderFactory.createEmptyBorder());
+                    }
                 }
                 return c;
             }
         });
 
-        TableStyler.styleTable(frozenTable2);
-        TableStyler.styleTable(scrollTable2);
 
 // Match row heights
         frozenTable2.setRowHeight(40);

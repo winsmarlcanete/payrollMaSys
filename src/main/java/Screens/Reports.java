@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class Reports extends javax.swing.JPanel {
 
+    private AttendanceReport attendanceReport;
+
     public Reports() {
         // Search bar
         JPanel searchPanel = new JPanel();
@@ -101,6 +103,14 @@ public class Reports extends javax.swing.JPanel {
             }
         });
 
+        attendanceReport = new AttendanceReport();
+
+        // Add listener to sortCombo
+        sortCombo.addActionListener(e -> {
+            String selectedDepartment = (String) sortCombo.getSelectedItem();
+            attendanceReport.updateDepartmentLabel(selectedDepartment);
+        });
+
         // Add hover effect (like LeaveManagement)
         Color comboDefaultBg = Color.WHITE;
         Color comboHoverBg = new Color(230, 255, 230); // light greenish
@@ -142,7 +152,7 @@ public class Reports extends javax.swing.JPanel {
         CardLayout cardLayout = new CardLayout();
         JPanel cardPanel = new JPanel(cardLayout);
 
-        AttendanceReport attendanceReport = new AttendanceReport();
+//        AttendanceReport attendanceReport = new AttendanceReport();
         LeaveReport leaveReport = new LeaveReport();
         PayslipScreen payslip = new PayslipScreen();
         ChangeLog changeLog = new ChangeLog();

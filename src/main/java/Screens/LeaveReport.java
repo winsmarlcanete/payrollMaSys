@@ -348,8 +348,8 @@ public class LeaveReport extends JPanel {
         comboPanel.setBackground(Color.BLACK);
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(comboPanel, BorderLayout.EAST);
-        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 16));
+        topPanel.add(comboPanel, BorderLayout.WEST);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 10, 0));
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10));
