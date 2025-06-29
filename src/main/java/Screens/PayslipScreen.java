@@ -265,8 +265,9 @@ public class PayslipScreen extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String filePath = "payslip.pdf";
+
                     String selectedPeriod = (String) periodCombo.getSelectedItem();
+                    String filePath = "payslips/payslip_" + selectedPeriod + ".pdf";
                     String[] dates = selectedPeriod.split(" - ");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
