@@ -778,7 +778,7 @@ public class PayrollScreen extends JPanel {
         }
 
         // Set the first row of the frozen column to "Sub total"
-        frozenData2[0][0] = "Sub total";
+        frozenData2[0][0] = "Sub Total";
 
 // Set the second row of the frozen column to "Grand total"
         frozenData2[1][0] = "Grand total";

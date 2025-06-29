@@ -993,21 +993,37 @@ public class Payroll {
     public static List<Payslip> retrieveAllPayslip(String department, Date periodStart, Date periodEnd) {
         List<Payslip> payslips = new ArrayList<>();
         Connection conn;
+
         try {
+            conn = JDBC.getConnection();
+
+            // Check if the department exists in the employees table
+            String checkDepartmentQuery = "SELECT COUNT(*) FROM payrollmsdb.employees WHERE department = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkDepartmentQuery)) {
+                checkStmt.setString(1, department);
+                ResultSet checkRs = checkStmt.executeQuery();
+                if (checkRs.next() && checkRs.getInt(1) == 0) {
+                    // If department does not exist, set department to null to retrieve all employees
+                    department = null;
+                }
+            }
+
+            // Query to retrieve payslips
             String sql = """
             SELECT p.*, e.first_name, e.last_name, e.middle_name, e.department,
                    e.employment_status, e.pay_rate, e.tin_number, e.philhealth_number,
                    e.sss_number, e.pagibig_number
             FROM payrollmsdb.payroll p
             JOIN payrollmsdb.employees e ON p.employee_id = e.employee_id
-            WHERE e.department = ? AND p.period_start = ? AND p.period_end = ?
-            """;
+            WHERE p.period_start = ? AND p.period_end = ?
+        """ + (department != null ? " AND e.department = ?" : "");
 
-            conn = JDBC.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, department);
-            stmt.setDate(2, periodStart);
-            stmt.setDate(3, periodEnd);
+            stmt.setDate(1, periodStart);
+            stmt.setDate(2, periodEnd);
+            if (department != null) {
+                stmt.setString(3, department);
+            }
 
             ResultSet rs = stmt.executeQuery();
 
@@ -1069,11 +1085,11 @@ public class Payroll {
             stmt.close();
             conn.close();
 
-            return payslips;
-
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving payslips: " + e.getMessage(), e);
         }
+
+        return payslips;
     }
 
     // Helper method to format pay period string

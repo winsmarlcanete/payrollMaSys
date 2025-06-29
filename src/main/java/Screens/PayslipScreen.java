@@ -100,6 +100,7 @@ public class PayslipScreen extends JPanel {
         String[] departments = E201File.retrieveAllDepartments();
         List<String> departmentsList = new ArrayList<>(Arrays.asList(departments));
         departmentsList.add(0, "Choose a department");
+        departmentsList.add(1, "All Departments");
         String[] departmentsArray = departmentsList.toArray(new String[0]);
 
         String[] payrollPeriods = generatePayrollPeriods();
@@ -267,7 +268,7 @@ public class PayslipScreen extends JPanel {
                 try {
 
                     String selectedPeriod = (String) periodCombo.getSelectedItem();
-                    String filePath = "payslips/payslip_" + selectedPeriod + ".pdf";
+                    String filePath = "payslips/payslip_" + selectedPeriod + "_" + deptCombo.getSelectedItem().toString() + ".pdf";
                     String[] dates = selectedPeriod.split(" - ");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
