@@ -7,6 +7,7 @@ import org.payroll.MainWindow;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -19,12 +20,31 @@ public class UserControl extends JPanel {
     private DefaultTableModel tableModel;
 
     private void addSampleData() {
-        String[] names = {"John Smith", "Emma Davis", "Michael Chen", "Sarah Wilson", "David Brown", "Lisa Anderson",
-                "James Taylor", "Maria Garcia", "Robert Lee", "Amanda White"};
-        String[] accessLevels = {"Admin", "User", "Manager", "Supervisor"};
-        String[] statuses = {"Active", "Inactive", "Suspended", "Pending"};
+        String[] names = {"John Smith",
+                "Emma Davis", "Michael Chen",
+                "Sarah Wilson", "David Brown",
+                "Lisa Anderson", "James Taylor",
+                "Maria Garcia", "Robert Lee",
+                "Amanda White", "Taylor Swift",
+                "Emma Davis", "Michael Chen",
+                "Sarah Wilson", "David Brown",
+                "Lisa Anderson", "James Taylor",
+                "Maria Garcia", "Robert Lee",
+                "Amanda White", "Taylor Swift",
+                "Emma Davis", "Michael Chen",
+                "Sarah Wilson", "David Brown",
+                "Lisa Anderson", "James Taylor",
+                "Maria Garcia", "Robert Lee",
+                "Amanda White", "Taylor Swift",
+                "Emma Davis", "Michael Chen",
+                "Sarah Wilson", "David Brown",
+                "Lisa Anderson", "James Taylor",
+                "Maria Garcia", "Robert Lee",
+                "Amanda White", "Taylor Swift"};
+        String[] accessLevels = {"Admin", "Human Resources", "Accounting"};
+        String[] statuses = {"Active", "Pending"};
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 41; i++) {
             String name = names[i];
             String userId = "UID" + String.format("%04d", (int)(Math.random() * 10000));
             String email = name.toLowerCase().replace(" ", ".") + "@company.com";
@@ -213,6 +233,40 @@ public class UserControl extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(userTable);
+        scrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected JButton createDecreaseButton(int orientation) { return createZeroButton(); }
+            @Override
+            protected JButton createIncreaseButton(int orientation) { return createZeroButton(); }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                button.setVisible(false);
+                return button;
+            }
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(34, 177, 76);
+                this.trackColor = new Color(220, 255, 220);
+            }
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(34, 177, 76));
+                g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10);
+                g2.dispose();
+            }
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(new Color(220, 255, 220));
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                g2.dispose();
+            }
+        });
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setOpaque(false);
