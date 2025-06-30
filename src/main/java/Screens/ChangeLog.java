@@ -8,6 +8,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.Objects; // Added for Objects.requireNonNull
 
 public class ChangeLog extends JPanel {
@@ -57,6 +59,30 @@ public class ChangeLog extends JPanel {
         TableStyler.styleTable(activityTable); // Apply custom table styling
         activityTable.setSelectionBackground(new Color(220, 220, 220)); // Light grey selection background
 
+        activityTable.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = activityTable.rowAtPoint(e.getPoint());
+                if (row != -1) {
+                    activityTable.setRowSelectionInterval(row, row);
+                } else {
+                    activityTable.clearSelection();
+                }
+            }
+        });
+
+        activityTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (activityTable.rowAtPoint(p) >= 0) {
+                    activityTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    activityTable.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
         // Center align activity header text
 //        DefaultTableCellRenderer activityHeaderRenderer = new DefaultTableCellRenderer();
 //        activityHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -98,6 +124,30 @@ public class ChangeLog extends JPanel {
         errorTable.setRowHeight(40);
         TableStyler.styleTable(errorTable);
         errorTable.setSelectionBackground(new Color(220, 220, 220));
+
+        errorTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (errorTable.rowAtPoint(p) >= 0) {
+                    errorTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    errorTable.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
+        errorTable.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int row = errorTable.rowAtPoint(e.getPoint());
+                if (row != -1) {
+                    errorTable.setRowSelectionInterval(row, row);
+                } else {
+                    errorTable.clearSelection();
+                }
+            }
+        });
 
         // Center align error header text
 //        DefaultTableCellRenderer errorHeaderRenderer = new DefaultTableCellRenderer();
