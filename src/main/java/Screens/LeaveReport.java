@@ -98,6 +98,18 @@ public class LeaveReport extends JPanel {
         rightTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
         rightTableScrollPane.add(rightTable.getTableHeader());
 
+        rightTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (rightTable.rowAtPoint(p) >= 0) {
+                    rightTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    rightTable.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
         // Name and SIL Table
         DefaultTableModel leftTableModel = new DefaultTableModel(
                 new Object[][] {
@@ -121,6 +133,18 @@ public class LeaveReport extends JPanel {
         leftTable.setDefaultEditor(Object.class, null); // Make cells non-editable
         TableStyler.styleTable(leftTable);
         leftTable.setRowHeight(200);
+
+        leftTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (leftTable.rowAtPoint(p) >= 0) {
+                    leftTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    leftTable.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
 
         // Set selection modes
         rightTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

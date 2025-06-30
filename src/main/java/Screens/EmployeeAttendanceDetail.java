@@ -3,6 +3,8 @@ package Screens;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +12,7 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.table.TableColumn;
 
 // JCalendar Imports:
+import Components.TableStyler;
 import Config.JDBC;
 import Module.Payroll.Payroll;
 import com.toedter.calendar.JDateChooser;
@@ -41,6 +44,7 @@ public class EmployeeAttendanceDetail extends JPanel {
         backButton.setBackground(Color.BLACK);
         backButton.setForeground(Color.WHITE);
         backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backButton.addActionListener(e -> cardLayout.show(mainContainer, "table"));
 
         JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -161,8 +165,21 @@ public class EmployeeAttendanceDetail extends JPanel {
         };
 
         table = new JTable(new DefaultTableModel(data, columns)); // Initialize table
+        table.getTableHeader().setReorderingAllowed(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        table.setRowHeight(30);
+        TableStyler.styleTable(table);
+
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (table.rowAtPoint(p) >= 0) {
+                    table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    table.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -198,9 +215,10 @@ public class EmployeeAttendanceDetail extends JPanel {
 
         JTextField field = new JTextField(value);
         field.setEditable(false);
+        field.setEnabled(false); // Disable the text field
+        field.setDisabledTextColor(Color.BLACK); // Keep text color black when disabled
         field.setColumns(10);
         field.setBackground(Color.WHITE);
-        field.setForeground(Color.BLACK);
         field.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         panel.add(lbl, BorderLayout.NORTH);

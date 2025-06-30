@@ -132,6 +132,7 @@ public class RegisterEmployee extends JPanel {
 
         // Add Register Button
         JButton registerButton = createRegisterButton();
+        registerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.add(registerButton);

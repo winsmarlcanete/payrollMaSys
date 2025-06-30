@@ -20,7 +20,7 @@ public class Reports extends javax.swing.JPanel {
     private LeaveReport leaveReport;
     private E201File Payroll;
 
-    public Reports() {
+    public Reports(String userRole) {
         // Search bar
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout(10, 0));
@@ -31,20 +31,34 @@ public class Reports extends javax.swing.JPanel {
 
         Font font = new Font("Arial", Font.PLAIN, 16);
 
-        JTextField searchField = new JTextField();
+        JTextField searchField = new JTextField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (getText().length() == 0) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setColor(Color.GRAY);
+                    g2.setFont(getFont().deriveFont(Font.PLAIN));
+                    FontMetrics fm = g2.getFontMetrics();
+                    int padding = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+                    g2.drawString("Search", 15, padding);
+                    g2.dispose();
+                }
+            }
+        };
         searchField.setFont(font);
         searchField.setBorder(null);
         searchField.setPreferredSize(null);
 
-        JButton searchButton = new JButton("Search");
-        searchButton.setFont(font);
-        searchButton.setPreferredSize(new Dimension(150, 70));
-        searchButton.setBackground(Color.WHITE);
-        searchButton.setBorder(null);
-        searchButton.setFocusable(false);
+//        JButton searchButton = new JButton("Search");
+//        searchButton.setFont(font);
+//        searchButton.setPreferredSize(new Dimension(150, 70));
+//        searchButton.setBackground(Color.WHITE);
+//        searchButton.setBorder(null);
+//        searchButton.setFocusable(false);
 
         searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.WEST);
+//        searchPanel.add(searchButton, BorderLayout.WEST);
 
         // Dropdown
         RoundedComboBox<String> sortCombo = new RoundedComboBox<>(E201File.retrieveAllDepartments()) {
@@ -174,24 +188,51 @@ public class Reports extends javax.swing.JPanel {
         buttonPanel.setBackground(Color.WHITE);
 
         Color activeColor = new Color(0, 158, 0);
-        Color defaultColor = UIManager.getColor("Button.background");
+        Color defaultColor = new Color(217, 217, 217);
+        Color hoverColor = new Color(190, 190, 190); // Slightly darker than default for hover
 
-        // Store buttons for color management
+// Store buttons for color management
         Map<String, JButton> buttonMap = new LinkedHashMap<>();
 
         for (String name : panelMap.keySet()) {
             JButton btn = new JButton(name);
             btn.setFont(new Font("Arial", Font.PLAIN, 16));
             btn.setFocusPainted(false);
-//                    btn.setPreferredSize(new Dimension(btn.getPreferredSize().width, 35));
-//                    btn.setMaximumSize(new Dimension(btn.getPreferredSize().width, 35));
             btn.setPreferredSize(new Dimension(0, 45));
             btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-            btn.setBackground(new Color(217, 217, 217));
-            btn.setBorderPainted(false); // Hide border, keep padding
+            btn.setBackground(defaultColor);
+            btn.setBorderPainted(false);
             buttonPanel.add(btn);
             buttonPanel.add(Box.createRigidArea(new Dimension(1, 0)));
+
+            if (name.equals("Change Log")) {
+                if (!userRole.equals("Admin")) {
+                    btn.setVisible(false);
+                } else {
+                    btn.setVisible(true);
+                }
+            }
+
             buttonMap.put(name, btn);
+
+            // Add hover effect
+            btn.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    if (btn.getBackground() != activeColor) {
+                        btn.setBackground(hoverColor);
+                        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    }
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    if (btn.getBackground() != activeColor) {
+                        btn.setBackground(defaultColor);
+                        btn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            });
 
             btn.addActionListener(e -> {
                 cardLayout.show(cardPanel, name);
@@ -202,7 +243,7 @@ public class Reports extends javax.swing.JPanel {
                         entry.getValue().setForeground(Color.WHITE);
                         entry.getValue().setFont(new Font("Arial", Font.BOLD, 16));
                     } else {
-                        entry.getValue().setBackground(new Color(217, 217, 217));
+                        entry.getValue().setBackground(defaultColor);
                         entry.getValue().setForeground(Color.BLACK);
                         entry.getValue().setFont(new Font("Arial", Font.PLAIN, 16));
                     }

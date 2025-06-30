@@ -884,6 +884,18 @@ public class Employees extends JPanel {
             }
         });
 
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (table.rowAtPoint(p) >= 0) {
+                    table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    table.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) { searchUsingBinarySearch(); }
