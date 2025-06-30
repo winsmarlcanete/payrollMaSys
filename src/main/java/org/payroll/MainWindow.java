@@ -23,7 +23,7 @@ public class MainWindow extends JFrame {
     private JPanel overlayPanel;
 
     private Object[][] employeeTableData;
-    public MainWindow() {
+    public MainWindow(int access_level) {
         setTitle("Synergy Grafix Corporation PMS");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -49,6 +49,38 @@ public class MainWindow extends JFrame {
         });
         setMinimumSize(new Dimension(1020, 600));
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
+
+        PayrollScreen payroll = new PayrollScreen();
+
+        // Create a modeless dialog to indicate updating
+        JDialog updatingDialog = new JDialog(this, "Please wait", false);
+        updatingDialog.setLayout(new BorderLayout());
+        updatingDialog.add(new JLabel("Updating payroll, please wait...", SwingConstants.CENTER), BorderLayout.CENTER);
+        updatingDialog.setSize(300, 100);
+        updatingDialog.setLocationRelativeTo(this);
+
+        // Scheduler to run update every 10 seconds
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+            System.out.println("Running updatePayrollDetails in the background...");
+            Date periodStart = Date.valueOf("2025-05-01");
+            Date periodEnd = Date.valueOf("2025-05-15");
+
+            Payroll.retrieveAllTimecards(periodStart, periodEnd);
+            System.out.println("updatePayrollDetails completed.");
+
+            SwingUtilities.invokeLater(() -> {
+                System.out.println("Refreshing Payroll UI...");
+                Payroll.retrieveAllPayrolls(periodStart, periodEnd);
+                payroll.repaint();
+                payroll.revalidate();
+
+                if (!updatingDialog.isVisible()) {
+                    updatingDialog.setVisible(false);
+                }
+            });
+        }, 0, 10, TimeUnit.SECONDS);
+
         ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
         setIconImage(windowIcon.getImage());
 
@@ -81,14 +113,22 @@ public class MainWindow extends JFrame {
         employeeTableData = E201File.getEmployeeTableData();
 
         JLabel currentUserLabel = new JLabel();
-        currentUserLabel.setText("Admin");
+        if (access_level == 1) {
+            currentUserLabel.setText("Admin");
+        } else if (access_level == 2) {
+            currentUserLabel.setText("Human Resource");
+        } else if (access_level == 3) {
+            currentUserLabel.setText("Accountant");
+        } else {
+            currentUserLabel.setText("Unknown");
+        }
 
         Employees employees = new Employees(this, employeeTableData);
         employees.loadEmployeeTabledata();
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
         LeaveManagementScreen leavemanagement = new LeaveManagementScreen();
-        PayrollScreen payroll = new PayrollScreen();
+
         Reports reports = new Reports(currentUserLabel.getText());
         Help help = new Help();
         About about = new About();
@@ -96,7 +136,7 @@ public class MainWindow extends JFrame {
 
         // Map for button names and panels
         Map<String, JPanel> panelMap = new LinkedHashMap<>();
-        panelMap.put("Employees", employees);
+        panelMap.put("E-201 File", employees);
         panelMap.put("Register Employee", regemployee);
         panelMap.put("Attendance", attendance);
         panelMap.put("Leave Management", leavemanagement);
@@ -255,6 +295,13 @@ public class MainWindow extends JFrame {
             buttonMap.get("User Control").setVisible(false);
         }
 
+
+        if (currentUserLabel.getText().equals("Accountant")) {
+            buttonMap.get("Attendance").setVisible(false);
+            buttonMap.get("Leave Management").setVisible(false);
+        }
+
+
         JButton currentUser = new JButton();
         currentUser.setText(currentUserLabel.getText());
         currentUser.setFont(new Font("Arial", Font.PLAIN,16));
@@ -359,53 +406,5 @@ public class MainWindow extends JFrame {
 
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainWindow frame = new MainWindow();
-            frame.setVisible(true);
 
-            PayrollScreen payroll = new PayrollScreen();
-
-            // Create a modeless dialog to indicate updating
-            JDialog updatingDialog = new JDialog(frame, "Please wait", false);
-            updatingDialog.setLayout(new BorderLayout());
-            updatingDialog.add(new JLabel("Updating payroll, please wait...", SwingConstants.CENTER), BorderLayout.CENTER);
-            updatingDialog.setSize(300, 100);
-            updatingDialog.setLocationRelativeTo(frame);
-
-            // Show the dialog
-            updatingDialog.setVisible(false);
-
-            // Scheduler to run update every 10 seconds
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(() -> {
-                System.out.println("Running updatePayrollDetails in the background...");
-                Date periodStart = Date.valueOf("2025-05-01");
-                Date periodEnd = Date.valueOf("2025-05-15");
-
-                Payroll.retrieveAllTimecards(periodStart, periodEnd);
-                System.out.println("updatePayrollDetails completed.");
-
-                SwingUtilities.invokeLater(() -> {
-                    System.out.println("Refreshing Payroll UI...");
-                    Payroll.retrieveAllPayrolls(periodStart, periodEnd);
-                    payroll.repaint();
-                    payroll.revalidate();
-
-                    if (!updatingDialog.isVisible()) {
-                        updatingDialog.setVisible(false);
-                    }
-                });
-            }, 0, 10, TimeUnit.SECONDS);
-
-            // Shutdown the scheduler when window closes
-            frame.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    scheduler.shutdown();
-                    updatingDialog.dispose();
-                }
-            });
-        });
-    }
 }

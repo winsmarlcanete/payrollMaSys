@@ -9,6 +9,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
 
+import Module.Security.LevelofAcess;
 import org.payroll.MainWindow;
 
 import java.awt.*;
@@ -221,7 +222,7 @@ public class Login extends JFrame {
                     errorMessageLabel.setVisible(false); // Hide any previous error
                     System.out.println("Email found and password matched!");
 
-                    MainWindow mainWindow = new MainWindow();
+                    MainWindow mainWindow = new MainWindow(LevelofAcess.checkAccess(input_email));
                     mainWindow.setVisible(true);
                     mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
                     dispose(); // Close login window

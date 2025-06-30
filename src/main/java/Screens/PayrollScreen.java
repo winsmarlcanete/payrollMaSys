@@ -464,6 +464,7 @@ public class PayrollScreen extends JPanel {
                     startDate = new java.sql.Date(dateFormat.parse(dates[0].trim()).getTime());
                     endDate = new java.sql.Date(dateFormat.parse(dates[1].trim()).getTime());
                     String selectedDepartment = (String) departmentDropdown.getSelectedItem();
+                    Payroll.retrieveAllTimecards(startDate, endDate );
                     // Call refreshPayrollData with the parsed dates
 
                     refreshPayrollData(startDate, endDate,selectedDepartment);
