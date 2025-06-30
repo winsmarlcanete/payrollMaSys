@@ -662,6 +662,19 @@ public class PayrollScreen extends JPanel {
                 }
             }
         });
+
+        frozenTable1.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (frozenTable1.rowAtPoint(p) >= 0) {
+                    frozenTable1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    frozenTable1.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
         scrollTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
@@ -670,6 +683,18 @@ public class PayrollScreen extends JPanel {
                     scrollTable1.setRowSelectionInterval(row, row);
                 } else {
                     scrollTable1.clearSelection();
+                }
+            }
+        });
+
+        scrollTable1.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (scrollTable1.rowAtPoint(p) >= 0) {
+                    scrollTable1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    scrollTable1.setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
@@ -684,7 +709,7 @@ public class PayrollScreen extends JPanel {
         JScrollPane frozenScroll1 = new JScrollPane(frozenTable1);
         frozenScroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         frozenScroll1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        frozenScroll1.setPreferredSize(new Dimension(300, frozenTable1.getPreferredSize().height));
+        frozenScroll1.setPreferredSize(new Dimension(285, frozenTable1.getPreferredSize().height));
 //        frozenScroll1.setMaximumSize(new Dimension(50, Integer.MAX_VALUE));
 //        frozenScroll1.setOpaque(false);
         frozenScroll1.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));

@@ -90,7 +90,7 @@ public class About extends JPanel {
         mainPanel.add(closing);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(devs);
-        mainPanel.setBorder(BorderFactory.createLineBorder(MainWindow.activeColor, 10));
+//        mainPanel.setBorder(BorderFactory.createLineBorder(MainWindow.activeColor, 10));
 
 //        GridBagConstraints gbc = new GridBagConstraints();
 //        gbc.gridx = 0;

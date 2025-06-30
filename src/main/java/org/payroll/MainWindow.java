@@ -80,15 +80,19 @@ public class MainWindow extends JFrame {
         // Create panels for each section
         employeeTableData = E201File.getEmployeeTableData();
 
+        JLabel currentUserLabel = new JLabel();
+        currentUserLabel.setText("Admin");
+
         Employees employees = new Employees(this, employeeTableData);
         employees.loadEmployeeTabledata();
         RegisterEmployee regemployee = new RegisterEmployee();
         Attendance attendance = new Attendance();
         LeaveManagementScreen leavemanagement = new LeaveManagementScreen();
         PayrollScreen payroll = new PayrollScreen();
-        Reports reports = new Reports();
+        Reports reports = new Reports(currentUserLabel.getText());
         Help help = new Help();
         About about = new About();
+        UserControl usercontrol = new UserControl();
 
         // Map for button names and panels
         Map<String, JPanel> panelMap = new LinkedHashMap<>();
@@ -100,6 +104,7 @@ public class MainWindow extends JFrame {
         panelMap.put("Reports", reports);
         panelMap.put("Help", help);
         panelMap.put("About", about);
+        panelMap.put("User Control", usercontrol);
 
         // Add panels to cardPanel
         for (Map.Entry<String, JPanel> entry : panelMap.entrySet()) {
@@ -244,8 +249,15 @@ public class MainWindow extends JFrame {
                         .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
         );
 
-        JButton currentUser = new JButton("Human Resources");
-        currentUser.setFont(new Font("Arial", Font.PLAIN, 16));
+        if (currentUserLabel.getText().equals("Admin")) {
+            buttonMap.get("User Control").setVisible(true);
+        } else {
+            buttonMap.get("User Control").setVisible(false);
+        }
+
+        JButton currentUser = new JButton();
+        currentUser.setText(currentUserLabel.getText());
+        currentUser.setFont(new Font("Arial", Font.PLAIN,16));
         currentUser.setFocusPainted(false);
         currentUser.setBackground(Color.BLACK);
         currentUser.setForeground(Color.WHITE);
