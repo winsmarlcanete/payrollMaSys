@@ -7,6 +7,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.border.EmptyBorder;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
 import Module.Security.LevelofAcess;
@@ -32,7 +35,47 @@ public class Login extends JFrame {
     private JLabel errorMessageLabel;
     private RoundedTextField emailField;
     private RoundedPasswordField passwordField;
+    private void performLogin() {
+        String input_email = emailField.getText().trim();
+        char[] passwordChars = passwordField.getPassword();
 
+        // Input Validation for Empty Fields
+        if (input_email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
+            errorMessageLabel.setVisible(false);
+            return;
+        }
+
+        if (passwordChars.length == 0) {
+            JOptionPane.showMessageDialog(this, "Password field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
+            errorMessageLabel.setVisible(false);
+            return;
+        }
+
+        String passwordInput = sha256.stringToSHA256(new String(passwordChars));
+        Arrays.fill(passwordChars, ' ');
+
+        if(emailExists(input_email)) {
+            String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
+            if (Objects.equals(passwordFromDB, passwordInput)){
+                errorMessageLabel.setVisible(false);
+                System.out.println("Email found and password matched!");
+
+                MainWindow mainWindow = new MainWindow(LevelofAcess.checkAccess(input_email));
+                mainWindow.setVisible(true);
+                mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                dispose();
+            } else {
+                errorMessageLabel.setText("Incorrect email or password");
+                errorMessageLabel.setVisible(true);
+                System.out.println("Email found but password incorrect!");
+            }
+        } else {
+            errorMessageLabel.setText("Incorrect email or password");
+            errorMessageLabel.setVisible(true);
+            System.out.println("Couldn't find account");
+        }
+    }
 
     public Login() {
         setTitle("SynergyGrafixCorp. Payroll Management System");
@@ -192,55 +235,19 @@ public class Login extends JFrame {
         forgotPasswordButton.setForeground(Color.WHITE);
 
         //Action Listener
-        loginButton.addActionListener(e -> {
-            String input_email = emailField.getText().trim(); // Trim whitespace
-            char[] passwordChars = passwordField.getPassword();
+        loginButton.addActionListener(e -> performLogin());
 
-            // --- Input Validation for Empty Fields ---
-            if (input_email.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Email field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
-                errorMessageLabel.setVisible(false); // Ensure error label is hidden for this type of warning
-                return; // Stop further processing
-            }
-
-            if (passwordChars.length == 0) {
-                JOptionPane.showMessageDialog(this, "Password field cannot be empty.", "Warning", JOptionPane.WARNING_MESSAGE);
-                errorMessageLabel.setVisible(false); // Ensure error label is hidden for this type of warning
-                return; // Stop further processing
-            }
-            // --- End Input Validation ---
-
-            String passwordInput = sha256.stringToSHA256(new String(passwordChars));
-
-            // Clear password array immediately after use for security
-            Arrays.fill(passwordChars, ' ');
-
-            if(emailExists(input_email)) {
-                String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
-                if (Objects.equals(passwordFromDB, passwordInput)){
-                    // Login Successful
-                    errorMessageLabel.setVisible(false); // Hide any previous error
-                    System.out.println("Email found and password matched!");
-
-                    MainWindow mainWindow = new MainWindow(LevelofAcess.checkAccess(input_email));
-                    mainWindow.setVisible(true);
-                    mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                    dispose(); // Close login window
-
-                } else {
-                    // Password incorrect
-                    errorMessageLabel.setText("Incorrect email or password");
-                    errorMessageLabel.setVisible(true); // Show error message
-                    System.out.println("Email found but password incorrect!");
+        KeyListener enterKeyListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    performLogin();
                 }
-            } else {
-                // Email not found
-                errorMessageLabel.setText("Incorrect email or password");
-                errorMessageLabel.setVisible(true); // Show error message
-                System.out.println("Couldn't find account");
             }
-        });
+        };
 
+        emailField.addKeyListener(enterKeyListener);
+        passwordField.addKeyListener(enterKeyListener);
 
         // Create Account Button ActionListener
         createAccountButton.addActionListener(e -> {
