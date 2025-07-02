@@ -116,7 +116,7 @@ public class UserControl extends JPanel {
                 button = new RoundedButton("Approve", 20) {
                     @Override
                     protected void paintComponent(Graphics g) {
-                        setModel(getModel()); // Ensure model state is current
+                        setModel(getModel());
                         super.paintComponent(g);
                     }
                 };
@@ -138,9 +138,19 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus, int row, int column) {
-                // Update button model state based on table row hover
+                String status = (String) table.getValueAt(row, 5);
+                if ("Active".equals(status)) {
+                    button.setText("Approved");
+                    button.setEnabled(false);
+                    button.setBackground(new Color(150, 150, 150));
+                } else {
+                    button.setText("Approve");
+                    button.setEnabled(true);
+                    button.setBackground(MainWindow.activeColor);
+                }
+
                 int mouseRow = table.getRowCount() > 0 ? table.getSelectedRow() : -1;
-                button.getModel().setRollover(mouseRow == row);
+                button.getModel().setRollover(mouseRow == row && button.isEnabled());
                 return panel;
             }
         }
@@ -176,21 +186,30 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value,
                                                          boolean isSelected, int row, int column) {
-                isPushed = true;
-                button.getModel().setRollover(true);
+                String status = (String) table.getValueAt(row, 5);
+                if ("Active".equals(status)) {
+                    button.setText("Approved");
+                    button.setEnabled(false);
+                    button.setBackground(new Color(150, 150, 150));
+                    isPushed = false;
+                } else {
+                    button.setText("Approve");
+                    button.setEnabled(true);
+                    button.setBackground(MainWindow.activeColor);
+                    isPushed = true;
+                }
+                button.getModel().setRollover(button.isEnabled());
                 return panel;
             }
 
             @Override
             public Object getCellEditorValue() {
-                isPushed = false;
                 button.getModel().setRollover(false);
-                return "Approve";
+                return button.getText();
             }
 
             @Override
             public boolean stopCellEditing() {
-                isPushed = false;
                 button.getModel().setRollover(false);
                 return super.stopCellEditing();
             }
