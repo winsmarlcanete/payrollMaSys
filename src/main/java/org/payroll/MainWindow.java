@@ -327,6 +327,8 @@ public class MainWindow extends JFrame {
         if (currentUserLabel.getText().equals("Accountant")) {
             buttonMap.get("Attendance").setVisible(false);
             buttonMap.get("Leave Management").setVisible(false);
+            buttonMap.get("Register Employee").setVisible(false);
+
         }
 
 

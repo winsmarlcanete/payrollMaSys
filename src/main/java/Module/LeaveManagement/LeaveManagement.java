@@ -4,6 +4,8 @@ import Config.JDBC;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static Module.Attendance.Backup.AttendanceBackup.checkEmployee;
 
@@ -93,5 +95,45 @@ public class LeaveManagement {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String[] getPayrollYears() {
+        String sql = "SELECT DISTINCT YEAR(payroll_date) AS year FROM payroll ORDER BY year ASC";
+        List<String> payrollYearsList = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = JDBC.getConnection();
+            System.out.println("Database connection established.");
+            stmt = conn.prepareStatement(sql);
+
+            System.out.println("Executing SQL: " + stmt.toString());
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                payrollYearsList.add(String.valueOf(rs.getInt("year")));
+            }
+
+            System.out.println("Payroll years retrieved successfully!");
+            System.out.println("Payroll Years: " + payrollYearsList);
+        } catch (SQLException e) {
+            System.out.println("Error during getPayrollYears:");
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+                System.out.println("Database resources closed.");
+            } catch (SQLException e) {
+                System.out.println("Error while closing resources:");
+                e.printStackTrace();
+            }
+        }
+
+        return payrollYearsList.toArray(new String[0]);
     }
 }

@@ -89,11 +89,11 @@ public class RegisterEmployee extends JPanel {
         row = 0; // Reset row for second panel
         row = addField(secondPanel, gbc, row, "TIN no.", tinNoField);
         row = addField(secondPanel, gbc, row, "SSS no.", sssNoField);
+        row = addField(secondPanel, gbc, row, "SSS Percentage (%)", sssPercentageField);
         row = addField(secondPanel, gbc, row, "Pag-Ibig no.", pagIbigNoField);
         row = addField(secondPanel, gbc, row, "Pag-Ibig Percentage (%)", pagIbigPercentageField);
         row = addField(secondPanel, gbc, row, "PhilHealth no.", philHealthNoField);
         row = addField(secondPanel, gbc, row, "PhilHealth Percentage (%)", philHealthPercentageField);
-        row = addField(secondPanel, gbc, row, "SSS Percentage (%)", sssPercentageField);
         row = addField(secondPanel, gbc, row, "E-Fund Amount (₱)", efundAmountField);
         row = addField(secondPanel, gbc, row, "Other Deductions (₱)", otherDeductionsField);
         row = addField(secondPanel, gbc, row, "Salary Adjustment Percentage (%)", salaryAdjPercentageField);

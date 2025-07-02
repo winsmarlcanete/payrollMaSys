@@ -3,6 +3,7 @@ package Screens;
 import Components.BlackRoundedComboBox;
 import Components.RoundedComboBox;
 import Components.TableStyler;
+import Module.LeaveManagement.LeaveManagement;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class LeaveReport extends JPanel {
@@ -33,56 +35,7 @@ public class LeaveReport extends JPanel {
         // Leave Type and Date Taken Table
         DefaultTableModel rightTableModel = new DefaultTableModel(
                 new Object[][] {
-                        {"Sick Leave", "Jan 10, 2024"},
-                        {"Sick Leave", "Feb 12, 2024"},
-                        {"Maternity Leave", "2023-03-20"},
-                        {"Vacation Leave", "2023-04-15"},
-                        {"Vacation Leave", "2023-05-10"},
-                        {"Vacation Leave", "2023-06-05"},
-                        {"Sick Leave", "2023-07-20"},
-                        {"Sick Leave", "2023-08-25"},
-                        {"Maternity Leave", "2023-09-30"},
-                        {"Vacation Leave", "2023-10-15"},
-                        {"Vacation Leave", "2023-11-10"},
-                        {"Vacation Leave", "2023-12-05"},
-                        {"Sick Leave", "2024-01-20"},
-                        {"Sick Leave", "2024-02-25"},
-                        {"Maternity Leave", "2024-03-30"},
-                        {"Vacation Leave", "2024-04-15"},
-                        {"Vacation Leave", "2024-05-10"},
-                        {"Vacation Leave", "2024-06-05"},
-                        {"Sick Leave", "2024-07-20"},
-                        {"Sick Leave", "2024-08-25"},
-                        {"Maternity Leave", "2024-09-30"},
-                        {"Vacation Leave", "2024-10-15"},
-                        {"Vacation Leave", "2024-11-10"},
-                        {"Vacation Leave", "2024-12-05"},
-                        {"Sick Leave", "Jan 10, 2024"},
-                        {"Sick Leave", "Feb 12, 2024"},
-                        {"Maternity Leave", "2023-03-20"},
-                        {"Vacation Leave", "2023-04-15"},
-                        {"Vacation Leave", "2023-05-10"},
-                        {"Vacation Leave", "2023-06-05"},
-                        {"Sick Leave", "2023-07-20"},
-                        {"Sick Leave", "2023-08-25"},
-                        {"Maternity Leave", "2023-09-30"},
-                        {"Vacation Leave", "2023-10-15"},
-                        {"Vacation Leave", "2023-11-10"},
-                        {"Vacation Leave", "2023-12-05"},
-                        {"Sick Leave", "2024-01-20"},
-                        {"Sick Leave", "2024-02-25"},
-                        {"Maternity Leave", "2024-03-30"},
-                        {"Vacation Leave", "2024-04-15"},
-                        {"Vacation Leave", "2024-05-10"},
-                        {"Vacation Leave", "2024-06-05"},
-                        {"Sick Leave", "2024-07-20"},
-                        {"Sick Leave", "2024-08-25"},
-                        {"Maternity Leave", "2024-09-30"},
-                        {"Vacation Leave", "2024-10-15"},
-                        {"Vacation Leave", "2024-11-10"},
-                        {"Vacation Leave", "2024-12-05"},
-                        {"Sick Leave", "Jan 10, 2024"},
-                        {"Sick Leave", "Feb 12, 2024"},
+
                 },
                 new String[] {"Leave Type", "Date Taken"}
         );
@@ -113,16 +66,7 @@ public class LeaveReport extends JPanel {
         // Name and SIL Table
         DefaultTableModel leftTableModel = new DefaultTableModel(
                 new Object[][] {
-                        {"Supan, Marc", "2/5"},
-                        {"Cañete, Winsmarl", "4/5"},
-                        {"Serrano, Jerwin", "1/5"},
-                        {"Reyes, Daniel", "3/5"},
-                        {"Dela Cruz, Anna", "0/5"},
-                        {"Santos, Miguel", "5/5"},
-                        {"Lopez, Carla", "2/5"},
-                        {"Garcia, Paolo", "1/5"},
-                        {"Torres, Jasmine", "4/5"},
-                        {"Rivera, John", "3/5"}
+
                 },
                 new String[] {"Name", "Remaining Leaves"}
         );
@@ -283,14 +227,17 @@ public class LeaveReport extends JPanel {
         tablePanel.add(rightTablePanel);
 
         // Dropdown
-        BlackRoundedComboBox<String> year = new BlackRoundedComboBox<>(new String[] {
-                "2023", "2024", "2025"
-        }) {
+        BlackRoundedComboBox<String> year = new BlackRoundedComboBox<>( new String[]{"2025"}) {
             @Override
             protected void paintBorder(Graphics g) {
                 // Do nothing: no border for this instance
             }
         };
+
+
+
+
+
         year.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
