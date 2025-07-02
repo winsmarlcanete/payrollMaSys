@@ -1,6 +1,7 @@
 package Screens;
 
 import Algorithms.sha256;
+import Config.JDBC;
 import Module.Registration.UserRegistration.UserRegistration;
 
 import javax.swing.*;
@@ -16,7 +17,10 @@ import Module.Security.LevelofAcess;
 import org.payroll.MainWindow;
 
 import java.awt.*;
+import java.sql.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -57,14 +61,20 @@ public class Login extends JFrame {
 
         if(emailExists(input_email)) {
             String passwordFromDB = UserRegistration.getPasswordByEmail(input_email);
-            if (Objects.equals(passwordFromDB, passwordInput)){
-                errorMessageLabel.setVisible(false);
-                System.out.println("Email found and password matched!");
+            if (Objects.equals(passwordFromDB, passwordInput)) {
+                if (UserRegistration.isAccountActive(input_email)) {
+                    errorMessageLabel.setVisible(false);
+                    System.out.println("Email found and password matched!");
 
-                MainWindow mainWindow = new MainWindow(LevelofAcess.checkAccess(input_email));
-                mainWindow.setVisible(true);
-                mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                dispose();
+                    MainWindow mainWindow = new MainWindow(LevelofAcess.checkAccess(input_email));
+                    mainWindow.setVisible(true);
+                    mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    dispose();
+                } else {
+                    errorMessageLabel.setText("Account is inactive. Please contact admin.");
+                    errorMessageLabel.setVisible(true);
+                    System.out.println("Account is inactive.");
+                }
             } else {
                 errorMessageLabel.setText("Incorrect email or password");
                 errorMessageLabel.setVisible(true);
@@ -76,6 +86,7 @@ public class Login extends JFrame {
             System.out.println("Couldn't find account");
         }
     }
+
 
     public Login() {
         setTitle("Synergy Grafix Corporation PMS");

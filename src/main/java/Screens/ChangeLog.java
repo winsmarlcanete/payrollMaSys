@@ -36,12 +36,7 @@ public class ChangeLog extends JPanel {
         // Create table model and data for Activity Log
         String[] activityColumnNames = {"Name", "Position", "Date", "Time", "Activity"};
         Object[][] activityData = {
-                {"Aela Cruz, Juan C.", "HR", "08 / 23 / 24", "8:23 A.M.", "Registered an employee"},
-                {"Aela Cruz, Juan C.", "HR", "08 / 23 / 24", "8:23 A.M.", "Registered an employee"},
-                {"Aela Cruz, Juan C.", "HR", "08 / 23 / 24", "8:23 A.M.", "Registered an employee"},
-                {"Bela Cruz, Juan C.", "Accountant", "08 / 23 / 24", "8:23 A.M.", "Modified payroll"},
-                {"Bela Cruz, Juan C.", "Accountant", "08 / 23 / 24", "8:23 A.M.", "Modified payroll"},
-                {"Bela Cruz, Juan C.", "Accountant", "08 / 23 / 24", "8:23 A.M.", "Generated payslip"},
+
                 // Add more sample data as needed
         };
 
@@ -105,10 +100,7 @@ public class ChangeLog extends JPanel {
         // Create table model and data for Error Log
         String[] errorColumnNames = {"Date", "Time", "Error Code", "Error Message", "Activity"};
         Object[][] errorData = {
-                {"08 / 23 / 24", "8:23 A.M.", "PAY-002", "Invalid salary amount", "java.lang.NumberFormatException:"},
-                {"08 / 23 / 24", "8:23 A.M.", "PAY-003", "Deduct Calc. Failed", "java.lang.NumberFormatExcepitonh"},
-                {"08 / 23 / 24", "8:23 A.M.", "PAY-003", "Database connection", "java.lang.SQLException: Error"},
-                // Add more sample data as needed
+
         };
 
         DefaultTableModel errorTableModel = new DefaultTableModel(errorData, errorColumnNames) {

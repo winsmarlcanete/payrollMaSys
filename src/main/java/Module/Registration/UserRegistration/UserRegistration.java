@@ -78,6 +78,22 @@ public class UserRegistration {
         return emails;
     }
 
+    public static boolean isAccountActive(String email) {
+        boolean isActive = false;
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT account_status FROM users WHERE email = ?")) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int status = rs.getInt("account_status");
+                isActive = (status == 1); // 1 = active
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isActive;
+    }
+
     public static String getPasswordByEmail(String email) {
         String sql = "SELECT `password` FROM `payrollmsdb`.`users` WHERE `email` = ?;";
         String password = null;
