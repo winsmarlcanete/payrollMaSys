@@ -3,7 +3,6 @@ package Components; // Ensure this matches your package structure
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
 
 public class RoundedPasswordField extends JPasswordField {
     private int cornerRadius = 15; // You can adjust this value
