@@ -216,6 +216,21 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value,
                                                          boolean isSelected, int row, int column) {
+
+                String status = (String) table.getValueAt(row, 5);
+                if ("Active".equals(status)) {
+                    button.setText("Approved");
+                    button.setEnabled(false);
+                    button.setBackground(new Color(150, 150, 150));
+                    isPushed = false;
+                } else {
+                    button.setText("Approve");
+                    button.setEnabled(true);
+                    button.setBackground(MainWindow.activeColor);
+                    isPushed = true;
+                }
+                button.getModel().setRollover(button.isEnabled());
+
                 this.table = table;
                 isPushed = true;
 
@@ -233,12 +248,14 @@ public class UserControl extends JPanel {
 
             @Override
             public Object getCellEditorValue() {
+                button.getModel().setRollover(false);
                 isPushed = false;
                 return button.getText();
             }
 
             @Override
             public boolean stopCellEditing() {
+                button.getModel().setRollover(false);
                 isPushed = false;
                 return super.stopCellEditing();
             }
