@@ -2,6 +2,7 @@ package Screens;
 
 import Components.RoundedButton;
 import Components.TableStyler;
+import Config.JDBC;
 import org.payroll.MainWindow;
 
 import javax.swing.*;
@@ -13,50 +14,70 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 public class UserControl extends JPanel {
     private  JTextField searchField;
     private JTable userTable;
     private DefaultTableModel tableModel;
 
-    private void addSampleData() {
-        String[] names = {"John Smith",
-                "Emma Davis", "Michael Chen",
-                "Sarah Wilson", "David Brown",
-                "Lisa Anderson", "James Taylor",
-                "Maria Garcia", "Robert Lee",
-                "Amanda White", "Taylor Swift",
-                "Emma Davis", "Michael Chen",
-                "Sarah Wilson", "David Brown",
-                "Lisa Anderson", "James Taylor",
-                "Maria Garcia", "Robert Lee",
-                "Amanda White", "Taylor Swift",
-                "Emma Davis", "Michael Chen",
-                "Sarah Wilson", "David Brown",
-                "Lisa Anderson", "James Taylor",
-                "Maria Garcia", "Robert Lee",
-                "Amanda White", "Taylor Swift",
-                "Emma Davis", "Michael Chen",
-                "Sarah Wilson", "David Brown",
-                "Lisa Anderson", "James Taylor",
-                "Maria Garcia", "Robert Lee",
-                "Amanda White", "Taylor Swift"};
-        String[] accessLevels = {"Admin", "Human Resources", "Accounting"};
-        String[] statuses = {"Active", "Pending"};
+    public static Object[][] getAllUsers() {
+        List<Object[]> users = new ArrayList<>();
 
-        for (int i = 0; i < 41; i++) {
-            String name = names[i];
-            String userId = "UID" + String.format("%04d", (int)(Math.random() * 10000));
-            String email = name.toLowerCase().replace(" ", ".") + "@company.com";
-            String accessLevel = accessLevels[(int)(Math.random() * accessLevels.length)];
-            String creationDate = String.format("%02d/%02d/2023",
-                    (int)(Math.random() * 12) + 1,
-                    (int)(Math.random() * 28) + 1);
-            String status = statuses[(int)(Math.random() * statuses.length)];
+        String query = "SELECT user_id, first_name, last_name, email, access_level, creation_date, account_status " +
+                "FROM users WHERE access_level != 1";
 
-            tableModel.addRow(new Object[]{name, userId, email, accessLevel, creationDate, status, "Edit"});
+        try (Connection conn = JDBC.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String fullName = rs.getString("first_name") + " " + rs.getString("last_name");
+                String userId = String.valueOf(rs.getInt("user_id"));
+                String email = rs.getString("email");
+                String accessLevel = getAccessLevelName(rs.getInt("access_level"));
+                String creationDate = rs.getDate("creation_date").toString();
+                String accountStatus = getAccountStatusName(rs.getInt("account_status"));
+
+                Object[] row = new Object[] {
+                        fullName,
+                        userId,
+                        email,
+                        accessLevel,
+                        creationDate,
+                        accountStatus,
+                        "Edit"
+                };
+
+                users.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        return users.toArray(new Object[0][]);
     }
+
+    private static String getAccessLevelName(int level) {
+        return switch (level) {
+            case 2 -> "Human Resources";
+            case 3 -> "Accounting";
+            default -> "Unknown";
+        };
+    }
+
+    private static String getAccountStatusName(int status) {
+        return switch (status) {
+            case 0 -> "Pending";
+            case 1 -> "Active";
+            default -> "Unknown";
+        };
+    }
+
 
     public UserControl() {
         setLayout(new BorderLayout());
@@ -149,6 +170,7 @@ public class UserControl extends JPanel {
             private final JPanel panel;
             private final RoundedButton button;
             private boolean isPushed;
+            private JTable table;
 
             public ButtonEditor() {
                 super(new JCheckBox());
@@ -165,7 +187,25 @@ public class UserControl extends JPanel {
                 button.setFocusPainted(false);
                 button.setContentAreaFilled(false);
 
-                button.addActionListener(e -> fireEditingStopped());
+                button.addActionListener(e -> {
+                    if (isPushed && table != null) {
+                        int row = table.getEditingRow();
+                        String userId = table.getValueAt(row, 1).toString(); // Column 1 is User ID
+
+                        // Update DB
+                        approveUserInDatabase(userId);
+
+                        // Update table
+                        table.setValueAt("Active", row, 5); // Column 5 is Account Status
+                        table.setValueAt("Approved", row, 6); // Change button label text
+
+                        // Optional: Disable button visually
+                        button.setText("Approved");
+                        button.setEnabled(false);
+
+                        fireEditingStopped();
+                    }
+                });
 
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.weightx = 1;
@@ -176,22 +216,30 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value,
                                                          boolean isSelected, int row, int column) {
+                this.table = table;
                 isPushed = true;
-                button.getModel().setRollover(true);
+
+                // Check if already approved
+                if ("Active".equals(table.getValueAt(row, 5))) {
+                    button.setText("Approved");
+                    button.setEnabled(false);
+                } else {
+                    button.setText("Approve");
+                    button.setEnabled(true);
+                }
+
                 return panel;
             }
 
             @Override
             public Object getCellEditorValue() {
                 isPushed = false;
-                button.getModel().setRollover(false);
-                return "Approve";
+                return button.getText();
             }
 
             @Override
             public boolean stopCellEditing() {
                 isPushed = false;
-                button.getModel().setRollover(false);
                 return super.stopCellEditing();
             }
         }
@@ -276,6 +324,22 @@ public class UserControl extends JPanel {
         setBorder(new EmptyBorder(10, 10, 10, 10));
         setBackground(MainWindow.activeColor);
         add(mainPanel, BorderLayout.CENTER);
-        addSampleData();
+
+        Object[][] userData = getAllUsers();
+        for (Object[] row : userData) {
+            tableModel.addRow(row);
+        }
     }
+
+    private void approveUserInDatabase(String userId) {
+        String query = "UPDATE users SET account_status = 1 WHERE user_id = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, Integer.parseInt(userId));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
