@@ -65,7 +65,7 @@ public class UserControl extends JPanel {
     private static String getAccessLevelName(int level) {
         return switch (level) {
             case 2 -> "Human Resources";
-            case 3 -> "Accounting";
+            case 3 -> "Accountant";
             default -> "Unknown";
         };
     }
@@ -192,9 +192,21 @@ public class UserControl extends JPanel {
                         String status = (String) table.getValueAt(row, 5);
 
                         if ("Pending".equals(status)) {
-                            String userId = table.getValueAt(row, 1).toString();
-                            approveUserInDatabase(userId);
-                            table.setValueAt("Active", row, 5);
+                            String userName = (String) table.getValueAt(row, 0);
+                            String accessLevel = (String) table.getValueAt(row, 3);
+                            int choice = JOptionPane.showConfirmDialog(
+                                    SwingUtilities.getWindowAncestor(button),
+                                    "Are you sure you want to approve " + userName + " as " + accessLevel + "?",
+                                    "Confirm Approval",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE
+                            );
+
+                            if (choice == JOptionPane.YES_OPTION) {
+                                String userId = table.getValueAt(row, 1).toString();
+                                approveUserInDatabase(userId);
+                                table.setValueAt("Active", row, 5);
+                            }
                         }
                         fireEditingStopped();
                     }
