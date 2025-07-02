@@ -6,7 +6,8 @@ import Module.Registration.EmployeeRegistration.EmployeeRegistration;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+//import java.sql.Date;
+//import java.util.Date;
 import java.sql.Time;
 import Screens.Employees;
 
@@ -32,20 +33,76 @@ public class RegisterEmployee extends JPanel {
     private final JTextField allowanceAmountField = new JTextField(15);
     private final JTextField otherCompAmountField = new JTextField(15);
 
-    private final JSpinner shiftStartSpinner = new JSpinner(new SpinnerDateModel());
-    private final JSpinner shiftEndSpinner = new JSpinner(new SpinnerDateModel());
+//    private final JSpinner shiftStartSpinner = new JSpinner(new SpinnerDateModel());
+//    private final JSpinner shiftEndSpinner = new JSpinner(new SpinnerDateModel());
+
+    private final JSpinner shiftStartSpinner;
+    private final JSpinner shiftEndSpinner;
 
     {
-        shiftStartSpinner.setEditor(new JSpinner.DateEditor(shiftStartSpinner, "HH:mm:ss"));
-        shiftEndSpinner.setEditor(new JSpinner.DateEditor(shiftEndSpinner, "HH:mm:ss"));
+//        shiftStartSpinner.setEditor(new JSpinner.DateEditor(shiftStartSpinner, "HH:mm"));
+//        shiftEndSpinner.setEditor(new JSpinner.DateEditor(shiftEndSpinner, "HH:mm"));
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+
+        // Initialize spinners with midnight time
+        SpinnerDateModel startModel = new SpinnerDateModel();
+        startModel.setValue(calendar.getTime());
+        shiftStartSpinner = new JSpinner(startModel);
+
+        SpinnerDateModel endModel = new SpinnerDateModel();
+        endModel.setValue(calendar.getTime());
+        shiftEndSpinner = new JSpinner(endModel);
+
+        shiftStartSpinner.setEditor(new JSpinner.DateEditor(shiftStartSpinner, "HH:mm"));
+        shiftEndSpinner.setEditor(new JSpinner.DateEditor(shiftEndSpinner, "HH:mm"));
     }
 
+    private void clearAllFields() {
+        firstNameField.setText("");
+        middleNameField.setText("");
+        lastNameField.setText("");
+        employeeIdField.setText("");
+        rateField.setText("");
+        tinNoField.setText("");
+        sssNoField.setText("");
+        pagIbigNoField.setText("");
+        philHealthNoField.setText("");
+        pagIbigPercentageField.setText("");
+        philHealthPercentageField.setText("");
+        sssPercentageField.setText("");
+        efundAmountField.setText("");
+        otherDeductionsField.setText("");
+        salaryAdjPercentageField.setText("");
+        allowanceAmountField.setText("");
+        otherCompAmountField.setText("");
+
+        departmentBox.setSelectedIndex(0);
+        employmentStatusBox.setSelectedIndex(0);
+
+        // Reset spinners to midnight (00:00:00)
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+
+        shiftStartSpinner.setValue(calendar.getTime());
+        shiftEndSpinner.setValue(calendar.getTime());
+
+        // Reset fingerprint enrollment
+        enrolled = null;
+    }
 
     private final JComboBox<String> departmentBox = new JComboBox<>(
-            new String[] { "Human Resource", "Accounting", "Sales", "Production (Pre-Press)",
+            new String[] { "Select Department", "Human Resource", "Accounting", "Sales", "Production (Pre-Press)",
                     "Production (Press)", "Production (Post-Press)", "Production (Quality Control)" });
     private final JComboBox<String> employmentStatusBox = new JComboBox<>(
-            new String[] { "Regular", "Part-time", "Contract" });
+            new String[] { "Select Status", "Regular", "Part-time", "Contract" });
 
     private final ZkFinger zkFinger = new ZkFinger();
 
@@ -245,6 +302,8 @@ public class RegisterEmployee extends JPanel {
                         "Employee registered successfully!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE);
+
+                clearAllFields();
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this,
                         "Please enter valid numeric values for percentages and amounts.",
