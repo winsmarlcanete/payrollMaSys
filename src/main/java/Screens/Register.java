@@ -22,7 +22,10 @@ public class Register extends JFrame {
     private JRadioButton accountantButton;
 
     public Register() {
-        setTitle("SynergyGrafixCorp. Payroll Management System");
+        setTitle("Synergy Grafix Corporation PMS");
+        setMinimumSize(new Dimension(1020, 600));
+        ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
+        setIconImage(windowIcon.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initComponents();
         // Pack the frame and center it after all components are added

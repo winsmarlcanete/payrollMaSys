@@ -78,7 +78,10 @@ public class Login extends JFrame {
     }
 
     public Login() {
-        setTitle("SynergyGrafixCorp. Payroll Management System");
+        setTitle("Synergy Grafix Corporation PMS");
+        setMinimumSize(new Dimension(1020, 600));
+        ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
+        setIconImage(windowIcon.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Set the background color for the entire frame's content pane
         getContentPane().setBackground(Color.LIGHT_GRAY);

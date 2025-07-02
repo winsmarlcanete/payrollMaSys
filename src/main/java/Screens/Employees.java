@@ -22,9 +22,91 @@ import org.payroll.MainWindow;
 
 
 public class Employees extends JPanel {
+    private final Runnable setPlainTextLook;
 
     private static DefaultTableModel employeeTableModel;
     private Map<Integer, Integer> filteredToOriginalIndex = new HashMap<>();
+    private boolean hasUnsavedChanges = false;
+
+    private JTextField lastNameField;
+    private JTextField firstNameField;
+    private JTextField middleNameField;
+    private JTextField idField;
+    private JTextField departmentField;
+    private JTextField employmentStatusField;
+    private JTextField shiftStartField;
+    private JTextField shiftEndField;
+    private JTextField payRateField;
+    private JTextField tinNumberField;
+    private JTextField pagibigNumberField;
+    private JTextField pagibigPercentageField;
+    private JTextField sssNumberField;
+    private JTextField sssPercentageField;
+    private JTextField philhealthNumberField;
+    private JTextField philhealthPercentageField;
+    private JTextField efundAmountField;
+    private JTextField otherDeductionsField;
+    private JTextField salaryAdjPercentageField;
+    private JTextField allowanceAmountField;
+    private JTextField otherCompAmountField;
+    private RoundedButton saveButton;
+    private RoundedButton editButton;
+    private JPanel topButtonPanel;
+    private JPanel saveButtonPanel;
+
+    public boolean getHasUnsavedChanges() {
+        return hasUnsavedChanges;
+    }
+
+
+    private final Runnable setEditableLook = () -> {
+        Border lineBorder = BorderFactory.createLineBorder(new Color(34, 177, 76), 1);
+        Border paddingBorder = BorderFactory.createEmptyBorder(4, 4, 4, 4);
+        Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
+
+        lastNameField.setBorder(compoundBorder);
+        middleNameField.setBorder(compoundBorder);
+        firstNameField.setBorder(compoundBorder);
+        departmentField.setBorder(compoundBorder);
+        employmentStatusField.setBorder(compoundBorder);
+        shiftStartField.setBorder(compoundBorder);
+        shiftEndField.setBorder(compoundBorder);
+        payRateField.setBorder(compoundBorder);
+        tinNumberField.setBorder(compoundBorder);
+        pagibigNumberField.setBorder(compoundBorder);
+        pagibigPercentageField.setBorder(compoundBorder);
+        sssNumberField.setBorder(compoundBorder);
+        sssPercentageField.setBorder(compoundBorder);
+        philhealthNumberField.setBorder(compoundBorder);
+        philhealthPercentageField.setBorder(compoundBorder);
+        efundAmountField.setBorder(compoundBorder);
+        otherDeductionsField.setBorder(compoundBorder);
+        salaryAdjPercentageField.setBorder(compoundBorder);
+        allowanceAmountField.setBorder(compoundBorder);
+        otherCompAmountField.setBorder(compoundBorder);
+
+        Color bg = Color.WHITE;
+        lastNameField.setBackground(bg);
+        middleNameField.setBackground(bg);
+        firstNameField.setBackground(bg);
+        departmentField.setBackground(bg);
+        employmentStatusField.setBackground(bg);
+        shiftStartField.setBackground(bg);
+        shiftEndField.setBackground(bg);
+        payRateField.setBackground(bg);
+        tinNumberField.setBackground(bg);
+        pagibigNumberField.setBackground(bg);
+        pagibigPercentageField.setBackground(bg);
+        sssNumberField.setBackground(bg);
+        sssPercentageField.setBackground(bg);
+        philhealthNumberField.setBackground(bg);
+        philhealthPercentageField.setBackground(bg);
+        efundAmountField.setBackground(bg);
+        otherDeductionsField.setBackground(bg);
+        salaryAdjPercentageField.setBackground(bg);
+        allowanceAmountField.setBackground(bg);
+        otherCompAmountField.setBackground(bg);
+    };
 
     private static void centerTableCells(JTable table) {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -354,23 +436,23 @@ public class Employees extends JPanel {
         // Employee details view panel
         JPanel detailsPanel = new JPanel(new BorderLayout());
 
-        JPanel topButtonPanel = new JPanel(new BorderLayout());
-        JPanel saveButtonPanel = new JPanel(new FlowLayout());
+        topButtonPanel = new JPanel(new BorderLayout());
+        saveButtonPanel = new JPanel(new FlowLayout());
 
-        JButton backButton = new JButton("Back");
+        RoundedButton backButton = new RoundedButton("Back", 20);
         backButton.setPreferredSize(new Dimension(100, 30));
-        JButton editButton = new JButton("Edit");
+        editButton = new RoundedButton("Edit", 20);
         editButton.setPreferredSize(new Dimension(100, 30));
-        JButton saveButton = new JButton("Save");
+        saveButton = new RoundedButton("Save", 20);
         saveButton.setPreferredSize(new Dimension(100, 30));
 
         topButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topButtonPanel.add(backButton, BorderLayout.WEST);
         topButtonPanel.add(editButton, BorderLayout.EAST);
 
-        saveButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        saveButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
         saveButtonPanel.add(saveButton);
-        saveButtonPanel.setPreferredSize(new Dimension(0, 50));
+        saveButtonPanel.setPreferredSize(new Dimension(0, 70));
         saveButton.setVisible(false);
 
         detailsPanel.add(topButtonPanel, BorderLayout.NORTH);
@@ -384,88 +466,135 @@ public class Employees extends JPanel {
         // Details fields
         // Update fields in detailsView
         JLabel idLabel = new JLabel("ID:");
-        JTextField idField = new JTextField();
+        idField = new JTextField();
         idField.setEditable(false);
 
         JLabel lastNameLabel = new JLabel("Last Name:");
-        JTextField lastNameField = new JTextField();
+        lastNameField = new JTextField();
         lastNameField.setEditable(false);
 
         JLabel firstNameLabel = new JLabel("First Name:");
-        JTextField firstNameField = new JTextField();
+        firstNameField = new JTextField();
         firstNameField.setEditable(false);
 
         JLabel middleNameLabel = new JLabel("Middle Name:");
-        JTextField middleNameField = new JTextField();
+        middleNameField = new JTextField();
         middleNameField.setEditable(false);
 
         JLabel departmentLabel = new JLabel("Department:");
-        JTextField departmentField = new JTextField();
+        departmentField = new JTextField();
         departmentField.setEditable(false);
 
         JLabel employmentStatusLabel = new JLabel("Employment Status:");
-        JTextField employmentStatusField = new JTextField();
+        employmentStatusField = new JTextField();
         employmentStatusField.setEditable(false);
 
         JLabel shiftStartLabel = new JLabel("Shift Start:");
-        JTextField shiftStartField = new JTextField();
+        shiftStartField = new JTextField();
         shiftStartField.setEditable(false);
 
         JLabel shiftEndLabel = new JLabel("Shift End:");
-        JTextField shiftEndField = new JTextField();
+        shiftEndField = new JTextField();
         shiftEndField.setEditable(false);
-
         JLabel payRateLabel = new JLabel("Pay Rate:");
-        JTextField payRateField = new JTextField();
+        payRateField = new JTextField();
         payRateField.setEditable(false);
 
         JLabel tinNumberLabel = new JLabel("TIN Number:");
-        JTextField tinNumberField = new JTextField();
+        tinNumberField = new JTextField();
         tinNumberField.setEditable(false);
 
         JLabel pagibigNumberLabel = new JLabel("Pag-Ibig Number:");
-        JTextField pagibigNumberField = new JTextField();
+        pagibigNumberField = new JTextField();
         pagibigNumberField.setEditable(false);
 
         JLabel pagibigPercentageLabel = new JLabel("Pag-Ibig Percentage:");
-        JTextField pagibigPercentageField = new JTextField();
+        pagibigPercentageField = new JTextField();
         pagibigPercentageField.setEditable(false);
 
         JLabel sssNumberLabel = new JLabel("SSS Number:");
-        JTextField sssNumberField = new JTextField();
+        sssNumberField = new JTextField();
         sssNumberField.setEditable(false);
 
         JLabel sssPercentageLabel = new JLabel("SSS Percentage:");
-        JTextField sssPercentageField = new JTextField();
+        sssPercentageField = new JTextField();
         sssPercentageField.setEditable(false);
 
         JLabel philhealthNumberLabel = new JLabel("PhilHealth Number:");
-        JTextField philhealthNumberField = new JTextField();
+        philhealthNumberField = new JTextField();
         philhealthNumberField.setEditable(false);
 
         JLabel philhealthPercentageLabel = new JLabel("PhilHealth Percentage:");
-        JTextField philhealthPercentageField = new JTextField();
+        philhealthPercentageField = new JTextField();
         philhealthPercentageField.setEditable(false);
 
         JLabel efundAmountLabel = new JLabel("E-Fund Amount:");
-        JTextField efundAmountField = new JTextField();
+        efundAmountField = new JTextField();
         efundAmountField.setEditable(false);
 
         JLabel otherDeductionsLabel = new JLabel("Other Deductions:");
-        JTextField otherDeductionsField = new JTextField();
+        otherDeductionsField = new JTextField();
         otherDeductionsField.setEditable(false);
 
         JLabel salaryAdjPercentageLabel = new JLabel("Salary Adjustment Percentage:");
-        JTextField salaryAdjPercentageField = new JTextField();
+        salaryAdjPercentageField = new JTextField();
         salaryAdjPercentageField.setEditable(false);
 
         JLabel allowanceAmountLabel = new JLabel("Allowance Amount:");
-        JTextField allowanceAmountField = new JTextField();
+        allowanceAmountField = new JTextField();
         allowanceAmountField.setEditable(false);
 
         JLabel otherCompAmountLabel = new JLabel("Other Compensation Amount:");
-        JTextField otherCompAmountField = new JTextField();
+        otherCompAmountField = new JTextField();
         otherCompAmountField.setEditable(false);
+
+        setPlainTextLook = () -> {
+            Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+            lastNameField.setBorder(emptyBorder);
+            middleNameField.setBorder(emptyBorder);
+            firstNameField.setBorder(emptyBorder);
+            idField.setBorder(emptyBorder);
+            departmentField.setBorder(emptyBorder);
+            employmentStatusField.setBorder(emptyBorder);
+            shiftStartField.setBorder(emptyBorder);
+            shiftEndField.setBorder(emptyBorder);
+            payRateField.setBorder(emptyBorder);
+            tinNumberField.setBorder(emptyBorder);
+            pagibigNumberField.setBorder(emptyBorder);
+            pagibigPercentageField.setBorder(emptyBorder);
+            sssNumberField.setBorder(emptyBorder);
+            sssPercentageField.setBorder(emptyBorder);
+            philhealthNumberField.setBorder(emptyBorder);
+            philhealthPercentageField.setBorder(emptyBorder);
+            efundAmountField.setBorder(emptyBorder);
+            otherDeductionsField.setBorder(emptyBorder);
+            salaryAdjPercentageField.setBorder(emptyBorder);
+            allowanceAmountField.setBorder(emptyBorder);
+            otherCompAmountField.setBorder(emptyBorder);
+
+            Color bg = getBackground();
+            lastNameField.setBackground(bg);
+            middleNameField.setBackground(bg);
+            firstNameField.setBackground(bg);
+            idField.setBackground(bg);
+            departmentField.setBackground(bg);
+            employmentStatusField.setBackground(bg);
+            shiftStartField.setBackground(bg);
+            shiftEndField.setBackground(bg);
+            payRateField.setBackground(bg);
+            tinNumberField.setBackground(bg);
+            pagibigNumberField.setBackground(bg);
+            pagibigPercentageField.setBackground(bg);
+            sssNumberField.setBackground(bg);
+            sssPercentageField.setBackground(bg);
+            philhealthNumberField.setBackground(bg);
+            philhealthPercentageField.setBackground(bg);
+            efundAmountField.setBackground(bg);
+            otherDeductionsField.setBackground(bg);
+            salaryAdjPercentageField.setBackground(bg);
+            allowanceAmountField.setBackground(bg);
+            otherCompAmountField.setBackground(bg);
+        };
 
 // Add fields to combinedDetailsPanel
         // First column
@@ -599,6 +728,7 @@ public class Employees extends JPanel {
 
         detailsPanel.add(combinedDetailsPanel, BorderLayout.CENTER);
 
+
         contentPanel.add(tablePanel, "TableView");
         contentPanel.add(detailsPanel, "DetailsView");
 
@@ -609,104 +739,6 @@ public class Employees extends JPanel {
         Border defaultBorder = lastNameField.getBorder();
         Insets defaultInsets = defaultBorder.getBorderInsets(lastNameField);
 
-        // Helper to set all fields to "plain text" look but keep spacing
-        Runnable setPlainTextLook = () -> {
-            Border emptyBorder = BorderFactory.createEmptyBorder(
-                    defaultInsets.top, defaultInsets.left, defaultInsets.bottom, defaultInsets.right
-            );
-            lastNameField.setBorder(emptyBorder);
-            middleNameField.setBorder(emptyBorder);
-            firstNameField.setBorder(emptyBorder);
-            idField.setBorder(emptyBorder);
-            departmentField.setBorder(emptyBorder);
-            employmentStatusField.setBorder(emptyBorder);
-            shiftStartField.setBorder(emptyBorder);
-            shiftEndField.setBorder(emptyBorder);
-            payRateField.setBorder(emptyBorder);
-            tinNumberField.setBorder(emptyBorder);
-            pagibigNumberField.setBorder(emptyBorder);
-            pagibigPercentageField.setBorder(emptyBorder);
-            sssNumberField.setBorder(emptyBorder);
-            sssPercentageField.setBorder(emptyBorder);
-            philhealthNumberField.setBorder(emptyBorder);
-            philhealthPercentageField.setBorder(emptyBorder);
-            efundAmountField.setBorder(emptyBorder);
-            otherDeductionsField.setBorder(emptyBorder);
-            salaryAdjPercentageField.setBorder(emptyBorder);
-            allowanceAmountField.setBorder(emptyBorder);
-            otherCompAmountField.setBorder(emptyBorder);
-
-            Color bg = combinedDetailsPanel.getBackground();
-            lastNameField.setBackground(bg);
-            middleNameField.setBackground(bg);
-            firstNameField.setBackground(bg);
-            idField.setBackground(bg);
-            departmentField.setBackground(bg);
-            employmentStatusField.setBackground(bg);
-            shiftStartField.setBackground(bg);
-            shiftEndField.setBackground(bg);
-            payRateField.setBackground(bg);
-            tinNumberField.setBackground(bg);
-            pagibigNumberField.setBackground(bg);
-            pagibigPercentageField.setBackground(bg);
-            sssNumberField.setBackground(bg);
-            sssPercentageField.setBackground(bg);
-            philhealthNumberField.setBackground(bg);
-            philhealthPercentageField.setBackground(bg);
-            efundAmountField.setBackground(bg);
-            otherDeductionsField.setBackground(bg);
-            salaryAdjPercentageField.setBackground(bg);
-            allowanceAmountField.setBackground(bg);
-            otherCompAmountField.setBackground(bg);
-        };
-
-        // Helper to restore default borders
-        Runnable setEditableLook = () -> {
-            lastNameField.setBorder(defaultBorder);
-            middleNameField.setBorder(defaultBorder);
-            firstNameField.setBorder(defaultBorder);
-            idField.setBorder(defaultBorder);
-            departmentField.setBorder(defaultBorder);
-            employmentStatusField.setBorder(defaultBorder);
-            shiftStartField.setBorder(defaultBorder);
-            shiftEndField.setBorder(defaultBorder);
-            payRateField.setBorder(defaultBorder);
-            tinNumberField.setBorder(defaultBorder);
-            pagibigNumberField.setBorder(defaultBorder);
-            pagibigPercentageField.setBorder(defaultBorder);
-            sssNumberField.setBorder(defaultBorder);
-            sssPercentageField.setBorder(defaultBorder);
-            philhealthNumberField.setBorder(defaultBorder);
-            philhealthPercentageField.setBorder(defaultBorder);
-            efundAmountField.setBorder(defaultBorder);
-            otherDeductionsField.setBorder(defaultBorder);
-            salaryAdjPercentageField.setBorder(defaultBorder);
-            allowanceAmountField.setBorder(defaultBorder);
-            otherCompAmountField.setBorder(defaultBorder);
-
-            Color bg = Color.WHITE;
-            lastNameField.setBackground(bg);
-            middleNameField.setBackground(bg);
-            firstNameField.setBackground(bg);
-            idField.setBackground(bg);
-            departmentField.setBackground(bg);
-            employmentStatusField.setBackground(bg);
-            shiftStartField.setBackground(bg);
-            shiftEndField.setBackground(bg);
-            payRateField.setBackground(bg);
-            tinNumberField.setBackground(bg);
-            pagibigNumberField.setBackground(bg);
-            pagibigPercentageField.setBackground(bg);
-            sssNumberField.setBackground(bg);
-            sssPercentageField.setBackground(bg);
-            philhealthNumberField.setBackground(bg);
-            philhealthPercentageField.setBackground(bg);
-            efundAmountField.setBackground(bg);
-            otherDeductionsField.setBackground(bg);
-            salaryAdjPercentageField.setBackground(bg);
-            allowanceAmountField.setBackground(bg);
-            otherCompAmountField.setBackground(bg);
-        };
 
         // Set plain text look initially
         setPlainTextLook.run();
@@ -751,9 +783,147 @@ public class Employees extends JPanel {
             }
         });
 
+        Font detailsFont = new Font("Arial", Font.PLAIN, 16);
+        Font buttonDetailsFont = new Font("Arial", Font.BOLD, 16);
+
+        backButton.setFont(buttonDetailsFont);
+        backButton.setPreferredSize(new Dimension(160, 40)); // width increased, height same as text fields
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createEmptyBorder());
+        backButton.setContentAreaFilled(false);
+        backButton.setOpaque(false);
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        editButton.setFont(buttonDetailsFont);
+        editButton.setPreferredSize(new Dimension(160, 40)); // width increased, height same as text fields
+        editButton.setBackground(Color.WHITE);
+        editButton.setForeground(new Color(0, 158, 0));
+        editButton.setFocusPainted(false);
+        editButton.setBorder(BorderFactory.createEmptyBorder());
+        editButton.setContentAreaFilled(false);
+        editButton.setOpaque(false);
+        editButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        saveButton.setFont(buttonDetailsFont);
+        saveButton.setPreferredSize(new Dimension(160, 40)); // width increased, height same as text fields
+        saveButton.setBackground(MainWindow.activeColor);
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setFocusPainted(false);
+        saveButton.setBorder(BorderFactory.createEmptyBorder());
+        saveButton.setContentAreaFilled(false);
+        saveButton.setOpaque(false);
+        saveButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Hover and click effect for back button
+        backButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                backButton.setBackground(new Color(30, 30, 30)); // Slightly lighter black
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                backButton.setBackground(Color.BLACK);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                backButton.setBackground(new Color(60, 60, 60)); // Even lighter on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                backButton.setBackground(backButton.getBounds().contains(e.getPoint()) ? new Color(30, 30, 30) : Color.BLACK);
+            }
+        });
+
+        // Hover and click effect for save button
+        editButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                editButton.setBackground(new Color(140, 153, 140)); // Light greenish white
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                editButton.setBackground(Color.WHITE);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                editButton.setBackground(new Color(200, 240, 200)); // Slightly darker greenish white
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                editButton.setBackground(editButton.getBounds().contains(e.getPoint()) ? new Color(230, 255, 230) : Color.WHITE);
+            }
+        });
+
+        saveButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(new Color(50, 180, 50)); // Slightly lighter green
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(MainWindow.activeColor);
+            }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(new Color(30, 150, 30)); // Darker green on click
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                saveButton.setBackground(saveButton.getBounds().contains(e.getPoint()) ?
+                        new Color(50, 180, 50) : MainWindow.activeColor);
+            }
+        });
+
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (hasUnsavedChanges) {
+                    int choice = JOptionPane.showConfirmDialog(
+                            null,
+                            "You have unsaved changes. Do you want to continue without saving?",
+                            "Unsaved Changes",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    if (choice != JOptionPane.YES_OPTION) {
+                        return; // Don't go back if user chooses not to continue
+                    }
+
+                    // Reset UI elements if user chooses to discard changes
+                    saveButton.setVisible(false);
+                    editButton.setVisible(true);
+
+                    // Make all fields non-editable again
+                    lastNameField.setEditable(false);
+                    firstNameField.setEditable(false);
+                    middleNameField.setEditable(false);
+                    departmentField.setEditable(false);
+                    employmentStatusField.setEditable(false);
+                    shiftStartField.setEditable(false);
+                    shiftEndField.setEditable(false);
+                    payRateField.setEditable(false);
+                    tinNumberField.setEditable(false);
+                    pagibigNumberField.setEditable(false);
+                    pagibigPercentageField.setEditable(false);
+                    sssNumberField.setEditable(false);
+                    sssPercentageField.setEditable(false);
+                    philhealthNumberField.setEditable(false);
+                    philhealthPercentageField.setEditable(false);
+                    efundAmountField.setEditable(false);
+                    otherDeductionsField.setEditable(false);
+                    salaryAdjPercentageField.setEditable(false);
+                    allowanceAmountField.setEditable(false);
+                    otherCompAmountField.setEditable(false);
+
+                    setPlainTextLook.run();
+                }
+
+                // Reset the unsaved changes flag
+                hasUnsavedChanges = false;
+
                 // Reload employee table data
                 loadEmployeeTabledata();
                 searchField.setText("");
@@ -762,12 +932,20 @@ public class Employees extends JPanel {
                 CardLayout cl = (CardLayout) (contentPanel.getLayout());
                 cl.show(contentPanel, "TableView");
                 searchPanel.setVisible(true);
+
+                // Refresh the panels
+                topButtonPanel.revalidate();
+                topButtonPanel.repaint();
+                saveButtonPanel.revalidate();
+                saveButtonPanel.repaint();
             }
         });
 
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hasUnsavedChanges = true;
+
                 lastNameField.setEditable(true);
                 firstNameField.setEditable(true);
                 middleNameField.setEditable(true);
@@ -831,6 +1009,9 @@ public class Employees extends JPanel {
                             employmentStatus, shiftStart, shiftEnd, payRate, tinNumber, pagibigNumber,
                             pagibigPercentage, sssNumber, sssPercentage, philhealthNumber, philhealthPercentage,
                             efundAmount, otherDeductions, salaryAdjPercentage, allowanceAmount, otherCompAmount);
+
+                    hasUnsavedChanges = false;
+
                     // Reset fields to non-editable
                     lastNameField.setEditable(false);
                     firstNameField.setEditable(false);
@@ -932,7 +1113,7 @@ public class Employees extends JPanel {
             }
         });
 
-        Font detailsFont = new Font("Arial", Font.PLAIN, 16);
+
 
         lastNameLabel.setFont(detailsFont);
         lastNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -1017,6 +1198,48 @@ public class Employees extends JPanel {
         otherCompAmountLabel.setFont(detailsFont);
         otherCompAmountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         otherCompAmountField.setFont(detailsFont);
+    }
+
+    private void setFieldsEditable(boolean editable) {
+        lastNameField.setEditable(editable);
+        firstNameField.setEditable(editable);
+        middleNameField.setEditable(editable);
+        departmentField.setEditable(editable);
+        employmentStatusField.setEditable(editable);
+        shiftStartField.setEditable(editable);
+        shiftEndField.setEditable(editable);
+        payRateField.setEditable(editable);
+        tinNumberField.setEditable(editable);
+        pagibigNumberField.setEditable(editable);
+        pagibigPercentageField.setEditable(editable);
+        sssNumberField.setEditable(editable);
+        sssPercentageField.setEditable(editable);
+        philhealthNumberField.setEditable(editable);
+        philhealthPercentageField.setEditable(editable);
+        efundAmountField.setEditable(editable);
+        otherDeductionsField.setEditable(editable);
+        salaryAdjPercentageField.setEditable(editable);
+        allowanceAmountField.setEditable(editable);
+        otherCompAmountField.setEditable(editable);
+    }
+
+    public void resetEditMode() {
+        // Reset UI elements
+        saveButton.setVisible(false);
+        editButton.setVisible(true);
+
+        // Make all fields non-editable
+        setFieldsEditable(false);
+
+        // Reset the look
+        setPlainTextLook.run();
+        hasUnsavedChanges = false;
+
+        // Refresh the panels
+        topButtonPanel.revalidate();
+        topButtonPanel.repaint();
+        saveButtonPanel.revalidate();
+        saveButtonPanel.repaint();
     }
 
 

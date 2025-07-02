@@ -36,7 +36,11 @@ public class ResetPassword {
     }
 
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Reset Password");
+        JFrame frame = new JFrame();
+        frame.setTitle("Synergy Grafix Corporation PMS");
+        frame.setMinimumSize(new Dimension(1020, 600));
+        ImageIcon windowIcon = new ImageIcon(getClass().getClassLoader().getResource("logo_only.png"));
+        frame.setIconImage(windowIcon.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.getContentPane().setBackground(Color.LIGHT_GRAY);

@@ -18,6 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MainWindow extends JFrame {
+
+    private Component currentPanel;
     public static Color activeColor = new Color(0, 128, 0);
     public static Color grayColor = new Color(217, 217, 217);
     private JPanel overlayPanel;
@@ -212,7 +214,29 @@ public class MainWindow extends JFrame {
                     buttonMap.put(name, btn);
 
                     btn.addActionListener(e -> {
+                        if (currentPanel instanceof Employees) {
+                            Employees employeesPanel = (Employees) currentPanel;
+                            // Add getter method in Employees class to access hasUnsavedChanges
+                            if (employeesPanel.getHasUnsavedChanges()) {
+                                int choice = JOptionPane.showConfirmDialog(
+                                        MainWindow.this,
+                                        "You have unsaved changes. Do you want to continue without saving?",
+                                        "Unsaved Changes",
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.WARNING_MESSAGE
+                                );
+
+                                if (choice != JOptionPane.YES_OPTION) {
+                                    return; // Don't switch if user chooses not to continue
+                                }
+
+                                // Reset edit mode if user chooses to continue
+                                employeesPanel.resetEditMode();
+                            }
+                        }
+
                         cardLayout.show(cardPanel, name);
+                        currentPanel = panelMap.get(name);
                         // Set active color for selected, default for others
                         for (Map.Entry<String, JButton> entry : buttonMap.entrySet()) {
                             if (entry.getKey().equals(name)) {
@@ -283,6 +307,10 @@ public class MainWindow extends JFrame {
 //                        }
                     });
                 }
+
+        if (!panelMap.isEmpty()) {
+            currentPanel = panelMap.values().iterator().next();
+        }
 
         ImageIcon userIcon = new ImageIcon(
                 new ImageIcon(getClass().getClassLoader().getResource("User.png"))
