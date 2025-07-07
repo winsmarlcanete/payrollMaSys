@@ -20,6 +20,7 @@ import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import Components.RoundedButton;
 import Components.RoundedComboBox;
@@ -97,6 +98,29 @@ public class LeaveManagementScreen extends JPanel {
             e.printStackTrace();
         } finally {
             System.out.println("=== Debug End ===");
+        }
+    }
+
+    // Helper method to process leave record
+    private void processLeaveRecord(int employeeId, String leaveType, java.sql.Date sqlDate, int usedLeaves)
+            throws SQLException {
+        String checkSql = "SELECT leave_id FROM leavemanagement WHERE employee_id = ? AND creation_date = ?";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(checkSql)) {
+
+            stmt.setInt(1, employeeId);
+            stmt.setDate(2, sqlDate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Update existing record
+                    int leaveId = rs.getInt("leave_id");
+                    LeaveManagement.updateLeaveEmployee(leaveId, leaveType, 5 - usedLeaves);
+                } else {
+                    // Insert new record
+                    LeaveManagement.insertLeaveEmployee(employeeId, leaveType, 5 - usedLeaves);
+                }
+            }
         }
     }
 
@@ -506,10 +530,6 @@ public class LeaveManagementScreen extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                     field1Date[0] = selectedDate;
                     dateField1.setText(sdf.format(selectedDate));
                 }
@@ -536,10 +556,6 @@ public class LeaveManagementScreen extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                     field2Date[0] = selectedDate;
                     dateField2.setText(sdf.format(selectedDate));
                 }
@@ -566,10 +582,6 @@ public class LeaveManagementScreen extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                     field3Date[0] = selectedDate;
                     dateField3.setText(sdf.format(selectedDate));
                 }
@@ -596,10 +608,6 @@ public class LeaveManagementScreen extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                     field4Date[0] = selectedDate;
                     dateField4.setText(sdf.format(selectedDate));
                 }
@@ -626,10 +634,6 @@ public class LeaveManagementScreen extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 java.util.Date selectedDate = (java.util.Date) picker.getModel().getValue();
                 if (selectedDate != null) {
-                    if (selectedDate.after(today)) {
-                        JOptionPane.showMessageDialog(null, "Start date cannot be in the future.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                     field5Date[0] = selectedDate;
                     dateField5.setText(sdf.format(selectedDate));
                 }
@@ -664,8 +668,8 @@ public class LeaveManagementScreen extends JPanel {
 
         JLabel departmentLabel = new JLabel("Department");
         int deptX = idX + idW + 20;
-        departmentLabel.setBounds(deptX, y, w, 25);
-        departmentField.setBounds(deptX, y + 25, w, h);
+        departmentLabel.setBounds(deptX, y, w+20, 25);
+        departmentField.setBounds(deptX, y + 25, w+20, h);
         departmentField.setFont(detailsFont);
         departmentLabel.setForeground(Color.WHITE);
         departmentField.setEditable(false);
@@ -673,8 +677,8 @@ public class LeaveManagementScreen extends JPanel {
 
         JLabel employmentStatusLabel = new JLabel("Employment Status");
         int empStatX = deptX + w + 20;
-        employmentStatusLabel.setBounds(empStatX, y, w, 25);
-        employmentStatusField.setBounds(empStatX, y + 25, w, h);
+        employmentStatusLabel.setBounds(empStatX + 20, y, w, 25);
+        employmentStatusField.setBounds(empStatX + 20, y + 25, w, h);
         employmentStatusField.setFont(detailsFont);
         employmentStatusLabel.setForeground(Color.WHITE);
         employmentStatusField.setEditable(false);
@@ -716,11 +720,11 @@ public class LeaveManagementScreen extends JPanel {
         typeOfLeaveLabel.setBounds(deptX, typeOfLeaveY, w, 25);
         groupPanel.add(typeOfLeaveLabel);
 
-        typeOfLeave1.setBounds(deptX, typeOfLeaveY + 25, w, h);
-        typeOfLeave2.setBounds(deptX, typeOfLeaveY + 25 + gap, w, h);
-        typeOfLeave3.setBounds(deptX, typeOfLeaveY + 25 + gap * 2, w, h);
-        typeOfLeave4.setBounds(deptX, typeOfLeaveY + 25 + gap * 3, w, h);
-        typeOfLeave5.setBounds(deptX, typeOfLeaveY + 25 + gap * 4, w, h);
+        typeOfLeave1.setBounds(deptX, typeOfLeaveY + 25, w+20, h);
+        typeOfLeave2.setBounds(deptX, typeOfLeaveY + 25 + gap, w+20, h);
+        typeOfLeave3.setBounds(deptX, typeOfLeaveY + 25 + gap * 2, w+20, h);
+        typeOfLeave4.setBounds(deptX, typeOfLeaveY + 25 + gap * 3, w+20, h);
+        typeOfLeave5.setBounds(deptX, typeOfLeaveY + 25 + gap * 4, w+20, h);
 
         typeOfLeave1.setFont(detailsFont);
         typeOfLeave2.setFont(detailsFont);
@@ -843,11 +847,11 @@ public class LeaveManagementScreen extends JPanel {
         dateLabel.setForeground(Color.WHITE);
         groupPanel.add(dateLabel);
 
-        dateField1.setBounds(empStatX, dateY + 25, w, h);
-        dateField2.setBounds(empStatX, dateY + 25 + gap, w, h);
-        dateField3.setBounds(empStatX, dateY + 25 + gap * 2, w, h);
-        dateField4.setBounds(empStatX, dateY + 25 + gap * 3, w, h);
-        dateField5.setBounds(empStatX, dateY + 25 + gap * 4, w, h);
+        dateField1.setBounds(empStatX + 20, dateY + 25, w, h);
+        dateField2.setBounds(empStatX + 20, dateY + 25 + gap, w, h);
+        dateField3.setBounds(empStatX + 20, dateY + 25 + gap * 2, w, h);
+        dateField4.setBounds(empStatX + 20, dateY + 25 + gap * 3, w, h);
+        dateField5.setBounds(empStatX + 20, dateY + 25 + gap * 4, w, h);
         dateField1.setFont(detailsFont); dateField2.setFont(detailsFont);
         dateField3.setFont(detailsFont); dateField4.setFont(detailsFont); dateField5.setFont(detailsFont);
         groupPanel.add(dateField1); groupPanel.add(dateField2);
@@ -874,7 +878,7 @@ public class LeaveManagementScreen extends JPanel {
 
         int buttonWidth = 160; // wider if you want
         int buttonHeight = h;  // same as your text fields
-        int arc = 20; 
+        int arc = 20;
 
         // Back button (upper left)
         RoundedButton backButton = new RoundedButton("Back", arc);
@@ -1010,119 +1014,61 @@ public class LeaveManagementScreen extends JPanel {
             }
         });
 
-        // --- Save button logic ---
         saveButton.addActionListener(e -> {
-            try {
-                int employeeId = Integer.parseInt(idField.getText());
-                String selectedYear = yearCombo.getSelectedItem().toString();
-                boolean hasValidEntry = false;
-                boolean hasError = false;
+            // Check if at least one type of leave is selected
+            boolean hasSelection = false;
+            int leavesUsed = 0;
+            boolean hasError = false;
 
-                // Array of leave components
-                JComboBox<?>[] leaveBoxes = {typeOfLeave1, typeOfLeave2, typeOfLeave3, typeOfLeave4, typeOfLeave5};
-                Date[] dates = {field1Date[0], field2Date[0], field3Date[0], field4Date[0], field5Date[0]};
+            // Array of pairs to check
+            Object[][] pairs = {
+                    {typeOfLeave1, field1Date[0]},
+                    {typeOfLeave2, field2Date[0]},
+                    {typeOfLeave3, field3Date[0]},
+                    {typeOfLeave4, field4Date[0]},
+                    {typeOfLeave5, field5Date[0]}
+            };
 
-                // Count used leaves
-                int usedLeaves = 0;
+            // Check each pair of type and date
+            for (Object[] pair : pairs) {
+                RoundedComboBox<String> typeCombo = (RoundedComboBox<String>) pair[0];
+                Date dateValue = (Date) pair[1];
 
-                // Process each leave entry
-                for (int i = 0; i < leaveBoxes.length; i++) {
-                    if (leaveBoxes[i].isEnabled() && leaveBoxes[i].getSelectedIndex() > 0) {
-                        String leaveType = leaveBoxes[i].getSelectedItem().toString();
-                        Date selectedDate = dates[i];
-
-                        if (selectedDate == null) {
-                            JOptionPane.showMessageDialog(null,
-                                    "Please select a date for leave #" + (i + 1),
-                                    "Missing Date",
-                                    JOptionPane.WARNING_MESSAGE);
-                            hasError = true;
-                            break;
-                        }
-
-                        // Call debug method before saving
-                        debugSaveOperation(
-                                String.valueOf(employeeId),
-                                leaveType,
-                                selectedDate,
-                                selectedDate,
-                                "Pending"
-                        );
-
-                        // Insert or update leave record
-                        try {
-                            // Calculate remaining SIL
-                            usedLeaves++;
-                            int remainingSil = 5 - usedLeaves;
-
-                            // Convert util.Date to sql.Date
-                            java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime());
-
-                            // Check if leave record exists
-                            String checkSql = "SELECT leave_id FROM leavemanagement WHERE employee_id = ? AND creation_date = ?";
-                            try (Connection conn = JDBC.getConnection();
-                                 PreparedStatement stmt = conn.prepareStatement(checkSql)) {
-
-                                stmt.setInt(1, employeeId);
-                                stmt.setDate(2, sqlDate);
-
-                                try (ResultSet rs = stmt.executeQuery()) {
-                                    if (rs.next()) {
-                                        // Update existing record
-                                        int leaveId = rs.getInt("leave_id");
-                                        LeaveManagement.updateLeaveEmployee(leaveId, leaveType, remainingSil);
-                                    } else {
-                                        // Insert new record
-                                        LeaveManagement.insertLeaveEmployee(employeeId, leaveType, remainingSil);
-                                    }
-                                }
-                            }
-
-                            hasValidEntry = true;
-                        } catch (SQLException ex) {
-                            System.err.println("Database error: " + ex.getMessage());
-                            hasError = true;
-                            break;
-                        }
+                if (typeCombo.getSelectedIndex() > 0) {
+                    hasSelection = true;
+                    if (dateValue == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Please input date for " + typeCombo.getSelectedItem(),
+                                "Missing Date",
+                                JOptionPane.WARNING_MESSAGE);
+                        hasError = true;
+                        break;
                     }
+                    leavesUsed++;
                 }
+            }
 
-                if (!hasValidEntry && !hasError) {
-                    JOptionPane.showMessageDialog(null,
-                            "Please select at least one leave type and date",
-                            "No Data",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                if (!hasError) {
-                    // Update displayed counts
-                    leavesUsedField.setText(String.valueOf(usedLeaves));
-                    remainingSILField.setText((5 - usedLeaves) + " / 5");
-
-                    // Show success message
-                    JOptionPane.showMessageDialog(null,
-                            "Leave applications saved successfully!",
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
-
-                    // Return to table view
-                    cardLayout.show(contentPanel, "TableView");
-                }
-
-            } catch (NumberFormatException ex) {
+            if (!hasSelection) {
                 JOptionPane.showMessageDialog(null,
-                        "Invalid employee ID format",
-                        "Error",
+                        "Please select type of leave and date",
+                        "No Selection",
                         JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                System.err.println("Error in save operation: " + ex.getMessage());
+                return;
+            }
+
+            if (!hasError) {
+                // Update fields based on leaves used
+                remainingSILField.setText((5 - leavesUsed) + " / 5");
+                leavesUsedField.setText(leavesUsed + "");
+
+                // Show success message
                 JOptionPane.showMessageDialog(null,
-                        "Error saving leave applications: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Leave records saved successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
+
 
         // --- Back button event ---
         backButton.addActionListener(e -> cardLayout.show(contentPanel, "TableView"));
