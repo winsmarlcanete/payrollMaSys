@@ -65,7 +65,7 @@ public class UserControl extends JPanel {
     private static String getAccessLevelName(int level) {
         return switch (level) {
             case 2 -> "Human Resources";
-            case 3 -> "Accounting";
+            case 3 -> "Accountant";
             default -> "Unknown";
         };
     }
@@ -134,16 +134,8 @@ public class UserControl extends JPanel {
                 panel = new JPanel(new GridBagLayout());
                 panel.setOpaque(false);
 
-                button = new RoundedButton("Approve", 20) {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        setModel(getModel()); // Ensure model state is current
-                        super.paintComponent(g);
-                    }
-                };
+                button = new RoundedButton("Approve", 20);
                 button.setOpaque(false);
-                button.setBackground(MainWindow.activeColor);
-                button.setForeground(Color.WHITE);
                 button.setBorderPainted(false);
                 button.setPreferredSize(new Dimension(100, 35));
                 button.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -159,9 +151,18 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus, int row, int column) {
-                // Update button model state based on table row hover
+                String status = (String) table.getValueAt(row, 5);
+                boolean isPending = "Pending".equals(status);
+
+                button.setText(isPending ? "Approve" : "Approved");
+                button.setEnabled(isPending);
+                button.setBackground(isPending ? MainWindow.activeColor : new Color(150, 150, 150));
+                button.setForeground(Color.WHITE);
+
+                // Only show rollover effect for pending status
                 int mouseRow = table.getRowCount() > 0 ? table.getSelectedRow() : -1;
-                button.getModel().setRollover(mouseRow == row);
+                button.getModel().setRollover(isPending && mouseRow == row);
+
                 return panel;
             }
         }
@@ -179,8 +180,6 @@ public class UserControl extends JPanel {
 
                 button = new RoundedButton("Approve", 20);
                 button.setOpaque(false);
-                button.setBackground(MainWindow.activeColor);
-                button.setForeground(Color.WHITE);
                 button.setBorderPainted(false);
                 button.setPreferredSize(new Dimension(100, 35));
                 button.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -190,19 +189,25 @@ public class UserControl extends JPanel {
                 button.addActionListener(e -> {
                     if (isPushed && table != null) {
                         int row = table.getEditingRow();
-                        String userId = table.getValueAt(row, 1).toString(); // Column 1 is User ID
+                        String status = (String) table.getValueAt(row, 5);
 
-                        // Update DB
-                        approveUserInDatabase(userId);
+                        if ("Pending".equals(status)) {
+                            String userName = (String) table.getValueAt(row, 0);
+                            String accessLevel = (String) table.getValueAt(row, 3);
+                            int choice = JOptionPane.showConfirmDialog(
+                                    SwingUtilities.getWindowAncestor(button),
+                                    "Are you sure you want to approve " + userName + " as " + accessLevel + "?",
+                                    "Confirm Approval",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE
+                            );
 
-                        // Update table
-                        table.setValueAt("Active", row, 5); // Column 5 is Account Status
-                        table.setValueAt("Approved", row, 6); // Change button label text
-
-                        // Optional: Disable button visually
-                        button.setText("Approved");
-                        button.setEnabled(false);
-
+                            if (choice == JOptionPane.YES_OPTION) {
+                                String userId = table.getValueAt(row, 1).toString();
+                                approveUserInDatabase(userId);
+                                table.setValueAt("Active", row, 5);
+                            }
+                        }
                         fireEditingStopped();
                     }
                 });
@@ -216,46 +221,27 @@ public class UserControl extends JPanel {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value,
                                                          boolean isSelected, int row, int column) {
-
-                String status = (String) table.getValueAt(row, 5);
-                if ("Active".equals(status)) {
-                    button.setText("Approved");
-                    button.setEnabled(false);
-                    button.setBackground(new Color(150, 150, 150));
-                    isPushed = false;
-                } else {
-                    button.setText("Approve");
-                    button.setEnabled(true);
-                    button.setBackground(MainWindow.activeColor);
-                    isPushed = true;
-                }
-                button.getModel().setRollover(button.isEnabled());
-
                 this.table = table;
-                isPushed = true;
+                String status = (String) table.getValueAt(row, 5);
+                boolean isPending = "Pending".equals(status);
 
-                // Check if already approved
-                if ("Active".equals(table.getValueAt(row, 5))) {
-                    button.setText("Approved");
-                    button.setEnabled(false);
-                } else {
-                    button.setText("Approve");
-                    button.setEnabled(true);
-                }
+                button.setText(isPending ? "Approve" : "Approved");
+                button.setEnabled(isPending);
+                button.setBackground(isPending ? MainWindow.activeColor : new Color(150, 150, 150));
+                button.setForeground(Color.WHITE);
 
+                isPushed = isPending;
                 return panel;
             }
 
             @Override
             public Object getCellEditorValue() {
-                button.getModel().setRollover(false);
                 isPushed = false;
                 return button.getText();
             }
 
             @Override
             public boolean stopCellEditing() {
-                button.getModel().setRollover(false);
                 isPushed = false;
                 return super.stopCellEditing();
             }

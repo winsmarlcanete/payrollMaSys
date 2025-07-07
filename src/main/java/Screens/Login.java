@@ -142,7 +142,10 @@ public class Login extends JFrame {
         emailField.setPreferredSize(new Dimension(350, 30));
         emailField.setMaximumSize(new Dimension(350, 30));
         emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        emailField.setBorder(BorderFactory.createEmptyBorder());
+        emailField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)  // left padding of 10 pixels
+        ));
         emailField.setBackground(Color.WHITE);
 
         emailPanel.add(emailField);
@@ -162,7 +165,10 @@ public class Login extends JFrame {
         passwordField.setMaximumSize(new Dimension(300, 30));
         passwordField.setEchoChar('•');
 //        passwordField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        passwordField.setBorder(BorderFactory.createEmptyBorder());
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)  // left padding of 10 pixels
+        ));
         passwordField.setBackground(Color.WHITE);
 
         // Eye button
